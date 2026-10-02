@@ -1,0 +1,71 @@
+import {createPublicClient,http,isAddress,keccak256,parseAbi,type Address} from 'viem';
+import {bsc} from 'viem/chains';
+import {BinanceReadClient} from '@mandate/connectors';
+import {assessReferenceCost,buildDirectSwap,PANCAKE_V3,pancakeFactoryAbi,pancakePoolAbi,pancakeQuoterAbi,pancakeRouterAbi,type DirectDirection} from './pancake-direct.ts';
+
+const tokenAbi=parseAbi([
+ 'function balanceOf(address) view returns (uint256)',
+ 'function allowance(address,address) view returns (uint256)',
+ 'function decimals() view returns (uint8)',
+]);
+const zero='0x0000000000000000000000000000000000000000';
+const cap=2n*10n**16n;
+
+// A wallet-specific read-only check. It never returns calldata or requests a wallet signature.
+export async function readDirectPreflight(ownerInput:string,direction:DirectDirection,sellAmountAtomic?:string){
+ if(!isAddress(ownerInput)||!['BUY','SELL'].includes(direction))throw new Error('INVALID_DIRECT_PREFLIGHT');
+ if(direction==='SELL'&&(!sellAmountAtomic||!/^[1-9]\d*$/.test(sellAmountAtomic)||BigInt(sellAmountAtomic)>cap))throw new Error('INVALID_DIRECT_SELL_AMOUNT');
+ const owner=ownerInput as Address,tokenIn=direction==='BUY'?PANCAKE_V3.usdt:PANCAKE_V3.spyOn,tokenOut=direction==='BUY'?PANCAKE_V3.spyOn:PANCAKE_V3.usdt;
+ const amountIn=direction==='BUY'?10n*10n**18n:BigInt(sellAmountAtomic!);
+ const client=createPublicClient({chain:bsc,transport:http(process.env.MANDATE_BSC_RPC_URL||'https://bsc-dataseed.bnbchain.org',{timeout:12000,retryCount:1})});
+ if(await client.getChainId()!==56)throw new Error('DIRECT_WRONG_CHAIN');
+ const block=await client.getBlock();
+ if(!block.hash||Date.now()-Number(block.timestamp)*1000>60000||Date.now()-Number(block.timestamp)*1000< -10000)throw new Error('DIRECT_STALE_CHAIN');
+ const blockNumber=block.number;
+ const pool=await client.readContract({address:PANCAKE_V3.factory,abi:pancakeFactoryAbi,functionName:'getPool',args:[PANCAKE_V3.usdt,PANCAKE_V3.spyOn,PANCAKE_V3.fee],blockNumber});
+ if(pool.toLowerCase()===zero)throw new Error('DIRECT_POOL_MISSING');
+ const [poolFactory,token0,token1,poolFee,liquidity,routerCode,poolCode,inputDecimals,outputDecimals,balance,allowance,nativeBalance]=await Promise.all([
+  client.readContract({address:pool,abi:pancakePoolAbi,functionName:'factory',blockNumber}),
+  client.readContract({address:pool,abi:pancakePoolAbi,functionName:'token0',blockNumber}),
+  client.readContract({address:pool,abi:pancakePoolAbi,functionName:'token1',blockNumber}),
+  client.readContract({address:pool,abi:pancakePoolAbi,functionName:'fee',blockNumber}),
+  client.readContract({address:pool,abi:pancakePoolAbi,functionName:'liquidity',blockNumber}),
+  client.getBytecode({address:PANCAKE_V3.router,blockNumber}),client.getBytecode({address:pool,blockNumber}),
+  client.readContract({address:tokenIn,abi:tokenAbi,functionName:'decimals',blockNumber}),
+  client.readContract({address:tokenOut,abi:tokenAbi,functionName:'decimals',blockNumber}),
+  client.readContract({address:tokenIn,abi:tokenAbi,functionName:'balanceOf',args:[owner],blockNumber}),
+  client.readContract({address:tokenIn,abi:tokenAbi,functionName:'allowance',args:[owner,PANCAKE_V3.router],blockNumber}),
+  client.getBalance({address:owner,blockNumber}),
+ ]);
+ const tokens=[token0.toLowerCase(),token1.toLowerCase()].sort(),expected=[PANCAKE_V3.usdt.toLowerCase(),PANCAKE_V3.spyOn.toLowerCase()].sort();
+ const poolChecked=Boolean(poolFactory.toLowerCase()===PANCAKE_V3.factory.toLowerCase()&&tokens[0]===expected[0]&&tokens[1]===expected[1]&&poolFee===PANCAKE_V3.fee&&liquidity>0n&&poolCode&&routerCode&&keccak256(routerCode)===PANCAKE_V3.routerCodeHash);
+ if(!poolChecked||inputDecimals!==18||outputDecimals!==18)throw new Error('DIRECT_POOL_IDENTITY_UNVERIFIED');
+ const quote=await client.simulateContract({address:PANCAKE_V3.quoter,abi:pancakeQuoterAbi,functionName:'quoteExactInputSingle',args:[{tokenIn,tokenOut,amountIn,fee:PANCAKE_V3.fee,sqrtPriceLimitX96:0n}],account:owner,blockNumber});
+ const quotedOut=quote.result[0];
+ const transaction=buildDirectSwap({direction,recipient:owner,amountIn,quotedOut,nowMs:Date.now()});
+ let reference={checked:false,reason:'REFERENCE_UNAVAILABLE' as string,deviationBps:null as string|null};
+ let referencePrice:string|null=null,referenceUpdatedAt:string|null=null;
+ if(process.env.BINANCE_WEB3_API_KEY&&process.env.BINANCE_WEB3_API_SECRET){
+  const price=await new BinanceReadClient(process.env.BINANCE_WEB3_API_KEY,process.env.BINANCE_WEB3_API_SECRET).get('/api/v1/dex/market/rwa/price',{binanceChainId:'56',tokenContractAddresses:PANCAKE_V3.spyOn});
+  const rows=(price.body as {data?:unknown}|null)?.data;
+  const row=Array.isArray(rows)?rows.find(x=>x&&typeof x==='object'&&String(x.tokenContractAddress).toLowerCase()===PANCAKE_V3.spyOn.toLowerCase()&&x.platformId==='ondo'&&String(x.binanceChainId)==='56'):null;
+  if(price.state==='AVAILABLE'&&row&&typeof row.tokenPrice==='string'&&Number.isSafeInteger(row.tokenPriceUpdatedAt)){
+   referencePrice=row.tokenPrice;referenceUpdatedAt=new Date(row.tokenPriceUpdatedAt).toISOString();
+   reference=assessReferenceCost(direction,amountIn,quotedOut,row.tokenPrice,row.tokenPriceUpdatedAt,Date.now());
+  }
+ }
+ let simulation:'NOT_RUN'|'PASSED'|'FAILED'='NOT_RUN',gasNeeded:bigint|null=null;
+ if(reference.checked&&balance>=amountIn&&allowance>=amountIn&&nativeBalance>0n){
+  try{
+   const args=[{tokenIn,tokenOut,fee:PANCAKE_V3.fee,recipient:owner,deadline:transaction.deadline,amountIn,amountOutMinimum:transaction.amountOutMinimum,sqrtPriceLimitX96:0n}] as const;
+   await client.simulateContract({address:PANCAKE_V3.router,abi:pancakeRouterAbi,functionName:'exactInputSingle',args,account:owner,blockNumber});
+   const [gas,gasPrice]=await Promise.all([client.estimateContractGas({address:PANCAKE_V3.router,abi:pancakeRouterAbi,functionName:'exactInputSingle',args,account:owner}),client.getGasPrice()]);
+   gasNeeded=gas*gasPrice*13n/10n;simulation='PASSED';
+  }catch{simulation='FAILED';}
+ }
+ return {state:'READ_ONLY_CHECK' as const,executionEnabled:false,checkedAt:new Date().toISOString(),blockNumber:blockNumber.toString(),blockHash:block.hash,direction,assetIn:tokenIn,assetOut:tokenOut,amountInAtomic:amountIn.toString(),quotedOutAtomic:quotedOut.toString(),minimumOutAtomic:transaction.amountOutMinimum.toString(),pool,router:PANCAKE_V3.router,selector:transaction.data.slice(0,10),
+  wallet:{balanceAtomic:balance.toString(),allowanceAtomic:allowance.toString(),bnbAtomic:nativeBalance.toString()},
+  gates:{poolIdentity:'CHECKED' as const,calldataMeaning:'CHECKED' as const,referenceCost:reference.checked?'CHECKED':'BLOCKED',funds:balance>=amountIn?'CHECKED':'BLOCKED',spendingPermission:allowance>=amountIn?'CHECKED':'BLOCKED',simulation,gas:gasNeeded===null?'UNKNOWN':nativeBalance>=gasNeeded?'CHECKED':'BLOCKED',authorization:'NOT_REQUESTED' as const,settlement:'NOT_RUN' as const},
+  reference:{price:referencePrice,updatedAt:referenceUpdatedAt,deviationBps:reference.deviationBps,reason:reference.reason,maximumAdverseBps:200},
+  gasBudgetAtomic:gasNeeded?.toString()??null,note:'Fresh wallet-specific research only. A new quote, simulation, user authorization, durable attempt and settlement proof are required before a trade.'};
+}

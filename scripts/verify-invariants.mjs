@@ -10,7 +10,7 @@ await mkdir(output,{recursive:true});
 const raw=join(output,'vitest.json'),report=join(output,'evidence.json');
 // All tests run. An unavailable PostgreSQL-server gate remains explicitly skipped.
 const result=await new Promise((resolveResult,reject)=>{
- const child=spawn(process.execPath,[join(root,'node_modules','vitest','vitest.mjs'),'run','--maxWorkers=2','--reporter=default','--reporter=json','--outputFile='+raw],{cwd:root,stdio:'inherit'});
+ const child=spawn(process.execPath,[join(root,'node_modules','vitest','vitest.mjs'),'run','--dir=tests','--maxWorkers=2','--reporter=default','--reporter=json','--outputFile='+raw],{cwd:root,stdio:'inherit'});
  child.once('error',reject);child.once('exit',code=>resolveResult(code??1));
 });
 const sources=[];

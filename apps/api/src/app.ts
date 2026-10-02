@@ -15,6 +15,7 @@ import {createWalletSessionService,WalletSessionError} from './wallet-session.ts
 import {BinanceReadClient,BSC_USDT,AAOIB,bindQuote,inspectBuild,costIdentityForAAOIBRoute,type RouteIntent} from '@mandate/connectors';
 import {readWalletReadiness} from './wallet-readiness.ts';
 import {reviewResearchExecution} from './execution-review.ts';
+import {readDirectPreflight} from './direct-preflight.ts';
 import {passportCatalogue} from './passports.ts';
 import {readRegime} from './regime.ts';
 import {latestObservedCost} from './observed-cost.ts';
@@ -22,7 +23,7 @@ import {passportPolicySchema,evaluatePassport} from '@mandate/domain';
 import {recurringScheduleInputSchema,recurringChangeSchema} from '@mandate/domain';
 class CapitalReadError extends Error{}
 class InflowReadError extends Error{}
-export function createApp(root=process.cwd(),options:{researchClient?:Pick<BinanceReadClient,'get'>;readinessReader?:typeof readWalletReadiness;capitalReader?:typeof readCapitalCheckpoint;marketReader?:typeof readPortfolioMarks;inflowReader?:typeof readInflowProof;ledger?:Ledger;recurringTickMs?:number|null}={}){
+export function createApp(root=process.cwd(),options:{researchClient?:Pick<BinanceReadClient,'get'>;readinessReader?:typeof readWalletReadiness;directReader?:(owner:string,direction:'BUY'|'SELL',sellAmountAtomic?:string)=>Promise<unknown>;capitalReader?:typeof readCapitalCheckpoint;marketReader?:typeof readPortfolioMarks;inflowReader?:typeof readInflowProof;ledger?:Ledger;recurringTickMs?:number|null}={}){
  const app=Fastify({logger:false,bodyLimit:16384});
  const wallet=createWalletSessionService();
  let ledgerPromise:Promise<Ledger>|undefined;
@@ -192,6 +193,14 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
    const executionReview=reviewResearchExecution({shapeChecked:inspection.identityAndShapeChecked,validUntil,checkedAt:new Date().toISOString(),wallet:walletCheck,costEvidence});
    return {instrument:'AAOIB',amount:'10',asset:'BSC USDT',state:inspection.identityAndShapeChecked?'SHAPE_CHECKED':'UNVERIFIED',observedAt:build.finishedAt,validUntil,mode:bound.mode,vendorName:bound.vendorName,toTokenAmount:bound.toTokenAmount,buildCode:build.code,inspection:{identityAndShapeChecked:inspection.identityAndShapeChecked,reasons:inspection.reasons},walletCheck,executionReview,costEvidence,executionEnabled:false,note:'Read-only research. Wallet funds, allowance and router code are observations only; eligibility, calldata meaning, gas sufficiency, simulation and transaction authorization remain unverified.'};
   }catch(error){if(error instanceof WalletSessionError)return reply.code(error.statusCode).send({error:error.code});throw error;}
+ });
+ const directPreflightBody=z.object({direction:z.enum(['BUY','SELL']),sellAmountAtomic:z.string().max(20).regex(/^[1-9]\d*$/).optional()}).strict().refine(x=>x.direction==='SELL'?x.sellAmountAtomic!==undefined&&BigInt(x.sellAmountAtomic)<=2n*10n**16n:x.sellAmountAtomic===undefined);
+ app.post('/v1/routes/SPYon/preflight',async(req,reply)=>{
+  const session=capitalSession(req.headers.cookie,req.headers.origin,true);
+  const parsed=directPreflightBody.safeParse(req.body);
+  if(!parsed.success)return reply.code(400).send({error:'INVALID_DIRECT_PREFLIGHT'});
+  try{return await (options.directReader??readDirectPreflight)(session.address,parsed.data.direction,parsed.data.sellAmountAtomic);}
+  catch{return reply.code(503).send({error:'DIRECT_PREFLIGHT_UNAVAILABLE',executionEnabled:false});}
  });
  app.post('/v1/plans/preview',async(req,reply)=>{
   const input=mandateSchema.safeParse(req.body);if(!input.success)return reply.code(400).send({error:'INVALID_MANDATE',issues:input.error.issues.map(i=>({path:i.path,message:i.message}))});

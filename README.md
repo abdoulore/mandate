@@ -40,3 +40,9 @@ The invariant suite runs without private credentials. A PostgreSQL-server test i
 - Wallet reads and unsigned route checks do not authorize a transaction. The 10 USDT AAOIB route has no matching historical collector-cost observation.
 - Reserves and pending holds are application bookkeeping, not on-chain locks. Allocation and cash-raising estimates use synthetic costs and nominal USDT parity.
 - No instrument or route is certified for live execution. No signer, approval, broadcast, or trade endpoint is provided.
+
+## Direct-route research in progress
+
+`npm run probe:roundtrip -- SPYon` checks fresh Binance buy and sell quote/build shapes. `npm run probe:pancake-direct` checks the corresponding Pancake V3 pool, its published router interface and a direct on-chain quote. Both commands are read-only and save sanitized, local-only reports under `data/capabilities/`.
+
+A connected wallet can request `POST /v1/routes/SPYon/preflight` with `{"direction":"BUY"}` or `{"direction":"SELL","sellAmountAtomic":"..."}`. The endpoint checks a fixed, capped SPYon/USDT pool route, wallet funds and allowance, a current reference-price limit, and simulation when possible. It returns **no calldata, approval request, signature request or trade authorization**. Quotes and checks must be repeated at execution time; live trading remains disabled while durable authorization and settlement are unfinished.
