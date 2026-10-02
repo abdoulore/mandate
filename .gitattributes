@@ -1,0 +1,2 @@
+# Recorded source hashes depend on these exact bytes and line endings.
+data/*.jsonl -text

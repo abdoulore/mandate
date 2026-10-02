@@ -1,0 +1,488 @@
+{"ts":"2026-09-21T13:28:53.614Z","tk":"MSTR","plat":"ondo","type":1,"open":true,"name":"Strategy Inc","err":40374}
+{"ts":"2026-09-21T13:28:54.652Z","tk":"CRCL","plat":"ondo","type":1,"open":true,"name":"Circle Internet Group, Inc.","pct":0.05602442059822188,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:28:55.687Z","tk":"SOXL","plat":"ondo","type":3,"open":true,"name":"Direxion Daily Semiconductor Bull 3X Shares","err":40374}
+{"ts":"2026-09-21T13:28:57.096Z","tk":"SBET","plat":"ondo","type":1,"open":true,"name":"SharpLink Gaming Ltd.","err":40374}
+{"ts":"2026-09-21T13:28:58.515Z","tk":"ARM","plat":"ondo","type":1,"open":true,"name":"Arm Holdings plc","err":40374}
+{"ts":"2026-09-21T13:28:59.550Z","tk":"HUT","plat":"ondo","type":1,"open":true,"name":"Hut 8 Corp.","pct":12786.366911341383,"impact":0.9914880713,"venues":1}
+{"ts":"2026-09-21T13:29:00.348Z","tk":"BMNR","plat":"ondo","type":1,"open":true,"name":"Bitmine Immersion Technologies, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:01.156Z","tk":"COIN","plat":"ondo","type":1,"open":true,"name":"Coinbase Global, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:01.961Z","tk":"USAR","plat":"ondo","type":1,"open":true,"name":"USA Rare Earth, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:02.757Z","tk":"DGXX","plat":"ondo","type":1,"open":true,"name":"Digi Power X Inc.","err":40367}
+{"ts":"2026-09-21T13:29:03.550Z","tk":"INTC","plat":"ondo","type":1,"open":true,"name":"Intel Corp","err":40367}
+{"ts":"2026-09-21T13:29:04.734Z","tk":"GLXY","plat":"ondo","type":1,"open":true,"name":"Galaxy Digital","err":40367}
+{"ts":"2026-09-21T13:29:05.542Z","tk":"AMD","plat":"ondo","type":1,"open":true,"name":"Advanced Micro Devices","err":40367}
+{"ts":"2026-09-21T13:29:06.337Z","tk":"LWLG","plat":"ondo","type":1,"open":true,"name":"Lightwave Logic, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:07.129Z","tk":"HIVE","plat":"ondo","type":1,"open":true,"name":"HIVE Digital Technologies Ltd.","err":40367}
+{"ts":"2026-09-21T13:29:07.927Z","tk":"MARA","plat":"ondo","type":1,"open":true,"name":"MARA Holdings, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:08.719Z","tk":"IBIT","plat":"ondo","type":3,"open":true,"name":"iShares Bitcoin Trust ETF","err":40367}
+{"ts":"2026-09-21T13:29:09.512Z","tk":"RIOT","plat":"ondo","type":1,"open":true,"name":"Riot Platforms, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:10.324Z","tk":"NVTS","plat":"ondo","type":1,"open":true,"name":"Navitas Semiconductor Corporation","err":40367}
+{"ts":"2026-09-21T13:29:11.138Z","tk":"FORM","plat":"ondo","type":1,"open":true,"name":"FormFactor, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:11.938Z","tk":"AXTI","plat":"ondo","type":1,"open":true,"name":"AXT, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:12.880Z","tk":"ETHA","plat":"ondo","type":3,"open":true,"name":"iShares Ethereum Trust ETF","err":40367}
+{"ts":"2026-09-21T13:29:13.862Z","tk":"HOOD","plat":"ondo","type":1,"open":true,"name":"Robinhood Markets, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:14.719Z","tk":"MRNA","plat":"ondo","type":1,"open":true,"name":"Moderna, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:15.605Z","tk":"MRVL","plat":"ondo","type":1,"open":true,"name":"Marvell Technology, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:16.472Z","tk":"ACMR","plat":"ondo","type":1,"open":true,"name":"ACM Research, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:17.291Z","tk":"BTDR","plat":"ondo","type":1,"open":true,"name":"Bitdeer Technologies Group","err":40367}
+{"ts":"2026-09-21T13:29:18.263Z","tk":"CIEN","plat":"ondo","type":1,"open":true,"name":"Ciena Corporation","err":40367}
+{"ts":"2026-09-21T13:29:19.218Z","tk":"TTMI","plat":"ondo","type":1,"open":true,"name":"TTM Technologies, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:20.114Z","tk":"ICHR","plat":"ondo","type":1,"open":true,"name":"Ichor Holdings, Ltd.","err":40367}
+{"ts":"2026-09-21T13:29:20.951Z","tk":"KEEL","plat":"ondo","type":1,"open":true,"name":"Keel Infrastructure Corp.","err":40367}
+{"ts":"2026-09-21T13:29:21.785Z","tk":"SMCI","plat":"ondo","type":1,"open":true,"name":"Super Micro Computer, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:22.717Z","tk":"ACLS","plat":"ondo","type":1,"open":true,"name":"Axcelis Technologies, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:23.553Z","tk":"RGTI","plat":"ondo","type":1,"open":true,"name":"Rigetti Computing, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:24.418Z","tk":"WOLF","plat":"ondo","type":1,"open":true,"name":"Wolfspeed, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:25.352Z","tk":"FSOL","plat":"ondo","type":3,"open":true,"name":"Fidelity Solana Fund","err":40367}
+{"ts":"2026-09-21T13:29:26.331Z","tk":"MU","plat":"ondo","type":1,"open":true,"name":"Micron Technology, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:27.180Z","tk":"DRAM","plat":"ondo","type":3,"open":true,"name":"Roundhill Memory ETF","err":40367}
+{"ts":"2026-09-21T13:29:27.986Z","tk":"TQQQ","plat":"ondo","type":3,"open":true,"name":"ProShares UltraPro QQQ","err":40367}
+{"ts":"2026-09-21T13:29:28.966Z","tk":"UUUU","plat":"ondo","type":1,"open":true,"name":"Energy Fuels Inc.","err":40367}
+{"ts":"2026-09-21T13:29:29.831Z","tk":"STX","plat":"ondo","type":1,"open":true,"name":"Seagate","err":40367}
+{"ts":"2026-09-21T13:29:30.842Z","tk":"SNDK","plat":"ondo","type":1,"open":true,"name":"SanDisk","err":40367}
+{"ts":"2026-09-21T13:29:31.750Z","tk":"MXL","plat":"ondo","type":1,"open":true,"name":"MaxLinear, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:32.560Z","tk":"OUST","plat":"ondo","type":1,"open":true,"name":"Ouster, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:33.392Z","tk":"AEHR","plat":"ondo","type":1,"open":true,"name":"Aehr Test Systems, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:34.231Z","tk":"GLW","plat":"ondo","type":1,"open":true,"name":"Corning Incorporated","err":40367}
+{"ts":"2026-09-21T13:29:35.110Z","tk":"IONQ","plat":"ondo","type":1,"open":true,"name":"IonQ","err":40367}
+{"ts":"2026-09-21T13:29:36.030Z","tk":"AMKR","plat":"ondo","type":1,"open":true,"name":"Amkor Technology, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:36.827Z","tk":"BKCH","plat":"ondo","type":3,"open":true,"name":"Global X Blockchain ETF","err":40367}
+{"ts":"2026-09-21T13:29:37.672Z","tk":"NNE","plat":"ondo","type":1,"open":true,"name":"NANO Nuclear Energy Inc.","err":40367}
+{"ts":"2026-09-21T13:29:38.471Z","tk":"MKSI","plat":"ondo","type":1,"open":true,"name":"MKS Inc.","err":40367}
+{"ts":"2026-09-21T13:29:39.272Z","tk":"FN","plat":"ondo","type":1,"open":true,"name":"Fabrinet","err":40367}
+{"ts":"2026-09-21T13:29:40.149Z","tk":"WDC","plat":"ondo","type":1,"open":true,"name":"Western Digital","err":40367}
+{"ts":"2026-09-21T13:29:41.154Z","tk":"COHR","plat":"ondo","type":1,"open":true,"name":"Coherent Corp.","err":40367}
+{"ts":"2026-09-21T13:29:42.337Z","tk":"VICR","plat":"ondo","type":1,"open":true,"name":"Vicor Corporation","err":40367}
+{"ts":"2026-09-21T13:29:43.138Z","tk":"POWL","plat":"ondo","type":1,"open":true,"name":"Powell Industries, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:43.992Z","tk":"CAMT","plat":"ondo","type":1,"open":true,"name":"Camtek Ltd.","err":40367}
+{"ts":"2026-09-21T13:29:44.869Z","tk":"TER","plat":"ondo","type":1,"open":true,"name":"Teradyne, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:45.910Z","tk":"LITE","plat":"ondo","type":1,"open":true,"name":"Lumentum Holdings Inc.","err":40367}
+{"ts":"2026-09-21T13:29:46.749Z","tk":"WYFI","plat":"ondo","type":1,"open":true,"name":"WhiteFiber, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:47.590Z","tk":"EWY","plat":"ondo","type":3,"open":true,"name":"iShares MSCI South Korea ETF","err":40367}
+{"ts":"2026-09-21T13:29:48.389Z","tk":"HSAI","plat":"ondo","type":1,"open":true,"name":"Hesai Group","err":40367}
+{"ts":"2026-09-21T13:29:49.189Z","tk":"RMBS","plat":"ondo","type":1,"open":true,"name":"Rambus Inc.","err":40367}
+{"ts":"2026-09-21T13:29:49.983Z","tk":"SOFI","plat":"ondo","type":1,"open":true,"name":"SoFi Technologies Inc","err":40367}
+{"ts":"2026-09-21T13:29:50.773Z","tk":"ONTO","plat":"ondo","type":1,"open":true,"name":"Onto Innovation Inc.","err":40367}
+{"ts":"2026-09-21T13:29:51.591Z","tk":"LIT","plat":"ondo","type":3,"open":true,"name":"Global X Lithium & Battery Tech ETF","err":40367}
+{"ts":"2026-09-21T13:29:52.390Z","tk":"UEC","plat":"ondo","type":1,"open":true,"name":"Uranium Energy","err":40367}
+{"ts":"2026-09-21T13:29:53.180Z","tk":"UCTT","plat":"ondo","type":1,"open":true,"name":"Ultra Clean Holdings, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:54.009Z","tk":"VPG","plat":"ondo","type":1,"open":true,"name":"Vishay Precision Group, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:54.801Z","tk":"AMAT","plat":"ondo","type":1,"open":true,"name":"Applied Materials, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:55.593Z","tk":"HPE","plat":"ondo","type":1,"open":true,"name":"Hewlett Packard Enterprise Company","err":40367}
+{"ts":"2026-09-21T13:29:56.389Z","tk":"KEYS","plat":"ondo","type":1,"open":true,"name":"Keysight Technologies, Inc.","err":40367}
+{"ts":"2026-09-21T13:29:57.731Z","tk":"NOK","plat":"ondo","type":1,"open":true,"name":"Nokia Oyj","err":40367}
+{"ts":"2026-09-21T13:29:58.537Z","tk":"URA","plat":"ondo","type":3,"open":true,"name":"Global X Uranium ETF","err":40367}
+{"ts":"2026-09-21T13:29:59.536Z","tk":"IREN","plat":"ondo","type":1,"open":true,"name":"Iris Energy Limited","err":40367}
+{"ts":"2026-09-21T13:30:00.390Z","tk":"BTGO","plat":"ondo","type":1,"open":true,"name":"BitGo","err":40367}
+{"ts":"2026-09-21T13:30:01.377Z","tk":"QBTS","plat":"ondo","type":1,"open":true,"name":"D-Wave Quantum Inc.","err":40367}
+{"ts":"2026-09-21T13:30:02.264Z","tk":"VSH","plat":"ondo","type":1,"open":true,"name":"Vishay Intertechnology, Inc.","err":40367}
+{"ts":"2026-09-21T13:30:03.057Z","tk":"NVMI","plat":"ondo","type":1,"open":true,"name":"Nova Ltd.","err":40367}
+{"ts":"2026-09-21T13:30:04.037Z","tk":"AAOI","plat":"ondo","type":1,"open":true,"name":"Applied Optoelectronics, Inc.","err":40367}
+{"ts":"2026-09-21T13:30:04.842Z","tk":"PLUG","plat":"ondo","type":1,"open":true,"name":"Plug Power Inc.","err":40367}
+{"ts":"2026-09-21T13:30:05.627Z","tk":"OKLO","plat":"ondo","type":1,"open":true,"name":"Oklo Inc.","err":40367}
+{"ts":"2026-09-21T13:30:06.419Z","tk":"CRDO","plat":"ondo","type":1,"open":true,"name":"Credo Technology Group Holding Ltd","err":40367}
+{"ts":"2026-09-21T13:30:07.218Z","tk":"CLS","plat":"ondo","type":1,"open":true,"name":"Celestica Inc.","err":40367}
+{"ts":"2026-09-21T13:30:08.239Z","tk":"CAT","plat":"ondo","type":1,"open":true,"name":"Caterpillar Inc.","err":40367}
+{"ts":"2026-09-21T13:30:09.037Z","tk":"FCX","plat":"ondo","type":1,"open":true,"name":"Freeport-McMoRan Inc.","err":40367}
+{"ts":"2026-09-21T13:30:09.848Z","tk":"ALB","plat":"ondo","type":1,"open":true,"name":"Albemarle Corporation","err":40367}
+{"ts":"2026-09-21T13:30:10.647Z","tk":"SOUN","plat":"ondo","type":1,"open":true,"name":"SoundHound AI, Inc Class A","err":40367}
+{"ts":"2026-09-21T13:30:11.824Z","tk":"INOD","plat":"ondo","type":1,"open":true,"name":"Innodata Inc.","err":40367}
+{"ts":"2026-09-21T13:30:12.620Z","tk":"QTUM","plat":"ondo","type":3,"open":true,"name":"Defiance Quantum ETF","err":40367}
+{"ts":"2026-09-21T13:30:13.438Z","tk":"ALAB","plat":"ondo","type":1,"open":true,"name":"Astera Labs, Inc.","err":40367}
+{"ts":"2026-09-21T13:30:14.255Z","tk":"UAMY","plat":"ondo","type":1,"open":true,"name":"United States Antimony Corporation","err":40367}
+{"ts":"2026-09-21T13:30:15.059Z","tk":"SOXX","plat":"ondo","type":3,"open":true,"name":"iShares Semiconductor ETF","err":40367}
+{"ts":"2026-09-21T13:30:15.848Z","tk":"FUTU","plat":"ondo","type":1,"open":true,"name":"Futu Holdings Limited","err":40367}
+{"ts":"2026-09-21T13:30:16.650Z","tk":"MTSI","plat":"ondo","type":1,"open":true,"name":"MACOM Technology Solutions Holdings, Inc.","err":40367}
+{"ts":"2026-09-21T13:30:17.439Z","tk":"VCX","plat":"ondo","type":1,"open":true,"name":"Fundrise Growth Tech Fund, LLC","err":40367}
+{"ts":"2026-09-21T13:30:18.242Z","tk":"FLEX","plat":"ondo","type":1,"open":true,"name":"Flex Ltd.","err":40367}
+{"ts":"2026-09-21T13:30:19.043Z","tk":"BAI","plat":"ondo","type":3,"open":true,"name":"iShares A.I. Innovation and Tech Active ETF","err":40367}
+{"ts":"2026-09-21T13:30:19.862Z","tk":"NVT","plat":"ondo","type":1,"open":true,"name":"nVent Electric plc","err":40367}
+{"ts":"2026-09-21T13:30:20.667Z","tk":"DELL","plat":"ondo","type":1,"open":true,"name":"Dell Technologies Inc.","err":40367}
+{"ts":"2026-09-21T13:30:21.461Z","tk":"STM","plat":"ondo","type":1,"open":true,"name":"STMicroelectronics N.V.","err":40367}
+{"ts":"2026-09-21T13:30:22.255Z","tk":"GFS","plat":"ondo","type":1,"open":true,"name":"GLOBALFOUNDRIES Inc.","err":40367}
+{"ts":"2026-09-21T13:30:23.053Z","tk":"SMR","plat":"ondo","type":1,"open":true,"name":"NuScale Power Corporation","err":40367}
+{"ts":"2026-09-21T13:30:23.867Z","tk":"APLD","plat":"ondo","type":1,"open":true,"name":"Applied Digital Corporation","err":40367}
+{"ts":"2026-09-21T13:30:24.663Z","tk":"JBL","plat":"ondo","type":1,"open":true,"name":"Jabil Inc.","err":40367}
+{"ts":"2026-09-21T13:30:25.447Z","tk":"AAL","plat":"ondo","type":1,"open":true,"name":"American Airlines Group, Inc.","err":40367}
+{"ts":"2026-09-21T13:30:26.249Z","tk":"TSLA","plat":"ondo","type":1,"open":true,"name":"Tesla, Inc.","err":40367}
+{"ts":"2026-09-21T13:30:27.065Z","tk":"ACHR","plat":"ondo","type":1,"open":true,"name":"Archer Aviation, Inc.","err":40367}
+{"ts":"2026-09-21T13:30:27.883Z","tk":"IEMG","plat":"ondo","type":3,"open":true,"name":"iShares Core MSCI Emerging Markets ETF","err":40367}
+{"ts":"2026-09-21T13:30:28.692Z","tk":"ORCL","plat":"ondo","type":1,"open":true,"name":"Oracle Corp","err":40367}
+{"ts":"2026-09-21T13:30:29.493Z","tk":"TSEM","plat":"ondo","type":1,"open":true,"name":"Tower Semiconductor Ltd.","err":40367}
+{"ts":"2026-09-21T13:30:30.292Z","tk":"GEV","plat":"ondo","type":1,"open":true,"name":"GE Vernova Inc.","err":40367}
+{"ts":"2026-09-21T13:30:31.091Z","tk":"PL","plat":"ondo","type":1,"open":true,"name":"Planet Labs PBC","err":40367}
+{"ts":"2026-09-21T13:30:31.899Z","tk":"HII","plat":"ondo","type":1,"open":true,"name":"Huntington Ingalls Industries, Inc.","err":40367}
+{"ts":"2026-09-21T13:30:32.700Z","tk":"VRT","plat":"ondo","type":1,"open":true,"name":"Vertiv Holdings Co.","err":40367}
+{"ts":"2026-09-21T13:30:33.503Z","tk":"FLNC","plat":"ondo","type":1,"open":true,"name":"Fluence Energy, Inc.","err":40367}
+{"ts":"2026-09-21T13:30:34.304Z","tk":"URNM","plat":"ondo","type":3,"open":true,"name":"Sprott Uranium Miners ETF","err":40367}
+{"ts":"2026-09-21T13:30:35.088Z","tk":"SOXQ","plat":"ondo","type":3,"open":true,"name":"Invesco PHLX Semiconductor ETF","err":40367}
+{"ts":"2026-09-21T13:30:35.911Z","tk":"TSM","plat":"ondo","type":1,"open":true,"name":"Taiwan Semiconductor Manufacturing Co Ltd.","err":40367}
+{"ts":"2026-09-21T13:30:36.708Z","tk":"LSCC","plat":"ondo","type":1,"open":true,"name":"Lattice Semiconductor Corporation","err":40367}
+{"ts":"2026-09-21T13:30:37.514Z","tk":"INDA","plat":"ondo","type":3,"open":true,"name":"iShares MSCI India ETF","err":40367}
+{"ts":"2026-09-21T13:30:38.315Z","tk":"SYM","plat":"ondo","type":1,"open":true,"name":"Symbotic Inc.","err":40367}
+{"ts":"2026-09-21T13:30:39.143Z","tk":"FPS","plat":"ondo","type":1,"open":true,"name":"Forgent Power Solutions, Inc.","err":40367}
+{"ts":"2026-09-21T13:30:39.951Z","tk":"CLF","plat":"ondo","type":1,"open":true,"name":"Cleveland-Cliffs Inc.","err":40367}
+{"ts":"2026-09-21T13:30:40.834Z","tk":"LASR","plat":"ondo","type":1,"open":true,"name":"nLIGHT, Inc.","err":40367}
+{"ts":"2026-09-21T13:30:41.622Z","tk":"PPLT","plat":"ondo","type":3,"open":true,"name":"abrdn Physical Platinum Shares ETF","err":40367}
+{"ts":"2026-09-21T13:30:42.418Z","tk":"EEM","plat":"ondo","type":3,"open":true,"name":"iShares MSCI Emerging Markets ETF","err":40367}
+{"ts":"2026-09-21T13:30:43.217Z","tk":"PWR","plat":"ondo","type":1,"open":true,"name":"Quanta Services, Inc.","err":40367}
+{"ts":"2026-09-21T13:30:44.022Z","tk":"ANET","plat":"ondo","type":1,"open":true,"name":"Arista Networks, Inc.","err":40367}
+{"ts":"2026-09-21T13:30:44.830Z","tk":"COPX","plat":"ondo","type":3,"open":true,"name":"Global X Copper Miners ETF","err":40367}
+{"ts":"2026-09-21T13:30:45.634Z","tk":"NBIS","plat":"ondo","type":1,"open":true,"name":"Nebius Group","err":40367}
+{"ts":"2026-09-21T13:30:46.438Z","tk":"BIDU","plat":"ondo","type":1,"open":true,"name":"Baidu, Inc.","err":40367}
+{"ts":"2026-09-21T13:30:47.232Z","tk":"SCCO","plat":"ondo","type":1,"open":true,"name":"Southern Copper","err":40367}
+{"ts":"2026-09-21T13:30:48.037Z","tk":"ONDS","plat":"ondo","type":1,"open":true,"name":"Ondas Holdings Inc.","err":40367}
+{"ts":"2026-09-21T13:30:48.834Z","tk":"BLCR","plat":"ondo","type":3,"open":true,"name":"iShares Large Cap Core Active ETF","err":40367}
+{"ts":"2026-09-21T13:30:49.649Z","tk":"CPER","plat":"ondo","type":3,"open":true,"name":"United States Copper Index Fund, LP","err":40367}
+{"ts":"2026-09-21T13:30:50.448Z","tk":"BBAI","plat":"ondo","type":1,"open":true,"name":"BigBear.ai Holdings, Inc.","err":40367}
+{"ts":"2026-09-21T13:30:51.241Z","tk":"BE","plat":"ondo","type":1,"open":true,"name":"Bloom Energy Corporation","err":40367}
+{"ts":"2026-09-21T13:30:52.041Z","tk":"UMC","plat":"ondo","type":1,"open":true,"name":"United Microelectronics Corporation","err":40367}
+{"ts":"2026-09-21T13:30:52.839Z","tk":"RKLB","plat":"ondo","type":1,"open":true,"name":"Rocket Lab","err":40367}
+{"ts":"2026-09-21T13:30:53.676Z","tk":"MP","plat":"ondo","type":1,"open":true,"name":"MP Materials Corp.","err":40367}
+{"ts":"2026-09-21T13:30:54.478Z","tk":"ASML","plat":"ondo","type":1,"open":true,"name":"ASML Holding NV","err":40367}
+{"ts":"2026-09-21T13:30:55.292Z","tk":"NET","plat":"ondo","type":1,"open":true,"name":"Cloudflare, Inc.","err":40367}
+{"ts":"2026-09-21T13:30:56.236Z","tk":"ASTS","plat":"ondo","type":1,"open":true,"name":"AST SpaceMobile, Inc.","err":40367}
+{"ts":"2026-09-21T13:30:57.358Z","tk":"META","plat":"ondo","type":1,"open":true,"name":"Meta Platforms, Inc.","err":40367}
+{"ts":"2026-09-21T13:30:58.791Z","tk":"BOTZ","plat":"ondo","type":3,"open":true,"name":"Global X Robotics & Artificial Intelligence ETF","err":40367}
+{"ts":"2026-09-21T13:30:59.605Z","tk":"AAON","plat":"ondo","type":1,"open":true,"name":"AAON, Inc.","err":40367}
+{"ts":"2026-09-21T13:31:00.636Z","tk":"LRCX","plat":"ondo","type":1,"open":true,"name":"Lam Research Corporation","err":40374}
+{"ts":"2026-09-21T13:31:01.911Z","tk":"SKHY","plat":"ondo","type":1,"open":true,"name":"SK Hynix","pct":-0.22977266475489033,"impact":0.0001951793,"venues":3}
+{"ts":"2026-09-21T13:31:03.076Z","tk":"TXN","plat":"ondo","type":1,"open":true,"name":"Texas Instruments Incorporated","pct":28975.94775972749,"impact":0.97567666,"venues":1}
+{"ts":"2026-09-21T13:31:04.092Z","tk":"GNRC","plat":"ondo","type":1,"open":true,"name":"Generac Holdings Inc.","err":40374}
+{"ts":"2026-09-21T13:31:05.132Z","tk":"AMZN","plat":"ondo","type":1,"open":true,"name":"Amazon.Com Inc","pct":299.4746854901014,"impact":0.752002629,"venues":10}
+{"ts":"2026-09-21T13:31:06.158Z","tk":"BABA","plat":"ondo","type":1,"open":true,"name":"Alibaba Group Holding Limited","pct":3720.5422067530626,"impact":0.9749619347,"venues":1}
+{"ts":"2026-09-21T13:31:07.188Z","tk":"GS","plat":"ondo","type":1,"open":true,"name":"Goldman Sachs Group Inc.","err":40374}
+{"ts":"2026-09-21T13:31:08.208Z","tk":"KLAC","plat":"ondo","type":1,"open":true,"name":"KLA Corporation","err":40374}
+{"ts":"2026-09-21T13:31:09.223Z","tk":"HIMS","plat":"ondo","type":1,"open":true,"name":"Hims & Hers Health, Inc.","err":40374}
+{"ts":"2026-09-21T13:31:10.249Z","tk":"ETN","plat":"ondo","type":1,"open":true,"name":"Eaton Corporation plc","err":40374}
+{"ts":"2026-09-21T13:31:11.276Z","tk":"SWKS","plat":"ondo","type":1,"open":true,"name":"Skyworks Solutions, Inc.","err":40374}
+{"ts":"2026-09-21T13:31:12.463Z","tk":"EFV","plat":"ondo","type":3,"open":true,"name":"iShares MSCI EAFE Value ETF","err":40374}
+{"ts":"2026-09-21T13:31:13.548Z","tk":"TT","plat":"ondo","type":1,"open":true,"name":"Trane Technologies plc","pct":0.14335440405459643,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:14.594Z","tk":"GLTR","plat":"ondo","type":3,"open":true,"name":"abrdn Physical Precious Metals Basket Shares ETF","pct":0.12937283904963515,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:15.622Z","tk":"QCOM","plat":"ondo","type":1,"open":true,"name":"Qualcomm Inc","pct":0.1100573020994089,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:16.855Z","tk":"QQQ","plat":"ondo","type":3,"open":true,"name":"Invesco QQQ Trust","pct":-0.0197373056731176,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:18.027Z","tk":"PDD","plat":"ondo","type":1,"open":true,"name":"PDD Holdings Inc.","pct":0.054786965567266144,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:19.073Z","tk":"GME","plat":"ondo","type":1,"open":true,"name":"GameStop Corp.","pct":-0.23641636321540815,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:20.183Z","tk":"SNOW","plat":"ondo","type":1,"open":true,"name":"Snowflake Inc.","pct":0.6182978298189923,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:21.225Z","tk":"FXI","plat":"ondo","type":3,"open":true,"name":"iShares China Large-Cap ETF","pct":0.44535255235502724,"impact":0.0025695661,"venues":3}
+{"ts":"2026-09-21T13:31:22.389Z","tk":"NVDA","plat":"ondo","type":1,"open":true,"name":"Nvidia Corp","pct":0.028851200032775637,"impact":0.0000089785,"venues":4}
+{"ts":"2026-09-21T13:31:23.430Z","tk":"RIVN","plat":"ondo","type":1,"open":true,"name":"Rivian Automotive, Inc. Class A","pct":0.04789490704579791,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:24.447Z","tk":"JPM","plat":"ondo","type":1,"open":true,"name":"JPMorgan Chase & Co.","pct":0.1842498897355771,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:25.527Z","tk":"PALL","plat":"ondo","type":3,"open":true,"name":"abrdn Physical Palladium Shares ETF","pct":0.06906849830168316,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:26.815Z","tk":"ECH","plat":"ondo","type":3,"open":true,"name":"iShares MSCI Chile ETF","pct":0.5969892500925722,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:28.019Z","tk":"PINS","plat":"ondo","type":1,"open":true,"name":"Pinterest, Inc.","pct":0.050298701131290535,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:29.302Z","tk":"CCJ","plat":"ondo","type":1,"open":true,"name":"Cameco Corporation","pct":0.3094060678830335,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:30.408Z","tk":"CVNA","plat":"ondo","type":1,"open":true,"name":"Carvana Co.","pct":0.14676150077657102,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:32.467Z","tk":"BILI","plat":"ondo","type":1,"open":true,"name":"Bilibili Inc.","pct":8.845940232255467,"impact":0.076049568,"venues":5}
+{"ts":"2026-09-21T13:31:33.492Z","tk":"CBRS","plat":"ondo","type":1,"open":true,"name":"Cerebras Systems Inc.","pct":0.8949531762220797,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:34.618Z","tk":"ROK","plat":"ondo","type":1,"open":true,"name":"Rockwell Automation, Inc.","pct":0.047504683647492385,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:35.847Z","tk":"REGN","plat":"ondo","type":1,"open":true,"name":"Regeneron Pharmaceuticals","pct":0.0038014979344636046,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:37.036Z","tk":"PAVE","plat":"ondo","type":3,"open":true,"name":"Global X US Infrastructure Development ETF","pct":0.020417570110731198,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:38.318Z","tk":"SPCX","plat":"ondo","type":1,"open":true,"name":"SpaceX","pct":50.31410919693926,"impact":0.3207519835,"venues":13}
+{"ts":"2026-09-21T13:31:39.590Z","tk":"F","plat":"ondo","type":1,"open":true,"name":"Ford Motor Company","pct":0.03875354054778679,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:40.608Z","tk":"ENTG","plat":"ondo","type":1,"open":true,"name":"Entegris, Inc.","pct":0.6032481489198993,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:41.642Z","tk":"BRLN","plat":"ondo","type":3,"open":true,"name":"iShares Floating Rate Loan Active ETF","pct":0.3092258222456401,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:42.684Z","tk":"CIBR","plat":"ondo","type":3,"open":true,"name":"First Trust NASDAQ Cybersecurity ETF","pct":0.1978923032424973,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:43.788Z","tk":"ADI","plat":"ondo","type":1,"open":true,"name":"Analog Devices, Inc.","pct":0.21053201822289758,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:44.830Z","tk":"DE","plat":"ondo","type":1,"open":true,"name":"Deere & Company","pct":0.14025413302545253,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:46.068Z","tk":"DYNF","plat":"ondo","type":3,"open":true,"name":"iShares U.S. Equity Factor Rotation Active ETF","pct":-0.04610376768789948,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:47.108Z","tk":"CORO","plat":"ondo","type":3,"open":true,"name":"iShares International Country Rotation Active ETF","pct":0.015046508354554788,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:48.549Z","tk":"AXP","plat":"ondo","type":1,"open":true,"name":"American Express Company","pct":0.00754980921608972,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:49.583Z","tk":"NEM","plat":"ondo","type":1,"open":true,"name":"Newmont","pct":0.25187444453276253,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:50.818Z","tk":"TM","plat":"ondo","type":1,"open":true,"name":"Toyota Motor Corporation","pct":0.11253361004164297,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:51.852Z","tk":"APH","plat":"ondo","type":1,"open":true,"name":"Amphenol Corporation","pct":0.16082660302019214,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:53.112Z","tk":"BA","plat":"ondo","type":1,"open":true,"name":"Boeing Company","pct":0.15670173755715222,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:54.310Z","tk":"BLK","plat":"ondo","type":1,"open":true,"name":"Blackrock, Inc.","pct":0.18307644084230024,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:55.624Z","tk":"IWN","plat":"ondo","type":3,"open":true,"name":"iShares Russell 2000 Value ETF","pct":0.03165311995259046,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:56.660Z","tk":"EWZ","plat":"ondo","type":3,"open":true,"name":"iShares MSCI Brazil ETF","pct":-0.03190665109730206,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:57.695Z","tk":"IWM","plat":"ondo","type":3,"open":true,"name":"iShares Russell 2000 ETF","pct":-0.012394339685073419,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:31:58.735Z","tk":"MRK","plat":"ondo","type":1,"open":true,"name":"Merck & Co., Inc.","pct":0.04103138668176687,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:00.229Z","tk":"IWF","plat":"ondo","type":3,"open":true,"name":"iShares Russell 1000 Growth ETF","pct":-0.0005392739155007931,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:01.805Z","tk":"ENPH","plat":"ondo","type":1,"open":true,"name":"Enphase Energy, Inc.","pct":0.22453426475177451,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:02.990Z","tk":"EQIX","plat":"ondo","type":1,"open":true,"name":"Equinix, Inc.","pct":0.358208270398519,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:04.178Z","tk":"EFA","plat":"ondo","type":3,"open":true,"name":"iShares MSCI EAFE ETF","pct":-0.028659669410247002,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:05.209Z","tk":"NOC","plat":"ondo","type":1,"open":true,"name":"Northrop Grumman","pct":0.046425729061883025,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:06.309Z","tk":"GE","plat":"ondo","type":1,"open":true,"name":"GE Aerospace","pct":0.07037784555172788,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:07.470Z","tk":"VST","plat":"ondo","type":1,"open":true,"name":"Vistra Corp.","pct":0.17544258806920787,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:08.709Z","tk":"AVGO","plat":"ondo","type":1,"open":true,"name":"Broadcom Inc.","pct":-0.022765743495822832,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:09.990Z","tk":"T","plat":"ondo","type":1,"open":true,"name":"AT&T Inc.","pct":0.3607497762214029,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:11.670Z","tk":"PLTR","plat":"ondo","type":1,"open":true,"name":"Palantir Technologies Inc.","pct":0.05177493481292039,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:12.877Z","tk":"TEL","plat":"ondo","type":1,"open":true,"name":"TE Connectivity plc","pct":0.15155752962074942,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:14.152Z","tk":"IEFA","plat":"ondo","type":3,"open":true,"name":"iShares Core MSCI EAFE ETF","pct":-0.020729884302750357,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:15.437Z","tk":"FIG","plat":"ondo","type":1,"open":true,"name":"Figma, Inc.","pct":0.15509051462248014,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:16.654Z","tk":"TIP","plat":"ondo","type":3,"open":true,"name":"iShares TIPS Bond ETF","pct":-0.025624662224243977,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:17.690Z","tk":"IJH","plat":"ondo","type":3,"open":true,"name":"iShares Core S&P Mid-Cap ETF","pct":-0.08221677674894456,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:18.836Z","tk":"WFC","plat":"ondo","type":1,"open":true,"name":"Wells Fargo & Co.","pct":0.14241809556136964,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:20.022Z","tk":"CPNG","plat":"ondo","type":1,"open":true,"name":"Coupang, Inc.","pct":0.05841952275074114,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:21.053Z","tk":"IYW","plat":"ondo","type":3,"open":true,"name":"iShares U.S. Technology ETF","pct":0.03030526430087832,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:22.249Z","tk":"C","plat":"ondo","type":1,"open":true,"name":"Citigroup Inc.","pct":0.07300208676932485,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:23.290Z","tk":"SPGI","plat":"ondo","type":1,"open":true,"name":"S&P Global Inc.","pct":0.07533186054826668,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:24.322Z","tk":"IJS","plat":"ondo","type":3,"open":true,"name":"iShares S&P Small-Cap 600 Value ETF","pct":-0.01767085390722567,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:25.463Z","tk":"EWJ","plat":"ondo","type":3,"open":true,"name":"iShares MSCI Japan ETF","pct":-0.018110630131329408,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:26.542Z","tk":"RDDT","plat":"ondo","type":1,"open":true,"name":"Reddit, Inc.","pct":0.07585555818421241,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:27.576Z","tk":"VTV","plat":"ondo","type":3,"open":true,"name":"Vanguard Value ETF","pct":-0.02619599617890156,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:28.868Z","tk":"KWEB","plat":"ondo","type":3,"open":true,"name":"KraneShares CSI China Internet ETF","pct":-0.003859154849783497,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:30.166Z","tk":"FCEL","plat":"ondo","type":1,"open":true,"name":"FuelCell Energy, Inc.","pct":0.3229847672361785,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:31.378Z","tk":"BAC","plat":"ondo","type":1,"open":true,"name":"Bank of America Corporation","pct":-0.013444939479789753,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:32.549Z","tk":"CMG","plat":"ondo","type":1,"open":true,"name":"Chipotle Mexican Grill, Inc.","pct":0.16272455874146718,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:33.696Z","tk":"TLT","plat":"ondo","type":3,"open":true,"name":"iShares 20+ Year Treasury Bond ETF","pct":-0.04844096922066443,"impact":0.0000599001,"venues":2}
+{"ts":"2026-09-21T13:32:34.958Z","tk":"BINC","plat":"ondo","type":3,"open":true,"name":"BlackRock Flexible Income ETF","pct":-0.0031456900985493697,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:36.024Z","tk":"ITOT","plat":"ondo","type":3,"open":true,"name":"iShares Core S&P Total U.S. Stock Market ETF","pct":-0.01112586068447996,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:37.060Z","tk":"V","plat":"ondo","type":1,"open":true,"name":"VISA Inc.","pct":0.014404852395855094,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:38.149Z","tk":"ITA","plat":"ondo","type":3,"open":true,"name":"iShares US Aerospace and Defense ETF","pct":0.059029853083969464,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:39.406Z","tk":"WLK","plat":"ondo","type":1,"open":true,"name":"Westlake Corporation","pct":0.7604966424987758,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:40.494Z","tk":"VTI","plat":"ondo","type":3,"open":true,"name":"Vanguard Total Stock Market Index Fund ETF Shares","pct":-0.02018109160845105,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:41.614Z","tk":"SPY","plat":"ondo","type":3,"open":true,"name":"SPDR S&P 500 ETF Trust","pct":-0.027847489033949735,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:42.645Z","tk":"VRTX","plat":"ondo","type":1,"open":true,"name":"Vertex Pharmaceuticals","pct":0.28842713870551595,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:43.665Z","tk":"IBM","plat":"ondo","type":1,"open":true,"name":"International Business Machines Corporation","pct":0.06336159339563885,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:44.691Z","tk":"AMGN","plat":"ondo","type":1,"open":true,"name":"Amgen Inc.","pct":0.43386579132338454,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:45.717Z","tk":"IVV","plat":"ondo","type":3,"open":true,"name":"iShares Core S&P 500 ETF","pct":-0.025748807834402587,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:46.799Z","tk":"DIS","plat":"ondo","type":1,"open":true,"name":"The Walt Disney Company","pct":0.15985776728115741,"impact":0.0001945879,"venues":2}
+{"ts":"2026-09-21T13:32:48.084Z","tk":"NOW","plat":"ondo","type":1,"open":true,"name":"SERVICENOW, INC.","pct":-0.061606121726442975,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:49.117Z","tk":"TMO","plat":"ondo","type":1,"open":true,"name":"Thermo Fisher Scientific Inc.","pct":0.2739340738072027,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:50.324Z","tk":"AAPL","plat":"ondo","type":1,"open":true,"name":"Apple Inc.","pct":-0.013208451718871306,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:51.516Z","tk":"IGV","plat":"ondo","type":3,"open":true,"name":"iShares Expanded Tech-Software Sector ETF","pct":0.007299946805860991,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:52.857Z","tk":"UNH","plat":"ondo","type":1,"open":true,"name":"UNITEDHEALTH GROUP INCORPORATED (Delaware)","pct":0.1498734775300381,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:54.015Z","tk":"COF","plat":"ondo","type":1,"open":true,"name":"Capital One Financial Corporation","pct":0.24675707907884092,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:55.437Z","tk":"SLV","plat":"ondo","type":3,"open":true,"name":"iShares Silver Trust","pct":-0.016719168746581747,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:56.628Z","tk":"JNJ","plat":"ondo","type":1,"open":true,"name":"Johnson & Johnson","pct":0.16436117828813046,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:57.657Z","tk":"CSCO","plat":"ondo","type":1,"open":true,"name":"Cisco Systems, Inc.","pct":0.3087429631106309,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:58.687Z","tk":"CRWV","plat":"ondo","type":1,"open":true,"name":"CoreWeave, Inc.","pct":0.5729709092038293,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:32:59.705Z","tk":"STRC","plat":"ondo","type":1,"open":true,"name":"MicroStrategy Inc. Perpetual Stretch Preferred","pct":-0.028924505659810862,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:01.244Z","tk":"CORZ","plat":"ondo","type":1,"open":true,"name":"Core Scientific, Inc.","pct":0.20425622606721205,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:02.424Z","tk":"ABNB","plat":"ondo","type":1,"open":true,"name":"Airbnb, Inc.","pct":0.08297078655585821,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:03.614Z","tk":"CEG","plat":"ondo","type":1,"open":true,"name":"Constellation Energy Corporation","pct":-0.12299659482907233,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:05.049Z","tk":"JD","plat":"ondo","type":1,"open":true,"name":"JD.com, Inc.","pct":-0.022503869249823616,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:06.182Z","tk":"MSFT","plat":"ondo","type":1,"open":true,"name":"Microsoft Corp","pct":0.045874769904452606,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:07.350Z","tk":"PYPL","plat":"ondo","type":1,"open":true,"name":"PayPal Holdings, Inc.","err":40374}
+{"ts":"2026-09-21T13:33:08.389Z","tk":"ISRG","plat":"ondo","type":1,"open":true,"name":"Intuitive Surgical, Inc.","err":40374}
+{"ts":"2026-09-21T13:33:09.407Z","tk":"SPOT","plat":"ondo","type":1,"open":true,"name":"Spotify Technology S.A.","err":40374}
+{"ts":"2026-09-21T13:33:10.440Z","tk":"UBER","plat":"ondo","type":1,"open":true,"name":"Uber Technologies, Inc.","err":40374}
+{"ts":"2026-09-21T13:33:11.517Z","tk":"QLTA","plat":"ondo","type":3,"open":true,"name":"iShares Aaa - A Rated Corporate Bond ETF","err":40374}
+{"ts":"2026-09-21T13:33:12.741Z","tk":"AG","plat":"ondo","type":1,"open":true,"name":"First Majestic Silver Corp.","err":40374}
+{"ts":"2026-09-21T13:33:13.921Z","tk":"IGEB","plat":"ondo","type":3,"open":true,"name":"iShares Investment Grade Systematic Bond ETF","err":40374}
+{"ts":"2026-09-21T13:33:14.956Z","tk":"AME","plat":"ondo","type":1,"open":true,"name":"AMETEK, Inc.","err":40374}
+{"ts":"2026-09-21T13:33:15.999Z","tk":"MELI","plat":"ondo","type":1,"open":true,"name":"Mercado Libre, Inc","err":40374}
+{"ts":"2026-09-21T13:33:17.037Z","tk":"PFE","plat":"ondo","type":1,"open":true,"name":"Pfizer Inc.","pct":0.09164712539162512,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:18.069Z","tk":"BRHY","plat":"ondo","type":3,"open":true,"name":"iShares High Yield Active ETF","pct":-0.017012924818604613,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:19.429Z","tk":"VNQ","plat":"ondo","type":3,"open":true,"name":"Vanguard Real Estate ETF","pct":-0.015445078823883573,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:20.525Z","tk":"QYLD","plat":"ondo","type":3,"open":true,"name":"Global X NASDAQ 100 Covered Call ETF","pct":-0.0412153987781716,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:21.698Z","tk":"BRTR","plat":"ondo","type":3,"open":true,"name":"iShares Total Return Active ETF","pct":-0.019473912530298954,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:22.967Z","tk":"RTX","plat":"ondo","type":1,"open":true,"name":"RTX Corporation","pct":0.035202467592831965,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:24.041Z","tk":"CRM","plat":"ondo","type":1,"open":true,"name":"Salesforce, Inc.","pct":0.2084819628603407,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:25.073Z","tk":"PBR","plat":"ondo","type":1,"open":true,"name":"PETROLEO BRASILEIRO S.A.-PETROBRAS","pct":-0.01488300911974827,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:26.174Z","tk":"GOOGL","plat":"ondo","type":1,"open":true,"name":"Alphabet Inc.","pct":-0.0985832929488506,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:27.216Z","tk":"SHOP","plat":"ondo","type":1,"open":true,"name":"Shopify Inc.","pct":0.2163387913970416,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:28.242Z","tk":"PG","plat":"ondo","type":1,"open":true,"name":"Procter & Gamble Company","pct":0.04506307891007921,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:29.357Z","tk":"LMT","plat":"ondo","type":1,"open":true,"name":"Lockheed Martin Corp.","pct":0.11270601295838567,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:30.629Z","tk":"IRDM","plat":"ondo","type":1,"open":true,"name":"Iridium Communications Inc.","pct":0.12494703173329125,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:31.908Z","tk":"EUHY","plat":"ondo","type":3,"open":true,"name":"iShares, Inc. - iShares Euro High Yield Corporate Bond USD Hedged ETF","pct":-0.009982307584599504,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:33.191Z","tk":"ADBE","plat":"ondo","type":1,"open":true,"name":"Adobe","pct":0.24084221460927147,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:34.388Z","tk":"INTU","plat":"ondo","type":1,"open":true,"name":"Intuit Inc","pct":0.3251758412317951,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:35.617Z","tk":"IEF","plat":"ondo","type":3,"open":true,"name":"iShares 7-10 Year Treasury Bond ETF","pct":-0.03236409325825251,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:36.647Z","tk":"SATA","plat":"ondo","type":1,"open":true,"name":"Strive, Inc.","pct":-0.029369240675214403,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:37.662Z","tk":"KO","plat":"ondo","type":1,"open":true,"name":"Coca-Cola Company","pct":-0.07008110472990214,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:38.686Z","tk":"USFR","plat":"ondo","type":3,"open":true,"name":"WisdomTree Floating Rate Treasury Fund","pct":-0.02923599425435075,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:39.734Z","tk":"JAAA","plat":"ondo","type":3,"open":true,"name":"JPMorgan Active High Yield ETF","pct":-0.031166366747659158,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:41.204Z","tk":"GGOV","plat":"ondo","type":3,"open":true,"name":"iShares Global Government Bond USD Hedged Active ETF","pct":0.08748005073901943,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:42.489Z","tk":"VZ","plat":"ondo","type":1,"open":true,"name":"Verizon Communications Inc.","pct":-0.10186567267902458,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:43.522Z","tk":"BIL","plat":"ondo","type":3,"open":true,"name":"State Street SPDR Bloomberg 1-3 Month T-Bill ETF","pct":-0.036907858447976505,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:44.738Z","tk":"SGOV","plat":"ondo","type":3,"open":true,"name":"iShares 0-3 Month Treasury Bond ETF","pct":-0.03754734515133418,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:46.028Z","tk":"NKE","plat":"ondo","type":1,"open":true,"name":"Nike, Inc.","pct":-0.0256995228759882,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:47.087Z","tk":"ABT","plat":"ondo","type":1,"open":true,"name":"Abbott Laboratories","pct":0.027429738382966917,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:48.131Z","tk":"MA","plat":"ondo","type":1,"open":true,"name":"Mastercard Incorporated","pct":-0.010694833575009,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:49.167Z","tk":"HYG","plat":"ondo","type":3,"open":true,"name":"iShares iBoxx $ High Yield Corporate Bond ETF","pct":-0.03166545866327697,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:50.192Z","tk":"MCD","plat":"ondo","type":1,"open":true,"name":"McDonald's Corporation","pct":0.07385896699041439,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:51.222Z","tk":"TCOM","plat":"ondo","type":1,"open":true,"name":"Trip.com Group Limited","pct":0.08274273437383073,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:52.252Z","tk":"LIN","plat":"ondo","type":1,"open":true,"name":"Linde plc","pct":0.07576955004595654,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:53.287Z","tk":"WMB","plat":"ondo","type":1,"open":true,"name":"The Williams Companies, Inc.","pct":0.15520842742802188,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:54.319Z","tk":"YEAR","plat":"ondo","type":3,"open":true,"name":"AB Ultra Short Income ETF","pct":-0.029548869600093397,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:55.352Z","tk":"STLD","plat":"ondo","type":1,"open":true,"name":"Steel Dynamics, Inc.","pct":0.17097837919020087,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:56.375Z","tk":"AGG","plat":"ondo","type":3,"open":true,"name":"iShares Core U.S. Aggregate Bond ETF","pct":-0.03053666101210384,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:57.384Z","tk":"NFLX","plat":"ondo","type":1,"open":true,"name":"NetFlix Inc","pct":-0.05438729816593657,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:58.413Z","tk":"APP","plat":"ondo","type":1,"open":true,"name":"Applovin Corporation","pct":0.06275763468612805,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:33:59.447Z","tk":"PEP","plat":"ondo","type":1,"open":true,"name":"PepsiCo, Inc.","pct":0.012954118418329053,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:00.482Z","tk":"DASH","plat":"ondo","type":1,"open":true,"name":"DoorDash, Inc.","pct":0.07992882670702084,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:01.512Z","tk":"ENB","plat":"ondo","type":1,"open":true,"name":"Enbridge Inc.","pct":0.03492952968970897,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:02.547Z","tk":"SLB","plat":"ondo","type":1,"open":true,"name":"SLB N.V.","pct":0.07084774107972702,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:03.692Z","tk":"SIL","plat":"ondo","type":3,"open":true,"name":"Global X Silver Miners ETF","pct":0.1530440524864618,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:04.725Z","tk":"SAP","plat":"ondo","type":1,"open":true,"name":"SAP SE","pct":0.003742451612320785,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:05.757Z","tk":"XYLD","plat":"ondo","type":3,"open":true,"name":"Global X S&P 500 Covered Call ETF","pct":-0.005447516634049521,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:06.781Z","tk":"GLD","plat":"ondo","type":3,"open":true,"name":"SPDR Gold Shares","pct":-0.021274888293498773,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:07.812Z","tk":"SHY","plat":"ondo","type":3,"open":true,"name":"iShares 1-3 Year Treasury Bond ETF","pct":-0.029185115965801867,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:08.838Z","tk":"PANW","plat":"ondo","type":1,"open":true,"name":"Palo Alto Networks, Inc.","pct":0.43488216681999425,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:09.858Z","tk":"HAL","plat":"ondo","type":1,"open":true,"name":"Halliburton Company","pct":0.24240373293102913,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:10.899Z","tk":"FGDL","plat":"ondo","type":3,"open":true,"name":"Franklin Responsibly Sourced Gold ETF","pct":0.29626386730174925,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:11.927Z","tk":"NUE","plat":"ondo","type":1,"open":true,"name":"Nucor Corporation","pct":0.16386519633886376,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:12.957Z","tk":"HYS","plat":"ondo","type":3,"open":true,"name":"PIMCO 0-5 Year High Yield Corporate Bond Index Exchange-Traded Fund","pct":0.07574589893599715,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:13.993Z","tk":"COST","plat":"ondo","type":1,"open":true,"name":"Costco Wholesale Corp","pct":-0.0024187621177396146,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:15.396Z","tk":"IAU","plat":"ondo","type":3,"open":true,"name":"iShares Gold Trust","pct":0.002546486098276013,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:16.927Z","tk":"ABBV","plat":"ondo","type":1,"open":true,"name":"AbbVie Inc. (ABBV)","pct":0.09636410790785366,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:18.318Z","tk":"NIO","plat":"ondo","type":1,"open":true,"name":"NIO Inc.","pct":0.06404243447222235,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:19.343Z","tk":"LLY","plat":"ondo","type":1,"open":true,"name":"Eli Lilly & Co.","pct":0.06947970345598797,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:20.503Z","tk":"IEI","plat":"ondo","type":3,"open":true,"name":"iShares 3-7 Year Treasury Bond ETF","pct":-0.022259021607118346,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:21.855Z","tk":"TMUS","plat":"ondo","type":1,"open":true,"name":"T-Mobile US, Inc.","pct":0.03570995394637233,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:22.888Z","tk":"OIH","plat":"ondo","type":3,"open":true,"name":"VanEck Oil Services ETF","pct":0.060400426258921946,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:23.996Z","tk":"EQT","plat":"ondo","type":1,"open":true,"name":"EQT Corporation","pct":0.017488639015716956,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:25.024Z","tk":"INSW","plat":"ondo","type":1,"open":true,"name":"International Seaways, Inc.","pct":0.7527481338846176,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:26.057Z","tk":"APO","plat":"ondo","type":1,"open":true,"name":"Apollo Global Management, Inc.","pct":0.39877927003060254,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:27.086Z","tk":"SBUX","plat":"ondo","type":1,"open":true,"name":"Starbucks Corp","pct":0.14465663709646304,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:28.134Z","tk":"WMT","plat":"ondo","type":1,"open":true,"name":"Walmart Inc.","pct":0.05876421675556909,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:29.154Z","tk":"PSQ","plat":"ondo","type":3,"open":true,"name":"ProShares Short QQQ","pct":-0.01365159431720997,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:30.272Z","tk":"CVX","plat":"ondo","type":1,"open":true,"name":"Chevron Corporation","pct":-0.09361987823793827,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:31.300Z","tk":"SHLD","plat":"ondo","type":3,"open":true,"name":"Global X Defense Tech ETF","pct":0.05551834177377479,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:32.348Z","tk":"UNP","plat":"ondo","type":1,"open":true,"name":"Union Pacific Corporation","pct":0.22193294514092354,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:33.370Z","tk":"VDE","plat":"ondo","type":3,"open":true,"name":"Vanguard Energy Index Fund ETF Shares","pct":-0.050574111949841516,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:34.411Z","tk":"COP","plat":"ondo","type":1,"open":true,"name":"ConocoPhillips","pct":0.008145658155300772,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:35.464Z","tk":"HUBB","plat":"ondo","type":1,"open":true,"name":"Hubbell Incorporated","pct":0.8056606538449529,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:36.508Z","tk":"XOM","plat":"ondo","type":1,"open":true,"name":"Exxon Mobil Corporation","pct":0.05221927842646856,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:37.527Z","tk":"UNG","plat":"ondo","type":3,"open":true,"name":"US Natural Gas Fund","pct":0.0073095683879698115,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:38.628Z","tk":"OXY","plat":"ondo","type":1,"open":true,"name":"Occidental Petroleum Corporation","pct":0.01664759123922721,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:39.651Z","tk":"STNG","plat":"ondo","type":1,"open":true,"name":"Scorpio Tankers Inc.","pct":0.24253302400454313,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:40.676Z","tk":"CRWD","plat":"ondo","type":1,"open":true,"name":"CrowdStrike Holdings, Inc.","pct":0.26716646123909893,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:41.706Z","tk":"ECO","plat":"ondo","type":1,"open":true,"name":"Okeanis Eco Tankers Corp.","pct":0.3033912842539399,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:42.751Z","tk":"SQQQ","plat":"ondo","type":3,"open":true,"name":"ProShares UltraPro Short QQQ","pct":0.00044962182881302937,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:43.791Z","tk":"BNO","plat":"ondo","type":3,"open":true,"name":"United States Brent Oil Fund, LP","pct":0.011225941032111386,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:45.135Z","tk":"USO","plat":"ondo","type":3,"open":true,"name":"United States Oil Fund, LP","pct":-0.017838640342249246,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:46.162Z","tk":"ACN","plat":"ondo","type":1,"open":true,"name":"Accenture PLC","pct":-0.007883639654993058,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:47.256Z","tk":"NVO","plat":"ondo","type":1,"open":true,"name":"Novo-Nordisk A/S","pct":0.016315348706053,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:48.297Z","tk":"SOXS","plat":"ondo","type":3,"open":true,"name":"Direxion Daily Semiconductor Bear 3X Shares","pct":-0.2840611381042524,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:49.348Z","tk":"QUBT","plat":"ondo","type":1,"open":false,"name":"Quantum Computing","pct":-0.05713934630113826,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:50.381Z","tk":"RDW","plat":"ondo","type":1,"open":false,"name":"Redwire","pct":-0.07628994615260787,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:51.427Z","tk":"LUNR","plat":"ondo","type":1,"open":false,"name":"Intuitive Machines","pct":-0.08675817103503958,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:52.458Z","tk":"TEN","plat":"ondo","type":1,"open":false,"name":"Tsakos Energy Navigation Limited","pct":0.6542744406166534,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:53.476Z","tk":"XYZ","plat":"ondo","type":1,"open":false,"name":"Block, Inc.","pct":0.17931860968136704,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:54.512Z","tk":"SCHW","plat":"ondo","type":1,"open":false,"name":"The Charles Schwab Corporation","pct":0.06278047697549916,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:55.557Z","tk":"ARGT","plat":"ondo","type":3,"open":false,"name":"Global X MSCI Argentina ETF","pct":0.6355618793742579,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:56.602Z","tk":"INCE","plat":"ondo","type":3,"open":false,"name":"Franklin Income Equity Focus ETF","pct":0.15529444735340459,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:57.636Z","tk":"NEE","plat":"ondo","type":1,"open":false,"name":"NextEra Energy, Inc.","pct":-0.03236539929962756,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:58.676Z","tk":"SYSB","plat":"ondo","type":null,"open":false,"name":null,"pct":-0.012820146363745621,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:34:59.721Z","tk":"FLQL","plat":"ondo","type":3,"open":false,"name":"Franklin U.S. Large Cap Multifactor Index ETF","pct":0.049058616017694234,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:00.772Z","tk":"LOW","plat":"ondo","type":1,"open":false,"name":"Lowe's Companies, Inc.","pct":0.016870135446267476,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:01.823Z","tk":"DTCR","plat":"ondo","type":3,"open":false,"name":"Global X Data Center & Digital Infrastructure ETF","pct":0.10028229389731358,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:02.857Z","tk":"MEI","plat":"ondo","type":1,"open":false,"name":"Methode Electronics, Inc.","err":40374}
+{"ts":"2026-09-21T13:35:03.916Z","tk":"IALT","plat":"ondo","type":3,"open":false,"name":"iShares Systematic Alternatives Active ETF","pct":0.09770930165848846,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:04.957Z","tk":"OPRA","plat":"ondo","type":1,"open":false,"name":"Opera Limited","pct":0.1920735508925464,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:05.982Z","tk":"ATKR","plat":"ondo","type":1,"open":false,"name":"Atkore Inc.","pct":0.005262330542965543,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:07.017Z","tk":"IDEF","plat":"ondo","type":3,"open":false,"name":"iShares Defense Industrials Act","pct":0.09673870363902104,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:08.092Z","tk":"DRS","plat":"ondo","type":1,"open":false,"name":"Leonardo DRS, Inc.","pct":0.23338182451793088,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:09.110Z","tk":"PRIM","plat":"ondo","type":1,"open":false,"name":"Primoris Services Corporation","pct":0.30732538101445606,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:10.121Z","tk":"NTES","plat":"ondo","type":1,"open":false,"name":"NetEase, Inc.","pct":0.11358690464167154,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:11.151Z","tk":"BTG","plat":"ondo","type":1,"open":false,"name":"B2Gold Corp.","pct":0.03278291684589707,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:12.185Z","tk":"FLHY","plat":"ondo","type":3,"open":false,"name":"Franklin High Yield Corporate ETF","pct":-0.007410265801655047,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:13.229Z","tk":"VRSN","plat":"ondo","type":1,"open":false,"name":"VeriSign, Inc.","pct":0.5735349276739132,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:14.256Z","tk":"HD","plat":"ondo","type":1,"open":false,"name":"The Home Depot, Inc.","pct":0.14898580855560173,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:15.343Z","tk":"FTGC","plat":"ondo","type":3,"open":false,"name":"First Trust Global Tactical Commodity Strategy Fund","pct":-0.04641469756830885,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:16.750Z","tk":"SECU","plat":"ondo","type":null,"open":false,"name":null,"pct":0.029464028929471198,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:17.976Z","tk":"HYGW","plat":"ondo","type":null,"open":false,"name":null,"pct":0.1449849277848525,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:19.004Z","tk":"AMC","plat":"ondo","type":1,"open":false,"name":"AMC Entertainment Holdings, Inc.","pct":0.3164303836579174,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:20.035Z","tk":"GRND","plat":"ondo","type":1,"open":false,"name":"Grindr, Inc.","pct":0.7002717297986294,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:21.054Z","tk":"FIGR","plat":"ondo","type":1,"open":false,"name":"Figure Technology Solutions","pct":-0.15901421913563363,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:22.094Z","tk":"DNN","plat":"ondo","type":1,"open":false,"name":"Denison Mines Corp.","pct":0.09492085744413625,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:23.120Z","tk":"GEMI","plat":"ondo","type":1,"open":false,"name":"Gemini Space Station","pct":0.5793969218185868,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:24.158Z","tk":"OPEN","plat":"ondo","type":1,"open":false,"name":"Opendoor Technologies Inc.","pct":0.12658046683149404,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:25.190Z","tk":"GRAB","plat":"ondo","type":1,"open":false,"name":"Grab Holdings Limited","pct":-0.16796789999962147,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:26.211Z","tk":"WULF","plat":"ondo","type":1,"open":false,"name":"TeraWulf Inc.","pct":0.164484801906295,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:27.250Z","tk":"OSCR","plat":"ondo","type":1,"open":false,"name":"Oscar Health, Inc.","pct":0.5880742895144397,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:28.274Z","tk":"ON","plat":"ondo","type":1,"open":false,"name":"onsemi","pct":0.1940618701449459,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:29.306Z","tk":"TLN","plat":"ondo","type":1,"open":false,"name":"Talen Energy Corporation","pct":0.594015812444626,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:30.326Z","tk":"REMX","plat":"ondo","type":3,"open":false,"name":"VanEck Rare Earth and Strategic Metals ETF","pct":0.17801971262030314,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:31.346Z","tk":"BZ","plat":"ondo","type":1,"open":false,"name":"Kanzhun Limited","pct":0.07712199286995514,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:32.369Z","tk":"PDBC","plat":"ondo","type":3,"open":false,"name":"Invesco Optimum Yield Diversified Commodity Strategy No K-1 ETF","pct":-0.035777858185814804,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:33.420Z","tk":"CIFR","plat":"ondo","type":1,"open":false,"name":"Cipher Mining Inc.","pct":-0.5372753974333233,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:34.442Z","tk":"NIKL","plat":"ondo","type":3,"open":false,"name":"Sprott Nickel Miners ETF","pct":0.3804561376121507,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:35.477Z","tk":"SNAP","plat":"ondo","type":1,"open":false,"name":"Snap, Inc. Class A","pct":0.09543134330229908,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:36.500Z","tk":"MTZ","plat":"ondo","type":1,"open":false,"name":"Mastec, Inc.","pct":0.14508184446795358,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:37.543Z","tk":"BLSH","plat":"ondo","type":1,"open":false,"name":"Bullish","pct":0.3468565836185489,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:38.575Z","tk":"DBC","plat":"ondo","type":3,"open":false,"name":"Invesco DB Commodity Index Tracking Fund","pct":-0.050746950672209135,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:39.600Z","tk":"VFS","plat":"ondo","type":1,"open":false,"name":"VinFast Auto","pct":0.20586721049047352,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:40.641Z","tk":"ENLV","plat":"ondo","type":1,"open":false,"name":"Enlivex Ltd.","pct":3.7207532285977063,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:41.682Z","tk":"CAPR","plat":"ondo","type":1,"open":false,"name":"Capricor Therapeutics, Inc.","pct":0.29495001700359236,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:42.715Z","tk":"SEDG","plat":"ondo","type":1,"open":false,"name":"SolarEdge Technologies","pct":0.34095588651525954,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:43.761Z","tk":"EXOD","plat":"ondo","type":1,"open":false,"name":"Exodus Movement, Inc.","pct":0.24257838799168763,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:44.797Z","tk":"FFOG","plat":"ondo","type":3,"open":false,"name":"Franklin Focused Growth ETF","pct":0.16112467365345662,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:45.831Z","tk":"AIP","plat":"ondo","type":1,"open":false,"name":"Arteris, Inc.","pct":-0.3767739916386459,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:46.875Z","tk":"ALOY","plat":"ondo","type":1,"open":false,"name":"REalloys Inc.","pct":0.10964083750173437,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:47.915Z","tk":"AOSL","plat":"ondo","type":1,"open":false,"name":"Alpha and Omega Semiconductor Limited","pct":0.4299900028014836,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:48.934Z","tk":"ARQQ","plat":"ondo","type":1,"open":false,"name":"Arqit Quantum Inc.","err":40374}
+{"ts":"2026-09-21T13:35:49.995Z","tk":"AUR","plat":"ondo","type":1,"open":false,"name":"Aurora Innovation, Inc.","pct":0.049994756779381255,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:51.031Z","tk":"BOT","plat":"ondo","type":1,"open":false,"name":"Robostrategy, Inc.","err":40374}
+{"ts":"2026-09-21T13:35:52.070Z","tk":"BWET","plat":"ondo","type":3,"open":false,"name":"Breakwave Tanker Shipping ETF","pct":0.5649690732911106,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:53.099Z","tk":"CEVA","plat":"ondo","type":1,"open":false,"name":"CEVA, Inc.","pct":0.2994773681991747,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:54.142Z","tk":"COHU","plat":"ondo","type":1,"open":false,"name":"Cohu, Inc.","pct":0.7906505064618097,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:55.181Z","tk":"EXTR","plat":"ondo","type":1,"open":false,"name":"Extreme Networks, Inc.","pct":0.40316835853380084,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:56.230Z","tk":"HLIT","plat":"ondo","type":1,"open":false,"name":"Harmonic Inc.","pct":0.11763478685982154,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:57.281Z","tk":"KOPN","plat":"ondo","type":1,"open":false,"name":"Kopin Corporation","pct":0.3102973845481083,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:58.338Z","tk":"LEMB","plat":"ondo","type":3,"open":false,"name":"iShares J.P. Morgan EM Local Currency Bond ETF","pct":-0.0004687709400985618,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:35:59.375Z","tk":"LPTH","plat":"ondo","type":1,"open":false,"name":"LightPath Technologies, Inc.","pct":0.3202831321567956,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:00.405Z","tk":"MBLY","plat":"ondo","type":1,"open":false,"name":"Mobileye Global Inc.","pct":-0.009156284675293502,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:01.467Z","tk":"MYRG","plat":"ondo","type":1,"open":false,"name":"MYR Group Inc.","pct":0.6321638058931045,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:02.526Z","tk":"OII","plat":"ondo","type":1,"open":false,"name":"Oceaneering International, Inc.","pct":1.3450730255085253,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:03.555Z","tk":"ORBX","plat":"ondo","type":3,"open":false,"name":"Global X Space Tech ETF","pct":0.2547780915297171,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:04.651Z","tk":"PENG","plat":"ondo","type":1,"open":false,"name":"Penguin Solutions, Inc.","pct":0.281831685261813,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:05.742Z","tk":"PURR","plat":"ondo","type":1,"open":false,"name":"Hyperliquid Strategies Inc.","pct":0.014318882732222704,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:06.781Z","tk":"TASK","plat":"ondo","type":1,"open":false,"name":"TaskUs, Inc.","pct":0.5986243152974691,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:07.850Z","tk":"PCG","plat":"ondo","type":1,"open":false,"name":"PG&E Corporation","pct":0.0026521316969230213,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:08.880Z","tk":"HIMX","plat":"ondo","type":1,"open":false,"name":"Himax Technologies, Inc.","pct":0.021485579261404375,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:09.904Z","tk":"SO","plat":"ondo","type":1,"open":false,"name":"The Southern Company","pct":0.014292949126715193,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:10.928Z","tk":"TNK","plat":"ondo","type":1,"open":false,"name":"Teekay Tankers Ltd.","pct":0.7806974818959755,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:11.968Z","tk":"POWI","plat":"ondo","type":1,"open":false,"name":"Power Integrations, Inc.","pct":0.8445172184517347,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:13.008Z","tk":"CLOA","plat":"ondo","type":3,"open":false,"name":"iShares AAA CLO Active ETF","pct":-0.026874864870840565,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:14.050Z","tk":"WS","plat":"ondo","type":1,"open":false,"name":"Worthington Steel, Inc.","pct":2.6999314318638223,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:15.085Z","tk":"NAT","plat":"ondo","type":1,"open":false,"name":"Nordic American Tankers Limited","pct":0.09216618266039145,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:16.115Z","tk":"DGRW","plat":"ondo","type":3,"open":false,"name":"WisdomTree U.S. Quality Dividend Growth Fund","pct":-0.021528040365714762,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:17.540Z","tk":"CLOI","plat":"ondo","type":3,"open":false,"name":"VanEck CLO ETF","pct":-0.019714862811726075,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:18.577Z","tk":"EMR","plat":"ondo","type":1,"open":false,"name":"Emerson Electric Co.","pct":0.12637526924776932,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:19.615Z","tk":"GD","plat":"ondo","type":1,"open":false,"name":"General Dynamics Corporation","pct":0.06767718970972503,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:20.653Z","tk":"INRO","plat":"ondo","type":3,"open":false,"name":"iShares U.S. Industry Rotation Active ETF","pct":0.11233284130054422,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:21.670Z","tk":"AIQ","plat":"ondo","type":3,"open":false,"name":"Global X Artificial Intelligence & Technology ETF","pct":-0.03886245904997088,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:22.696Z","tk":"WCC","plat":"ondo","type":1,"open":false,"name":"WESCO International, Inc.","pct":0.21543794230907132,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:24.109Z","tk":"LECO","plat":"ondo","type":1,"open":false,"name":"Lincoln Electric Holdings, Inc.","pct":0.42342423794961004,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:25.131Z","tk":"WM","plat":"ondo","type":1,"open":false,"name":"Waste Management","pct":0.0009535160649498664,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:26.149Z","tk":"LI","plat":"ondo","type":1,"open":false,"name":"Li Auto Inc.","pct":0.016971019625566797,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:26.975Z","tk":"INTW","plat":"bstock","type":3,"open":true,"name":"2x Long INTC Daily ETF - GraniteShares","pct":0.1151970820199022,"impact":0,"venues":2}
+{"ts":"2026-09-21T13:36:27.818Z","tk":"SOXL","plat":"bstock","type":3,"open":true,"name":"Direxion Daily Semiconductor Bull 3X Shares","pct":0.03640936859330424,"impact":8.28e-8,"venues":1}
+{"ts":"2026-09-21T13:36:28.660Z","tk":"KORU","plat":"bstock","type":3,"open":true,"name":"Daily MSCI South Korea Bull 3X ETF - Direxion","pct":0.08855126467384178,"impact":1.8e-9,"venues":1}
+{"ts":"2026-09-21T13:36:29.682Z","tk":"MVLL","plat":"bstock","type":3,"open":true,"name":"2x Long Marvell Daily ETF - GraniteShares","pct":0.4665920326916817,"impact":0,"venues":2}
+{"ts":"2026-09-21T13:36:30.639Z","tk":"MSTR","plat":"bstock","type":1,"open":true,"name":"Strategy Inc","pct":0.05152178116174522,"impact":0.0008490847,"venues":1}
+{"ts":"2026-09-21T13:36:31.533Z","tk":"CRCL","plat":"bstock","type":1,"open":true,"name":"Circle Internet Group, Inc.","pct":0.05902794008698642,"impact":0.0001346319,"venues":2}
+{"ts":"2026-09-21T13:36:32.372Z","tk":"MUU","plat":"bstock","type":3,"open":true,"name":"Daily 2X Long Micron ETF - Direxion","pct":0.3407414976423606,"impact":0.0000516534,"venues":1}
+{"ts":"2026-09-21T13:36:33.349Z","tk":"SNXX","plat":"bstock","type":3,"open":true,"name":"2X Long SanDisk Daily ETF - Tradr","pct":0.06071688162456734,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:34.195Z","tk":"ARM","plat":"bstock","type":1,"open":true,"name":"Arm Holdings plc","pct":0.1942735695096065,"impact":0,"venues":2}
+{"ts":"2026-09-21T13:36:35.020Z","tk":"AXTI","plat":"bstock","type":1,"open":true,"name":"AXT, Inc.","pct":0.16805495250384883,"impact":0,"venues":2}
+{"ts":"2026-09-21T13:36:35.943Z","tk":"COIN","plat":"bstock","type":1,"open":true,"name":"Coinbase Global, Inc.","pct":0.30347281166767104,"impact":0.0023522963,"venues":1}
+{"ts":"2026-09-21T13:36:36.814Z","tk":"HOOD","plat":"bstock","type":1,"open":true,"name":"Robinhood Markets, Inc.","pct":-0.010558405862737263,"impact":0,"venues":2}
+{"ts":"2026-09-21T13:36:37.647Z","tk":"INTC","plat":"bstock","type":1,"open":true,"name":"Intel Corp","pct":0.1684976097075186,"impact":0.0000302549,"venues":1}
+{"ts":"2026-09-21T13:36:38.563Z","tk":"AMD","plat":"bstock","type":1,"open":true,"name":"Advanced Micro Devices","pct":0.263334203322807,"impact":0,"venues":1}
+{"ts":"2026-09-21T13:36:39.394Z","tk":"WDC","plat":"bstock","type":1,"open":true,"name":"Western Digital","pct":0.06327843445459447,"impact":0.0000676938,"venues":1}
+{"ts":"2026-09-21T13:36:40.228Z","tk":"MRVL","plat":"bstock","type":1,"open":true,"name":"Marvell Technology, Inc.","pct":0.011954636716060563,"impact":0.0000239665,"venues":2}
+{"ts":"2026-09-21T13:36:41.060Z","tk":"LITE","plat":"bstock","type":1,"open":true,"name":"Lumentum Holdings Inc.","pct":0.05635040990046303,"impact":0.000043205,"venues":1}
+{"ts":"2026-09-21T13:36:41.894Z","tk":"NOK","plat":"bstock","type":1,"open":true,"name":"Nokia Oyj","pct":0.12804100471679458,"impact":0,"venues":2}
+{"ts":"2026-09-21T13:36:42.732Z","tk":"MU","plat":"bstock","type":1,"open":true,"name":"Micron Technology, Inc.","pct":0.14286780768641982,"impact":0.0004189734,"venues":3}
+{"ts":"2026-09-21T13:36:43.589Z","tk":"DRAM","plat":"bstock","type":3,"open":true,"name":"Roundhill Memory ETF","pct":0.3003763703817386,"impact":0,"venues":2}
+{"ts":"2026-09-21T13:36:44.423Z","tk":"TQQQ","plat":"bstock","type":3,"open":true,"name":"ProShares UltraPro QQQ","pct":0.4936095060844581,"impact":0.0001829893,"venues":3}
+{"ts":"2026-09-21T13:36:45.374Z","tk":"GLW","plat":"bstock","type":1,"open":true,"name":"Corning Incorporated","pct":-0.11038342510540922,"impact":0.0000981494,"venues":1}
+{"ts":"2026-09-21T13:36:46.218Z","tk":"SNDK","plat":"bstock","type":1,"open":true,"name":"SanDisk","pct":0.027239543002055555,"impact":0.0005649251,"venues":5}
+{"ts":"2026-09-21T13:36:47.050Z","tk":"EWY","plat":"bstock","type":3,"open":true,"name":"iShares MSCI South Korea ETF","pct":-0.00046565396395470415,"impact":0.0000027916,"venues":1}
+{"ts":"2026-09-21T13:36:47.885Z","tk":"AAOI","plat":"bstock","type":1,"open":true,"name":"Applied Optoelectronics, Inc.","pct":0.34222520967570613,"impact":0.0001092653,"venues":1}
+{"ts":"2026-09-21T13:36:48.719Z","tk":"NBIS","plat":"bstock","type":1,"open":true,"name":"Nebius Group","pct":-0.2486402432505086,"impact":0,"venues":2}
+{"ts":"2026-09-21T13:36:49.560Z","tk":"QNT","plat":"bstock","type":1,"open":true,"name":"Quantinuum Inc.","pct":-0.008191963026515925,"impact":0,"venues":2}
+{"ts":"2026-09-21T13:36:50.404Z","tk":"TSLA","plat":"bstock","type":1,"open":true,"name":"Tesla, Inc.","pct":0.01740372475023122,"impact":0.0000188053,"venues":3}
+{"ts":"2026-09-21T13:36:51.250Z","tk":"ORCL","plat":"bstock","type":1,"open":true,"name":"Oracle Corp","pct":0.024512240903318272,"impact":0,"venues":2}
+{"ts":"2026-09-21T13:36:52.079Z","tk":"TSM","plat":"bstock","type":1,"open":true,"name":"Taiwan Semiconductor Manufacturing Co Ltd.","pct":-0.04211354183675242,"impact":0.000057739,"venues":1}
+{"ts":"2026-09-21T13:36:53.078Z","tk":"RKLB","plat":"bstock","type":1,"open":true,"name":"Rocket Lab","pct":0.16900027706174825,"impact":0,"venues":2}
+{"ts":"2026-09-21T13:36:54.013Z","tk":"CBRS","plat":"bstock","type":1,"open":true,"name":"Cerebras Systems Inc.","pct":0.2135812457198849,"impact":0.0000016262,"venues":2}
+{"ts":"2026-09-21T13:36:54.840Z","tk":"META","plat":"bstock","type":1,"open":true,"name":"Meta Platforms, Inc.","pct":-0.00584827685576883,"impact":0,"venues":2}
+{"ts":"2026-09-21T13:36:55.748Z","tk":"SKHY","plat":"bstock","type":1,"open":true,"name":"SK Hynix","pct":0.26417774536713345,"impact":0.0037972574,"venues":6}
+{"ts":"2026-09-21T13:36:56.577Z","tk":"BABA","plat":"bstock","type":1,"open":true,"name":"Alibaba Group Holding Limited","pct":0.08326204051092301,"impact":0.0000055394,"venues":3}
+{"ts":"2026-09-21T13:36:57.486Z","tk":"NVDA","plat":"bstock","type":1,"open":true,"name":"Nvidia Corp","pct":-0.07248053481700989,"impact":0.0007051101,"venues":9}
+{"ts":"2026-09-21T13:36:58.401Z","tk":"SPCX","plat":"bstock","type":1,"open":true,"name":"SpaceX","pct":-0.05639147387573873,"impact":0.0004227001,"venues":7}
+{"ts":"2026-09-21T13:36:59.341Z","tk":"QQQ","plat":"bstock","type":3,"open":true,"name":"Invesco QQQ Trust","pct":-0.03876768861001967,"impact":0.000290393,"venues":2}
+{"ts":"2026-09-21T13:37:00.193Z","tk":"QCOM","plat":"bstock","type":1,"open":true,"name":"Qualcomm Inc","pct":0.08834533395087885,"impact":0,"venues":2}
+{"ts":"2026-09-21T13:37:01.033Z","tk":"AVGO","plat":"bstock","type":1,"open":true,"name":"Broadcom Inc.","pct":0.05548369290580002,"impact":0.0000443214,"venues":1}
+{"ts":"2026-09-21T13:37:01.887Z","tk":"SPY","plat":"bstock","type":3,"open":true,"name":"SPDR S&P 500 ETF Trust","pct":-0.04238193366503662,"impact":0.0003034879,"venues":4}
+{"ts":"2026-09-21T13:37:02.773Z","tk":"PLTR","plat":"bstock","type":1,"open":true,"name":"Palantir Technologies Inc.","pct":0.07322210287246111,"impact":0,"venues":2}
+{"ts":"2026-09-21T13:37:03.637Z","tk":"GOOGL","plat":"bstock","type":1,"open":true,"name":"Alphabet Inc.","pct":0.049942351655474226,"impact":0.0006905719,"venues":4}
+{"ts":"2026-09-21T13:37:04.458Z","tk":"MSFT","plat":"bstock","type":1,"open":true,"name":"Microsoft Corp","pct":-0.030661362369999168,"impact":0,"venues":2}
+{"ts":"2026-09-21T13:37:05.286Z","tk":"CRWV","plat":"bstock","type":1,"open":true,"name":"CoreWeave, Inc.","pct":0.13898904376634658,"impact":0,"venues":2}
+{"ts":"2026-09-21T13:37:06.128Z","tk":"IBM","plat":"bstock","type":1,"open":true,"name":"International Business Machines Corporation","pct":0.10045243934135861,"impact":0.0003042112,"venues":2}

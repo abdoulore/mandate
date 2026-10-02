@@ -1,0 +1,37 @@
+import './smoke-output.mjs';
+import {chromium} from '@playwright/test';
+import fs from 'node:fs';
+const browser=await chromium.launch({channel:'msedge',headless:true});
+const page=await browser.newPage({viewport:{width:1440,height:1060}});
+const errors=[];page.on('pageerror',e=>errors.push(e.message));
+const output='.runtime/outputs';fs.mkdirSync(output,{recursive:true});
+try{
+ await page.goto('http://127.0.0.1:3110/portfolio-exit',{waitUntil:'networkidle',timeout:90000});
+ await page.getByRole('heading',{name:'Illustrative allocation'}).waitFor({timeout:30000});
+ await page.getByText('Fits your rules',{exact:true}).waitFor();
+ await page.screenshot({path:output+'/mandate-overview.png',fullPage:true});
+ await page.getByRole('textbox',{name:'Additional commitment in USDT'}).fill('400');
+ await page.getByRole('button',{name:'Preview allocation'}).click();
+ await page.getByText('Fits your rules',{exact:true}).waitFor();
+ if(!(await page.locator('.balance-emphasis').innerText()).includes('2,380.00'))throw new Error('New commitment did not reduce allocation');
+ await page.getByLabel('Illustrative cost condition').selectOption('missing');
+ await page.getByRole('button',{name:'Preview allocation'}).click();
+ await page.getByText('This example needs a change.',{exact:true}).waitFor();
+ await page.goto('http://127.0.0.1:3110/instruments',{waitUntil:'networkidle'});
+ await page.getByRole('textbox',{name:'Search instruments'}).fill('NVDA');
+ if(await page.locator('tbody tr').count()<1)throw new Error('Recorded instrument search returned no NVDA');
+ await page.goto('http://127.0.0.1:3110/withdraw',{waitUntil:'networkidle'});
+ await page.getByRole('button',{name:'Estimate cash available'}).click();
+ await page.getByText('Modeled coverage',{exact:true}).waitFor();
+ if(!(await page.locator('.withdraw-result').innerText()).includes('400.00'))throw new Error('Withdrawal preview missing');
+ await page.goto('http://127.0.0.1:3110/lab',{waitUntil:'networkidle'});
+ await page.getByRole('button',{name:'Respect the issuer limit',exact:false}).click();
+ await page.getByText('Fits your rules',{exact:true}).waitFor();
+ await page.goto('http://127.0.0.1:3110/portfolio-exit',{waitUntil:'networkidle'});
+ await page.setViewportSize({width:390,height:844});
+ await page.screenshot({path:output+'/mandate-mobile.png',fullPage:true});
+ const horizontalOverflow=await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth);
+ if(horizontalOverflow)throw new Error('Mobile page has horizontal overflow');
+ if(errors.length)throw new Error(errors.join('\n'));
+ console.log(JSON.stringify({passed:true,checks:['initial feasible plan','expense changes budget','missing quote blocks plan','recorded catalogue search','withdrawal coverage','lab-to-planner parity','mobile overflow','browser runtime errors'],screenshots:['mandate-overview.png','mandate-mobile.png']},null,2));
+}finally{await browser.close();}

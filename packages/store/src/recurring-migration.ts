@@ -1,0 +1,7 @@
+export const recurringMigration=[
+ `CREATE TABLE recurring_schedules(id text PRIMARY KEY,account_id text NOT NULL REFERENCES accounts(id),wallet text NOT NULL,request_id text NOT NULL,status text NOT NULL CHECK(status IN ('active','paused','revoked')),revision integer NOT NULL CHECK(revision>0),interval_seconds integer NOT NULL CHECK(interval_seconds BETWEEN 60 AND 2592000),scenario text NOT NULL CHECK(scenario IN ('normal','expensive','missing')),starts_at timestamptz NOT NULL,next_due timestamptz NOT NULL,lease_token text,lease_until timestamptz,created_at timestamptz NOT NULL DEFAULT clock_timestamp(),updated_at timestamptz NOT NULL DEFAULT clock_timestamp(),UNIQUE(account_id,request_id))`,
+ `CREATE INDEX recurring_schedules_due ON recurring_schedules(status,next_due,lease_until)`,
+ `CREATE TABLE recurring_firings(id text PRIMARY KEY,account_id text NOT NULL REFERENCES accounts(id),schedule_id text NOT NULL REFERENCES recurring_schedules(id),due_at timestamptz NOT NULL,request_id text NOT NULL,state text NOT NULL CHECK(state IN ('claimed','deferred','proposed','cancelled')),attempts integer NOT NULL CHECK(attempts>0),proposal_id text REFERENCES research_proposals(id),reason text,created_at timestamptz NOT NULL DEFAULT clock_timestamp(),updated_at timestamptz NOT NULL DEFAULT clock_timestamp(),UNIQUE(schedule_id,due_at),UNIQUE(account_id,request_id))`,
+ `CREATE INDEX recurring_firings_history ON recurring_firings(account_id,created_at DESC,id)`,
+ 'INSERT INTO mandate_schema(version) VALUES(7)',
+];

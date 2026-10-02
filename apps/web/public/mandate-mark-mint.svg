@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Mandate mark</title>
+  <rect width="64" height="64" rx="13" fill="#daf2df"/>
+  <path d="M13 43V28.2C13 21.3 17.4 17 23.4 17c4.8 0 8.1 2.3 9.6 6.2 1.5-3.9 4.8-6.2 9.6-6.2C48.6 17 53 21.3 53 28.2V43h-7V28.7c0-3.3-1.6-5.2-4.3-5.2-2.8 0-4.7 2-4.7 5.5V43h-7V28.7c0-3.3-1.6-5.2-4.3-5.2-2.8 0-4.7 2-4.7 5.5V43h-8Z" fill="#102e34"/>
+  <rect x="13" y="48" width="40" height="3" rx="1.5" fill="#176153"/>
+</svg>

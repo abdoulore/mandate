@@ -1,0 +1,53 @@
+# Credentials and local wallet material
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.wallets/
+.studio/
+# Dependencies and generated artifacts
+node_modules/
+.next/
+.next-production/
+dist/
+coverage/
+test-results/
+playwright-report/
+*.tsbuildinfo
+# Local observations and runtime state. Only frozen, derived demo evidence is public.
+data/*
+!data/cost-2026-09-20.jsonl
+!data/cost-2026-09-21.jsonl
+!data/cost-2026-09-22.jsonl
+!data/cost-2026-09-23.jsonl
+!data/cost-2026-09-24.jsonl
+!data/cost-2026-09-25.jsonl
+!data/universe-2026-09-21.jsonl
+!data/sweep-all-2026-09-21T13-28.jsonl
+*.log
+.runtime/
+# Internal planning, handoff, design exploration and private research notes
+/PLAN.md
+/REVIEW-2026-09-28.md
+/DX-REPORT.md
+/DEMO-DESIGN-PLAN.md
+/docs/
+/planning/
+/bnb-tokenized-stocks-handoff/
+/design/
+/research/*
+!/research/evidence-manifest.json
+!/research/passports/
+/research/passports/*
+!/research/passports/launch.json
+/apps/web/AGENTS.md
+/apps/web/CLAUDE.md
+# This PC's Task Scheduler integration is local-only
+/scripts/collector-watchdog.ps1
+/scripts/collector-watchdog-hidden.vbs
+# Old product image retained locally only
+/apps/web/public/mandate-regime.png
+# Local editor/OS files
+.DS_Store
+Thumbs.db

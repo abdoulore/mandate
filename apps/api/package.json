@@ -1,0 +1,14 @@
+{
+  "name": "@mandate/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "fastify": "5.12.5",
+    "@mandate/core": "0.1.0",
+    "@mandate/domain": "0.1.0",
+    "@mandate/connectors": "0.1.0",
+    "viem": "2.56.8",
+    "@mandate/store": "0.1.0"
+  }
+}

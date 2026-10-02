@@ -1,0 +1,24 @@
+import {z} from 'zod';
+import {exposureModelSchema} from './portfolio.ts';
+
+const id = z.string().min(1).max(120);
+const timestamp = z.string().datetime();
+export const atomicSchema = z.string().regex(/^(0|[1-9]\d{0,77})$/);
+const record = {schemaVersion:z.literal('1.0.0'),id,createdAt:timestamp};
+export const assetIdentitySchema = z.object({chainId:z.number().int().positive(),contract:z.string().regex(/^0x[0-9a-fA-F]{40}$/),decimals:z.number().int().min(0).max(36)}).strict();
+export const moneyRecordSchema = z.object({asset:assetIdentitySchema,atomic:atomicSchema}).strict();
+export const instrumentRecordSchema = z.object({...record,asset:assetIdentitySchema,underlying:id,issuer:id,accountingModel:z.enum(['token_units','rebasing','multiplier','unknown']),leveraged:z.boolean(),executionCertified:z.literal(false),source:z.string().url(),effectiveAt:timestamp}).strict();
+export const accountRecordSchema = z.object({...record,wallet:z.string().regex(/^0x[0-9a-fA-F]{40}$/),asset:assetIdentitySchema,balanceAtomic:atomicSchema,protectedAtomic:atomicSchema,revision:z.number().int().nonnegative(),observedAt:timestamp,evidenceMode:z.enum(['synthetic','observed','confirmed'])}).strict();
+export const positionRecordSchema = z.object({...record,accountId:id,instrumentId:id,quantity:moneyRecordSchema,observedAt:timestamp,blockNumber:atomicSchema,evidenceMode:z.enum(['synthetic','confirmed'])}).strict();
+export const obligationRecordSchema = z.object({...record,accountId:id,label:z.string().min(1).max(120),amount:moneyRecordSchema,dueAt:timestamp.nullable(),status:z.enum(['active','fulfilled','cancelled'])}).strict();
+export const planRevisionRecordSchema = z.object({...record,accountId:id,revision:z.number().int().positive(),accountRevision:z.number().int().nonnegative(),decisionId:id,inputHash:z.string().regex(/^[0-9a-f]{64}$/),maximumDebit:moneyRecordSchema,evidenceMode:z.enum(['synthetic','live']),expiresAt:timestamp,exposureModel:exposureModelSchema.optional()}).strict();
+export const planControlSchema=z.object({planId:id,accountId:id,status:z.enum(['active','paused','cancellation_requested','revoked']),revision:z.number().int().positive(),createdAt:timestamp,updatedAt:timestamp}).strict();
+export const reservationRecordSchema = z.object({...record,accountId:id,planRevisionId:id,idempotencyKey:id,amountAtomic:atomicSchema,state:z.enum(['held','released','consumed'])}).strict();
+export const authorizationRecordSchema = z.object({...record,accountId:id,planRevisionId:id,wallet:z.string().regex(/^0x[0-9a-fA-F]{40}$/),maximumDebit:moneyRecordSchema,expiresAt:timestamp,scope:z.literal('exact_plan_revision'),revokedAt:timestamp.nullable()}).strict();
+export const receiptRecordSchema = z.object({...record,reservationId:id,transactionHash:z.string().regex(/^0x[0-9a-fA-F]{64}$/),blockNumber:atomicSchema,debitedAtomic:atomicSchema,observedAt:timestamp,evidenceMode:z.enum(['synthetic','confirmed'])}).strict();
+export const journalRecordSchema = z.object({...record,accountId:id,kind:id,payload:z.record(z.string(),z.unknown())}).strict();
+export type AccountRecord = z.infer<typeof accountRecordSchema>;
+export type PlanRevisionRecord = z.infer<typeof planRevisionRecordSchema>;
+export type PlanControl = z.infer<typeof planControlSchema>;
+export type ReservationRecord = z.infer<typeof reservationRecordSchema>;
+export type ReceiptRecord = z.infer<typeof receiptRecordSchema>;

@@ -1,0 +1,48 @@
+{
+  "capturedAt": "2026-09-22T14:52:39.508Z",
+  "note": "Append-only files were read sequentially and may keep growing. Hashes identify the captured byte prefixes; history was not rewritten.",
+  "files": [
+    {
+      "file": "cost-2026-09-20.jsonl",
+      "bytes": 1329089,
+      "sha256": "4bffcd9907884aebebb14c7f0dbf9ea191b916b683e0bb89a76adca30f2a9c32",
+      "rows": 9540
+    },
+    {
+      "file": "cost-2026-09-21.jsonl",
+      "bytes": 2537055,
+      "sha256": "b6bf6f6a4ad80a395603a423d4e984604edfe3d802886785dc3b0832030c2011",
+      "rows": 16758
+    },
+    {
+      "file": "cost-2026-09-22.jsonl",
+      "bytes": 1018487,
+      "sha256": "a685ca57615f470e3ea33c8a9e1f61135a70e6278720aa7299d0527b41f13dd8",
+      "rows": 6774
+    },
+    {
+      "file": "sweep-all-2026-09-21T13-28.jsonl",
+      "bytes": 73231,
+      "sha256": "c05f25466d605bf082b774c0986c763c6d927fb3c8afd3b93510b9661a0e94f6",
+      "rows": 488
+    },
+    {
+      "file": "universe-2026-09-20.jsonl",
+      "bytes": 8691931,
+      "sha256": "b80a32842424f50262f2bf4586492c304c3969e6875410a860df9671bd0caa9b",
+      "rows": 25864
+    },
+    {
+      "file": "universe-2026-09-21.jsonl",
+      "bytes": 15023195,
+      "sha256": "c22065afd6208501efa5d9a7fd1c2651d12ab97c1bdf1cab9525fee652805d6e",
+      "rows": 45034
+    },
+    {
+      "file": "universe-2026-09-22.jsonl",
+      "bytes": 6192389,
+      "sha256": "d036d43a2e552f57690d06ce954051c2bf01da604152ffdb95453eeab8831f1e",
+      "rows": 18498
+    }
+  ]
+}

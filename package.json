@@ -1,0 +1,39 @@
+{
+  "name": "mandate",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=24.0.0 <25"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:api": "node --env-file-if-exists=.env --import tsx apps/api/src/server.ts",
+    "build": "npm run build --workspace @mandate/web",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:invariants": "node scripts/verify-invariants.mjs",
+    "probe": "node --env-file-if-exists=.env --import tsx scripts/probe.ts",
+    "probe:instrument": "node --env-file-if-exists=.env --experimental-transform-types scripts/probe-first-instrument.ts",
+    "probe:router": "node --experimental-transform-types scripts/probe-router.ts",
+    "probe:routes": "node --env-file-if-exists=.env --experimental-transform-types scripts/probe-route-alternatives.ts",
+    "probe:wallet": "node --experimental-transform-types scripts/probe-wallet-readiness.ts",
+    "manifest": "node scripts/manifest.mjs",
+    "demo:ledger": "node --import tsx scripts/ledger-demo.ts",
+    "demo:agent": "node --experimental-transform-types scripts/agent-demo.ts",
+    "probe:passports": "node --env-file-if-exists=.env --experimental-transform-types scripts/probe-passports.ts"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "typescript": "7.0.2",
+    "tsx": "4.23.15",
+    "vitest": "5.0.1",
+    "@playwright/test": "1.63.0"
+  }
+}

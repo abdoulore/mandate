@@ -1,0 +1,252 @@
+[
+  {
+    "schemaVersion": "1.0.0",
+    "id": "recorded-nvda-issuer-cost-divergence",
+    "title": "NVDA issuer cost divergence",
+    "kind": "recorded",
+    "capturedAt": "2026-09-20T11:06:45.960Z",
+    "question": "Two issuers reported different derived buy-cost metrics for the same ticker and nominal 1,000 USD size. Should a planner silently substitute one token for the other?",
+    "expectedControl": "Keep issuer and contract identity explicit; apply the saved representation allowlist and cost limit before a research proposal.",
+    "limitations": [
+      "The old collector saved derived metrics or summary fields, not the upstream raw quote/build response, wallet context, expiry, or fill.",
+      "This is historical research evidence only. It cannot establish executable liquidity, eligibility, transaction meaning, or a counterfactual trade outcome.",
+      "The samples are about six seconds apart; their cost estimates are not directly executable quotes or proof of equivalent instrument accounting."
+    ],
+    "executionEnabled": false,
+    "events": [
+      {
+        "kind": "recorded_collector_row",
+        "at": "2026-09-20T11:06:39.771Z",
+        "source": {
+          "file": "data/cost-2026-09-20.jsonl",
+          "line": 2,
+          "fileBytes": 1329089,
+          "fileSha256": "4bffcd9907884aebebb14c7f0dbf9ea191b916b683e0bb89a76adca30f2a9c32",
+          "lineSha256": "ff510abaf4dd71ca80dc603078fcaa3ae00bd40d591b3adfae3c1fe86892f00c"
+        },
+        "metricClass": "derived_cost_metric",
+        "storedCollectorRow": {
+          "ts": "2026-09-20T11:06:39.771Z",
+          "tk": "NVDA",
+          "plat": "ondo",
+          "side": "buy",
+          "usd": 1000,
+          "open": true,
+          "pct": 1.880168874801047,
+          "impact": 0.0131734196,
+          "route": "Rfq Halfmoon|Pancakeswap V3"
+        },
+        "note": "Ondo NVDA derived buy-cost metric for 1,000 USD."
+      },
+      {
+        "kind": "recorded_collector_row",
+        "at": "2026-09-20T11:06:45.960Z",
+        "source": {
+          "file": "data/cost-2026-09-20.jsonl",
+          "line": 8,
+          "fileBytes": 1329089,
+          "fileSha256": "4bffcd9907884aebebb14c7f0dbf9ea191b916b683e0bb89a76adca30f2a9c32",
+          "lineSha256": "90bf776499d7ea4a0c1c8a7e9528c473512db3725b870219a6b2ca3bbedae818"
+        },
+        "metricClass": "derived_cost_metric",
+        "storedCollectorRow": {
+          "ts": "2026-09-20T11:06:45.960Z",
+          "tk": "NVDA",
+          "plat": "bstock",
+          "side": "buy",
+          "usd": 1000,
+          "open": true,
+          "pct": -0.058745600789289476,
+          "impact": -0.000490748,
+          "route": "Metric"
+        },
+        "note": "Backed NVDA derived buy-cost metric for 1,000 USD."
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "recorded-source-error-40367",
+    "title": "Collector source error during a closed-status observation",
+    "kind": "recorded",
+    "capturedAt": "2026-09-20T11:07:56.811Z",
+    "question": "What should research mode do when the collector recorded an error code and a false open flag?",
+    "expectedControl": "Represent source availability as unknown or blocked; do not infer a live quote, fill, or current market closure from the old row.",
+    "limitations": [
+      "The old collector saved derived metrics or summary fields, not the upstream raw quote/build response, wallet context, expiry, or fill.",
+      "This is historical research evidence only. It cannot establish executable liquidity, eligibility, transaction meaning, or a counterfactual trade outcome.",
+      "The collector did not preserve the upstream error body or enough context to identify the precise meaning of error 40367."
+    ],
+    "executionEnabled": false,
+    "events": [
+      {
+        "kind": "recorded_collector_row",
+        "at": "2026-09-20T11:07:56.811Z",
+        "source": {
+          "file": "data/cost-2026-09-20.jsonl",
+          "line": 91,
+          "fileBytes": 1329089,
+          "fileSha256": "4bffcd9907884aebebb14c7f0dbf9ea191b916b683e0bb89a76adca30f2a9c32",
+          "lineSha256": "1b47f345d281bb307b0ffc4e9573d868a1458e840deafb5d6d43eb308dd2e5fd"
+        },
+        "metricClass": "derived_cost_metric",
+        "storedCollectorRow": {
+          "ts": "2026-09-20T11:07:56.811Z",
+          "tk": "SOXL",
+          "plat": "ondo",
+          "side": "buy",
+          "usd": 100,
+          "open": false,
+          "err": 40367
+        },
+        "note": "SOXL buy-cost collection returned code 40367; no finite derived metric was saved."
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "recorded-sweep-error-40374",
+    "title": "Catalogue sweep error",
+    "kind": "recorded",
+    "capturedAt": "2026-09-21T13:28:53.614Z",
+    "question": "How should a discovered instrument with a sweep error appear in research results?",
+    "expectedControl": "Keep discovery separate from market data and route certification; show error provenance and avoid a tradable claim.",
+    "limitations": [
+      "The old collector saved derived metrics or summary fields, not the upstream raw quote/build response, wallet context, expiry, or fill.",
+      "This is historical research evidence only. It cannot establish executable liquidity, eligibility, transaction meaning, or a counterfactual trade outcome.",
+      "The sweep row has no raw upstream response or executable quote. Code 40374 alone does not prove a specific market condition."
+    ],
+    "executionEnabled": false,
+    "events": [
+      {
+        "kind": "recorded_collector_row",
+        "at": "2026-09-21T13:28:53.614Z",
+        "source": {
+          "file": "data/sweep-all-2026-09-21T13-28.jsonl",
+          "line": 1,
+          "fileBytes": 73231,
+          "fileSha256": "c05f25466d605bf082b774c0986c763c6d927fb3c8afd3b93510b9661a0e94f6",
+          "lineSha256": "d2586b1505bba5ccddea7c88ddabd64885b2149957b3c890f5916f055a8641ff"
+        },
+        "metricClass": "collector_sweep_summary",
+        "storedCollectorRow": {
+          "ts": "2026-09-21T13:28:53.614Z",
+          "tk": "MSTR",
+          "plat": "ondo",
+          "type": 1,
+          "open": true,
+          "name": "Strategy Inc",
+          "err": 40374
+        },
+        "note": "MSTR was discovered but the sweep saved error code 40374."
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "synthetic-quote-expiry",
+    "title": "Quote expires before authorization",
+    "kind": "synthetic",
+    "capturedAt": "2026-09-28T00:00:30.000Z",
+    "question": "Can an expired research quote become a transaction?",
+    "expectedControl": "Block preparation and require a fresh quote, route check, simulation, and authorization.",
+    "limitations": [
+      "This incident is invented to exercise a control; it was not observed in the collector or on-chain.",
+      "The replay cannot reach a signer, approval, submit endpoint, or live market source."
+    ],
+    "executionEnabled": false,
+    "events": [
+      {
+        "kind": "synthetic_failure",
+        "at": "2026-09-28T00:00:30.000Z",
+        "failure": "quote_expired",
+        "injectedState": {
+          "quoteAgeSeconds": 31,
+          "quoteTtlSeconds": 30,
+          "authorizationGranted": false
+        },
+        "note": "Synthetic 30-second TTL crossed without an authorized transaction."
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "synthetic-source-timeout",
+    "title": "Source times out during revalidation",
+    "kind": "synthetic",
+    "capturedAt": "2026-09-28T00:00:00.000Z",
+    "question": "Does an older observation authorize a new proposal when a fresh read times out?",
+    "expectedControl": "Defer the proposal and preserve the prior record as historical evidence.",
+    "limitations": [
+      "This incident is invented to exercise a control; it was not observed in the collector or on-chain.",
+      "The replay cannot reach a signer, approval, submit endpoint, or live market source."
+    ],
+    "executionEnabled": false,
+    "events": [
+      {
+        "kind": "synthetic_failure",
+        "at": "2026-09-28T00:00:00.000Z",
+        "failure": "source_timeout",
+        "injectedState": {
+          "freshReadSucceeded": false,
+          "lastKnownAgeSeconds": 600
+        },
+        "note": "Synthetic fresh market source timeout; last-known value remains historical."
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "synthetic-ambiguous-submission",
+    "title": "Submission response lost after dispatch",
+    "kind": "synthetic",
+    "capturedAt": "2026-09-28T00:00:00.000Z",
+    "question": "May a worker retry a transaction when submission outcome is unknown?",
+    "expectedControl": "Hold the reservation and reconcile by durable attempt identifiers before any new submission.",
+    "limitations": [
+      "This incident is invented to exercise a control; it was not observed in the collector or on-chain.",
+      "The replay cannot reach a signer, approval, submit endpoint, or live market source."
+    ],
+    "executionEnabled": false,
+    "events": [
+      {
+        "kind": "synthetic_failure",
+        "at": "2026-09-28T00:00:00.000Z",
+        "failure": "ambiguous_submission",
+        "injectedState": {
+          "submissionAttempted": true,
+          "responseReceived": false,
+          "transactionHash": null
+        },
+        "note": "Synthetic network interruption after dispatch; no on-chain outcome is asserted."
+      }
+    ]
+  },
+  {
+    "schemaVersion": "1.0.0",
+    "id": "synthetic-partial-settlement",
+    "title": "Partial settlement is not a complete fill",
+    "kind": "synthetic",
+    "capturedAt": "2026-09-28T00:00:00.000Z",
+    "question": "How should reserved cash be treated when a modeled order settles only partly?",
+    "expectedControl": "Reconcile actual debits before releasing unused reservation; do not report the target quantity as filled.",
+    "limitations": [
+      "This incident is invented to exercise a control; it was not observed in the collector or on-chain.",
+      "The replay cannot reach a signer, approval, submit endpoint, or live market source."
+    ],
+    "executionEnabled": false,
+    "events": [
+      {
+        "kind": "synthetic_failure",
+        "at": "2026-09-28T00:00:00.000Z",
+        "failure": "partial_settlement",
+        "injectedState": {
+          "requestedAtomic": "10000000000000000000",
+          "confirmedDebitAtomic": "4000000000000000000",
+          "settlementConfirmed": false
+        },
+        "note": "Synthetic partial debit amounts; not a real chain receipt."
+      }
+    ]
+  }
+]
