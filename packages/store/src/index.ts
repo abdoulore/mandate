@@ -15,6 +15,7 @@ import {planControlMigration} from './plan-control-migration.ts';
 import {directAttemptMigration} from './direct-attempt.ts';
 export {RecurringStore} from './recurring.ts';
 export {DirectAttemptStore,DirectAttemptError,type DirectAttempt} from './direct-attempt.ts';
+export {PlanBoundDirectStore,PlanBoundDirectError,type PlanDirectPreparation} from './plan-bound-direct.ts';
 export {embeddedDatabase,postgresDatabase,type Database} from './database.ts';
 
 export class LedgerError extends Error {constructor(public code:string){super(code);}}
@@ -324,6 +325,7 @@ export class Ledger {
    if(!pointer)fail('RESERVATION_NOT_FOUND');
    const account=await this.lockedAccount(tx,pointer.account_id);
    const row=(await tx.query<{record:ReservationRecord}>('SELECT record FROM reservations WHERE id=$1 FOR UPDATE',[id])).rows[0].record;
+   if((await tx.query("SELECT id FROM direct_attempts WHERE record->'planBinding'->>'reservationId'=$1 LIMIT 1",[id])).rows.length)fail('PLAN_BOUND_ATTEMPT_REQUIRES_LEDGER');
    const target=receipt?'consumed':'released';
    if(row.state===target){
     if(receipt){const previous=(await tx.query<{record:ReceiptRecord}>('SELECT record FROM receipts WHERE reservation_id=$1',[id])).rows[0]?.record;if(!same(previous,receipt))fail('RECEIPT_CONFLICT');}

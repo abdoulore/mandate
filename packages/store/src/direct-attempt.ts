@@ -25,8 +25,9 @@ export type DirectAttempt={
  preparedAt:string;expiresAt:string;state:DirectAttemptState;
  transactionHash:string|null;settlement:null|{status:'success'|'reverted';blockNumber:string;blockHash:string;confirmations:string;observedAt:string;spentAtomic?:string;receivedAtomic?:string;gasCostWei?:string};
  recovery?:{reason:'expired_without_observed_token_spend';checkedAt:string;fromBlock:string;throughBlock:string;throughBlockHash:string;throughTimestamp:string};
+ planBinding?:{accountId:string;planId:string;reservationId:string;mandateId:string;mandateRevision:number;cashPolicyRevision:number;checkpointId:string;inputHash:string;payloadHash:string};
 };
-type PrepareInput=Omit<DirectAttempt,'id'|'preparedAt'|'state'|'transactionHash'|'settlement'>;
+type PrepareInput=Omit<DirectAttempt,'id'|'preparedAt'|'state'|'transactionHash'|'settlement'|'planBinding'> & {planBinding?:never};
 const address=/^0x[0-9a-fA-F]{40}$/;
 const hash=/^0x[0-9a-fA-F]{64}$/;
 const quantity=/^(0|[1-9]\d*)$/;
@@ -58,12 +59,13 @@ export class DirectAttemptStore {
   return sold?null:received;
  }
  async prepare(input:PrepareInput){
+  if('planBinding' in input)fail('PLAN_BOUND_ATTEMPT_REQUIRES_LEDGER');
   const now=Date.now(),expiry=Date.parse(input.expiresAt);
   if(!address.test(input.wallet)||!address.test(input.to)||!address.test(input.tokenIn)||!address.test(input.tokenOut)||!/^0x[0-9a-fA-F]{8,}$/.test(input.data)||input.data.length%2||input.chainId!==56||input.valueAtomic!=='0'||!quantity.test(input.amountInAtomic)||!quantity.test(input.minimumOutAtomic)||!quantity.test(input.deadline)||!Number.isFinite(expiry)||expiry<=now||expiry>now+120000||!['approval','swap'].includes(input.kind)||!['BUY','SELL'].includes(input.direction))fail('INVALID_DIRECT_ATTEMPT');
   if(BigInt(input.amountInAtomic)<=0n||BigInt(input.deadline)*1000n<BigInt(Math.ceil(expiry)))fail('INVALID_DIRECT_ATTEMPT');
   const record:DirectAttempt={...input,wallet:input.wallet.toLowerCase(),to:input.to.toLowerCase(),tokenIn:input.tokenIn.toLowerCase(),tokenOut:input.tokenOut.toLowerCase(),id:randomUUID(),preparedAt:new Date(now).toISOString(),state:'prepared',transactionHash:null,settlement:null};
   return this.db.transaction(async tx=>{
-   await tx.query("UPDATE direct_attempts SET state='abandoned',record=jsonb_set(record,'{state}','\"abandoned\"'::jsonb),updated_at=clock_timestamp() WHERE wallet=$1 AND state='prepared' AND (record->>'expiresAt')::timestamptz<=clock_timestamp()",[record.wallet]);
+   await tx.query("UPDATE direct_attempts SET state='abandoned',record=jsonb_set(record,'{state}','\"abandoned\"'::jsonb),updated_at=clock_timestamp() WHERE wallet=$1 AND state='prepared' AND NOT (record ? 'planBinding') AND (record->>'expiresAt')::timestamptz<=clock_timestamp()",[record.wallet]);
    const active=(await tx.query<{state:DirectAttemptState}>('SELECT state FROM direct_attempts WHERE wallet=$1 AND state IN (\'prepared\',\'submission_unknown\',\'submitted\') FOR UPDATE',[record.wallet])).rows[0];
    if(active)fail('DIRECT_ATTEMPT_PENDING');
    try{await tx.query('INSERT INTO direct_attempts(id,wallet,kind,direction,state,record) VALUES($1,$2,$3,$4,$5,$6)',[record.id,record.wallet,record.kind,record.direction,record.state,JSON.stringify(record)]);}catch(error){if((error as {code?:string}).code==='23505')fail('DIRECT_ATTEMPT_PENDING');throw error;}
@@ -74,6 +76,7 @@ export class DirectAttemptStore {
   return this.db.transaction(async tx=>{
    const row=(await tx.query<{record:DirectAttempt}>('SELECT record FROM direct_attempts WHERE wallet=$1 AND id=$2 FOR UPDATE',[wallet.toLowerCase(),id])).rows[0];
    if(!row)fail('DIRECT_ATTEMPT_NOT_FOUND');
+   if(row.record.planBinding)fail('PLAN_BOUND_ATTEMPT_REQUIRES_LEDGER');
    if(row.record.state!=='prepared')fail('DIRECT_ATTEMPT_ALREADY_BEGUN');
    if(Date.parse(row.record.expiresAt)<=Date.now())fail('DIRECT_ATTEMPT_EXPIRED');
    const record={...row.record,state:'submission_unknown' as const};
@@ -85,6 +88,7 @@ export class DirectAttemptStore {
   return this.db.transaction(async tx=>{
    const row=(await tx.query<{record:DirectAttempt}>('SELECT record FROM direct_attempts WHERE wallet=$1 AND id=$2 FOR UPDATE',[wallet.toLowerCase(),id])).rows[0];
    if(!row)fail('DIRECT_ATTEMPT_NOT_FOUND');
+   if(row.record.planBinding)fail('PLAN_BOUND_ATTEMPT_REQUIRES_LEDGER');
    if(row.record.state!=='prepared')fail('DIRECT_ATTEMPT_ALREADY_BEGUN');
    const record={...row.record,state:'abandoned' as const};
    await tx.query('UPDATE direct_attempts SET state=$2,record=$3,updated_at=clock_timestamp() WHERE id=$1',[id,record.state,JSON.stringify(record)]);
@@ -95,6 +99,7 @@ export class DirectAttemptStore {
   return this.db.transaction(async tx=>{
    const row=(await tx.query<{record:DirectAttempt}>('SELECT record FROM direct_attempts WHERE wallet=$1 AND id=$2 FOR UPDATE',[wallet.toLowerCase(),id])).rows[0];
    if(!row)fail('DIRECT_ATTEMPT_NOT_FOUND');
+   if(row.record.planBinding)fail('PLAN_BOUND_ATTEMPT_REQUIRES_LEDGER');
    const prior=row.record;
    if(prior.kind!=='swap'||prior.state!=='submission_unknown'||prior.transactionHash!==null)fail('DIRECT_ATTEMPT_NOT_RECOVERABLE');
    if(recovery.reason!=='expired_without_observed_token_spend'||!Number.isFinite(Date.parse(recovery.checkedAt))||!quantity.test(recovery.fromBlock)||!quantity.test(recovery.throughBlock)||!hash.test(recovery.throughBlockHash)||!quantity.test(recovery.throughTimestamp)||BigInt(recovery.throughTimestamp)<BigInt(prior.deadline)+60n||BigInt(recovery.throughBlock)<BigInt(recovery.fromBlock))fail('INVALID_DIRECT_RECOVERY');
@@ -120,6 +125,7 @@ export class DirectAttemptStore {
   return this.db.transaction(async tx=>{
    const row=(await tx.query<{record:DirectAttempt}>('SELECT record FROM direct_attempts WHERE wallet=$1 AND id=$2 FOR UPDATE',[wallet.toLowerCase(),id])).rows[0];
    if(!row)fail('DIRECT_ATTEMPT_NOT_FOUND');
+   if(row.record.planBinding)fail('PLAN_BOUND_ATTEMPT_REQUIRES_LEDGER');
    if(row.record.state==='confirmed'||row.record.state==='reverted'){
    const prior=row.record.settlement;
    if(!prior)throw new DirectAttemptError('DIRECT_SETTLEMENT_CONFLICT');
