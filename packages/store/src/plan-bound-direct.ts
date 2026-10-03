@@ -38,8 +38,8 @@ async function event(tx:Queryable,accountId:string,kind:string,payload:Record<st
  await tx.query('INSERT INTO outbox(id,payload) VALUES($1,$2)',[id,JSON.stringify(envelope)]);
 }
 
-// Internal staging boundary. No HTTP route creates plan-bound attempts yet;
-// lifecycle routes can handle one only after this atomic preparation succeeds.
+// Atomic staging boundary for the gated plan-bound HTTP route. Lifecycle
+// routes can handle an attempt only after this preparation succeeds.
 export class PlanBoundDirectStore{
  constructor(private readonly db:Database){}
  async prepare(input:PlanDirectPreparation){
