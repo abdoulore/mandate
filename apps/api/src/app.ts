@@ -26,7 +26,7 @@ import {passportPolicySchema,evaluatePassport} from '@mandate/domain';
 import {recurringScheduleInputSchema,recurringChangeSchema} from '@mandate/domain';
 class CapitalReadError extends Error{}
 class InflowReadError extends Error{}
-export function createApp(root=process.cwd(),options:{researchClient?:Pick<BinanceReadClient,'get'>;readinessReader?:typeof readWalletReadiness;directReader?:(owner:string,direction:'BUY'|'SELL',sellAmountAtomic?:string)=>Promise<unknown>;directPreparer?:typeof readDirectPreparation;directApprovalPreparer?:typeof readDirectApprovalPreparation;directSettlementReader?:typeof readDirectSettlement;capitalReader?:typeof readCapitalCheckpoint;marketReader?:typeof readPortfolioMarks;inflowReader?:typeof readInflowProof;ledger?:Ledger;recurringTickMs?:number|null}={}){
+export function createApp(root=process.cwd(),options:{researchClient?:Pick<BinanceReadClient,'get'>;readinessReader?:typeof readWalletReadiness;directReader?:(owner:string,direction:'BUY'|'SELL',sellAmountAtomic?:string,buyAmountAtomic?:string)=>Promise<unknown>;directPreparer?:typeof readDirectPreparation;directApprovalPreparer?:typeof readDirectApprovalPreparation;directSettlementReader?:typeof readDirectSettlement;capitalReader?:typeof readCapitalCheckpoint;marketReader?:typeof readPortfolioMarks;inflowReader?:typeof readInflowProof;ledger?:Ledger;recurringTickMs?:number|null}={}){
  const app=Fastify({logger:false,bodyLimit:16384});
  const wallet=createWalletSessionService();
  let ledgerPromise:Promise<Ledger>|undefined;
@@ -198,19 +198,19 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
    return {instrument:'AAOIB',amount:'10',asset:'BSC USDT',state:inspection.identityAndShapeChecked?'SHAPE_CHECKED':'UNVERIFIED',observedAt:build.finishedAt,validUntil,mode:bound.mode,vendorName:bound.vendorName,toTokenAmount:bound.toTokenAmount,buildCode:build.code,inspection:{identityAndShapeChecked:inspection.identityAndShapeChecked,reasons:inspection.reasons},walletCheck,executionReview,costEvidence,executionEnabled:false,note:'Read-only research. Wallet funds, allowance and router code are observations only; eligibility, calldata meaning, gas sufficiency, simulation and transaction authorization remain unverified.'};
   }catch(error){if(error instanceof WalletSessionError)return reply.code(error.statusCode).send({error:error.code});throw error;}
  });
- const directPreflightBody=z.object({direction:z.enum(['BUY','SELL']),sellAmountAtomic:z.string().max(20).regex(/^[1-9]\d*$/).optional()}).strict().refine(x=>x.direction==='SELL'?x.sellAmountAtomic!==undefined&&BigInt(x.sellAmountAtomic)<=2n*10n**16n:x.sellAmountAtomic===undefined);
+ const directPreflightBody=z.object({direction:z.enum(['BUY','SELL']),sellAmountAtomic:z.string().max(20).regex(/^[1-9]\d*$/).optional(),buyAmountAtomic:z.string().max(20).regex(/^[1-9]\d*$/).optional()}).strict().refine(x=>x.direction==='SELL'?x.buyAmountAtomic===undefined&&x.sellAmountAtomic!==undefined&&BigInt(x.sellAmountAtomic)<=2n*10n**16n:x.sellAmountAtomic===undefined&&(x.buyAmountAtomic===undefined||BigInt(x.buyAmountAtomic)<=10n*10n**18n));
  app.post('/v1/routes/SPYon/preflight',async(req,reply)=>{
   const session=capitalSession(req.headers.cookie,req.headers.origin,true);
   const parsed=directPreflightBody.safeParse(req.body);
   if(!parsed.success)return reply.code(400).send({error:'INVALID_DIRECT_PREFLIGHT'});
-  try{return await (options.directReader??readDirectPreflight)(session.address,parsed.data.direction,parsed.data.sellAmountAtomic);}
+  try{return await (options.directReader??readDirectPreflight)(session.address,parsed.data.direction,parsed.data.sellAmountAtomic,parsed.data.buyAmountAtomic);}
   catch{return reply.code(503).send({error:'DIRECT_PREFLIGHT_UNAVAILABLE',executionEnabled:false});}
  });
  const attemptIdBody=z.object({attemptId:z.string().uuid()}).strict();
  const attemptHashBody=attemptIdBody.extend({transactionHash:z.string().regex(/^0x[0-9a-fA-F]{64}$/)}).strict();
  const directEnabled=()=>process.env.MANDATE_DIRECT_EXECUTION_ENABLED==='true';
  const publicAttempt=(attempt:DirectAttempt)=>{const {data:_,...review}=attempt;return review;};
- const checkBuyCapital=async(address:string)=>{const capital=await refreshCapital(address);return capital.state==='OBSERVED'&&capital.policyRevision>=1&&BigInt(capital.availableAtomic)>=10n*10n**18n;};
+ const checkBuyCapital=async(address:string,amountIn:bigint)=>{const capital=await refreshCapital(address);return capital.state==='OBSERVED'&&capital.policyRevision>=1&&BigInt(capital.availableAtomic)>=amountIn;};
  const approvalAbi=parseAbi(['function approve(address,uint256) returns (bool)']);
  function swapPayloadMatches(data:Hex,owner:string,amountIn:bigint,minimumOut:bigint,deadline:bigint,direction:'BUY'|'SELL'){
   try{const decoded=decodeFunctionData({abi:pancakeRouterAbi,data});if(decoded.functionName!=='exactInputSingle')return false;const p=decoded.args[0];return p.tokenIn.toLowerCase()===(direction==='BUY'?PANCAKE_V3.usdt:PANCAKE_V3.spyOn).toLowerCase()&&p.tokenOut.toLowerCase()===(direction==='BUY'?PANCAKE_V3.spyOn:PANCAKE_V3.usdt).toLowerCase()&&p.recipient.toLowerCase()===owner&&p.fee===PANCAKE_V3.fee&&p.amountIn===amountIn&&p.amountOutMinimum===minimumOut&&p.deadline===deadline&&p.sqrtPriceLimitX96===0n;}catch{return false;}
@@ -221,11 +221,12 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
   const session=capitalSession(req.headers.cookie,req.headers.origin,true);
   if(!directEnabled())return reply.code(409).send({error:'DIRECT_EXECUTION_DISABLED'});
   const parsed=directPreflightBody.safeParse(req.body);if(!parsed.success)return reply.code(400).send({error:'INVALID_DIRECT_PREPARATION'});
-  const {direction,sellAmountAtomic}=parsed.data;
-  if(direction==='BUY'&&!(await checkBuyCapital(session.address)))return reply.code(409).send({error:'PROTECTED_CASH_OR_POLICY_BLOCKS_TRADE'});
-  const {view,transaction}=await (options.directPreparer??readDirectPreparation)(session.address,direction,sellAmountAtomic);
+  const {direction,sellAmountAtomic,buyAmountAtomic}=parsed.data;
+  const requestedAmount=direction==='BUY'?BigInt(buyAmountAtomic??'10000000000000000000'):BigInt(sellAmountAtomic!);
+  if(direction==='BUY'&&!(await checkBuyCapital(session.address,requestedAmount)))return reply.code(409).send({error:'PROTECTED_CASH_OR_POLICY_BLOCKS_TRADE'});
+  const {view,transaction}=await (options.directPreparer??readDirectPreparation)(session.address,direction,sellAmountAtomic,buyAmountAtomic);
   const checkedAt=Date.parse(view.checkedAt),expiry=Math.min(checkedAt+20000,Number(transaction.deadline)*1000);
-  if(!Number.isFinite(checkedAt)||Date.now()-checkedAt>10000||Date.now()<checkedAt-10000||expiry<=Date.now()||view.gates.poolIdentity!=='CHECKED'||view.gates.calldataMeaning!=='CHECKED'||view.gates.referenceCost!=='CHECKED'||view.gates.funds!=='CHECKED'||view.gates.spendingPermission!=='CHECKED'||view.gates.simulation!=='PASSED'||view.gates.gas!=='CHECKED'||transaction.chainId!==56||transaction.from.toLowerCase()!==session.address||transaction.to.toLowerCase()!==PANCAKE_V3.router.toLowerCase()||transaction.value!==0n||transaction.amountIn.toString()!==view.amountInAtomic||transaction.amountOutMinimum.toString()!==view.minimumOutAtomic||transaction.tokenIn.toLowerCase()!==view.assetIn.toLowerCase()||transaction.tokenOut.toLowerCase()!==view.assetOut.toLowerCase()||!swapPayloadMatches(transaction.data,session.address,transaction.amountIn,transaction.amountOutMinimum,transaction.deadline,direction))return reply.code(409).send({error:'DIRECT_PREFLIGHT_BLOCKED'});
+  if(!Number.isFinite(checkedAt)||Date.now()-checkedAt>10000||Date.now()<checkedAt-10000||expiry<=Date.now()||view.gates.poolIdentity!=='CHECKED'||view.gates.calldataMeaning!=='CHECKED'||view.gates.referenceCost!=='CHECKED'||view.gates.funds!=='CHECKED'||view.gates.spendingPermission!=='CHECKED'||view.gates.simulation!=='PASSED'||view.gates.gas!=='CHECKED'||transaction.chainId!==56||transaction.from.toLowerCase()!==session.address||transaction.to.toLowerCase()!==PANCAKE_V3.router.toLowerCase()||transaction.value!==0n||transaction.amountIn!==requestedAmount||transaction.amountIn.toString()!==view.amountInAtomic||transaction.amountOutMinimum.toString()!==view.minimumOutAtomic||transaction.tokenIn.toLowerCase()!==view.assetIn.toLowerCase()||transaction.tokenOut.toLowerCase()!==view.assetOut.toLowerCase()||!swapPayloadMatches(transaction.data,session.address,transaction.amountIn,transaction.amountOutMinimum,transaction.deadline,direction))return reply.code(409).send({error:'DIRECT_PREFLIGHT_BLOCKED'});
   const attempt=await (await directStore()).prepare({wallet:session.address,kind:'swap',direction,chainId:56,to:transaction.to,data:transaction.data,valueAtomic:'0',tokenIn:transaction.tokenIn,tokenOut:transaction.tokenOut,amountInAtomic:transaction.amountIn.toString(),minimumOutAtomic:transaction.amountOutMinimum.toString(),deadline:transaction.deadline.toString(),expiresAt:new Date(expiry).toISOString()});
   // Preparation displays a review, but the one-shot /begin call is needed before calldata is released.
   return {attempt:publicAttempt(attempt)};
@@ -234,11 +235,12 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
   const session=capitalSession(req.headers.cookie,req.headers.origin,true);
   if(!directEnabled())return reply.code(409).send({error:'DIRECT_EXECUTION_DISABLED'});
   const parsed=directPreflightBody.safeParse(req.body);if(!parsed.success)return reply.code(400).send({error:'INVALID_DIRECT_PREPARATION'});
-  const {direction,sellAmountAtomic}=parsed.data;
-  if(direction==='BUY'&&!(await checkBuyCapital(session.address)))return reply.code(409).send({error:'PROTECTED_CASH_OR_POLICY_BLOCKS_TRADE'});
-  const {view,transaction}=await (options.directApprovalPreparer??readDirectApprovalPreparation)(session.address,direction,sellAmountAtomic);
+  const {direction,sellAmountAtomic,buyAmountAtomic}=parsed.data;
+  const requestedAmount=direction==='BUY'?BigInt(buyAmountAtomic??'10000000000000000000'):BigInt(sellAmountAtomic!);
+  if(direction==='BUY'&&!(await checkBuyCapital(session.address,requestedAmount)))return reply.code(409).send({error:'PROTECTED_CASH_OR_POLICY_BLOCKS_TRADE'});
+  const {view,transaction}=await (options.directApprovalPreparer??readDirectApprovalPreparation)(session.address,direction,sellAmountAtomic,buyAmountAtomic);
   const checkedAt=Date.parse(view.checkedAt),expiry=checkedAt+20000;
-  if(!Number.isFinite(checkedAt)||Date.now()-checkedAt>10000||Date.now()<checkedAt-10000||expiry<=Date.now()||view.gates.poolIdentity!=='CHECKED'||view.gates.referenceCost!=='CHECKED'||view.gates.funds!=='CHECKED'||view.gates.spendingPermission!=='BLOCKED'||transaction.chainId!==56||transaction.from.toLowerCase()!==session.address||transaction.to.toLowerCase()!==view.assetIn.toLowerCase()||transaction.value!==0n||transaction.amountIn.toString()!==view.amountInAtomic||transaction.amountOutMinimum!==0n||transaction.tokenIn.toLowerCase()!==view.assetIn.toLowerCase()||transaction.tokenOut.toLowerCase()!==view.assetOut.toLowerCase()||!approvalPayloadMatches(transaction.data,transaction.amountIn))return reply.code(409).send({error:'DIRECT_APPROVAL_BLOCKED'});
+  if(!Number.isFinite(checkedAt)||Date.now()-checkedAt>10000||Date.now()<checkedAt-10000||expiry<=Date.now()||view.gates.poolIdentity!=='CHECKED'||view.gates.referenceCost!=='CHECKED'||view.gates.funds!=='CHECKED'||view.gates.spendingPermission!=='BLOCKED'||transaction.chainId!==56||transaction.from.toLowerCase()!==session.address||transaction.to.toLowerCase()!==view.assetIn.toLowerCase()||transaction.value!==0n||transaction.amountIn!==requestedAmount||transaction.amountIn.toString()!==view.amountInAtomic||transaction.amountOutMinimum!==0n||transaction.tokenIn.toLowerCase()!==view.assetIn.toLowerCase()||transaction.tokenOut.toLowerCase()!==view.assetOut.toLowerCase()||!approvalPayloadMatches(transaction.data,transaction.amountIn))return reply.code(409).send({error:'DIRECT_APPROVAL_BLOCKED'});
   const attempt=await (await directStore()).prepare({wallet:session.address,kind:'approval',direction,chainId:56,to:transaction.to,data:transaction.data,valueAtomic:'0',tokenIn:transaction.tokenIn,tokenOut:transaction.tokenOut,amountInAtomic:transaction.amountIn.toString(),minimumOutAtomic:'0',deadline:transaction.deadline.toString(),expiresAt:new Date(expiry).toISOString()});
   return {attempt:publicAttempt(attempt)};
  });
@@ -248,7 +250,7 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
   const parsed=attemptIdBody.safeParse(req.body);if(!parsed.success)return reply.code(400).send({error:'INVALID_DIRECT_ATTEMPT'});
   const store=await directStore(),pending=await store.get(session.address,parsed.data.attemptId);
   if(!pending)return reply.code(404).send({error:'DIRECT_ATTEMPT_NOT_FOUND'});
-  if(pending.direction==='BUY'&&!(await checkBuyCapital(session.address)))return reply.code(409).send({error:'PROTECTED_CASH_OR_POLICY_BLOCKS_TRADE'});
+  if(pending.direction==='BUY'&&!(await checkBuyCapital(session.address,BigInt(pending.amountInAtomic))))return reply.code(409).send({error:'PROTECTED_CASH_OR_POLICY_BLOCKS_TRADE'});
   const attempt=await store.begin(session.address,parsed.data.attemptId);
   return {attemptId:attempt.id,state:attempt.state,transaction:{chainId:56,from:attempt.wallet,to:attempt.to,value:'0x0',data:attempt.data},note:'The submission barrier is committed. If the wallet result is unknown, do not retry.'};
  });

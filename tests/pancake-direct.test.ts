@@ -17,6 +17,14 @@ describe('direct Pancake V3 transaction preparation',()=>{
   expect(decoded.args[0].tokenOut.toLowerCase()).toBe(PANCAKE_V3.spyOn.toLowerCase());
   expect(decoded.args[0]).toMatchObject({fee:2500,recipient,amountIn:10n*10n**18n,amountOutMinimum:12_829_022_819_485_697n*995n/1000n,deadline:BigInt(Math.floor(nowMs/1000)+120)});
  });
+ it('keeps a smaller buy within the same exact-input and minimum-output rules',()=>{
+  const input=10n**16n,quoted=12_854_592_097_194n;
+  const transaction=buildDirectSwap({direction:'BUY',recipient,amountIn:input,quotedOut:quoted,nowMs});
+  const decoded=decodeFunctionData({abi:pancakeRouterAbi,data:transaction.data});
+  expect(transaction.amountOutMinimum).toBe(quoted*995n/1000n);
+  expect(decoded.functionName).toBe('exactInputSingle');
+  if(decoded.functionName==='exactInputSingle')expect(decoded.args[0].amountIn).toBe(input);
+ });
  it('binds the reverse sale and rejects an oversized trade',()=>{
   const sale=buildDirectSwap({direction:'SELL',recipient,amountIn:12_829_022_819_485_697n,quotedOut:9_935_733_702_015_095_466n,nowMs});
   expect(sale.tokenIn).toBe(PANCAKE_V3.spyOn);

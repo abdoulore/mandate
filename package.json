@@ -23,6 +23,7 @@
     "probe:routes": "node --env-file-if-exists=.env --experimental-transform-types scripts/probe-route-alternatives.ts",
     "probe:roundtrip": "node --env-file-if-exists=.env --experimental-transform-types scripts/probe-roundtrip.ts",
     "probe:pancake-direct": "node --env-file-if-exists=.env --experimental-transform-types scripts/probe-pancake-direct.ts",
+    "probe:direct-amounts": "node --env-file-if-exists=.env --experimental-transform-types scripts/probe-direct-amounts.ts",
     "probe:wallet": "node --experimental-transform-types scripts/probe-wallet-readiness.ts",
     "manifest": "node scripts/manifest.mjs",
     "demo:ledger": "node --import tsx scripts/ledger-demo.ts",

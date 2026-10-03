@@ -14,11 +14,12 @@ const cap=2n*10n**16n;
 
 // One inspection feeds the public read-only view and the optional, private
 // preparation path. Only the latter can access the exact simulated calldata.
-async function inspectDirect(ownerInput:string,direction:DirectDirection,sellAmountAtomic?:string){
+async function inspectDirect(ownerInput:string,direction:DirectDirection,sellAmountAtomic?:string,buyAmountAtomic?:string){
  if(!isAddress(ownerInput)||!['BUY','SELL'].includes(direction))throw new Error('INVALID_DIRECT_PREFLIGHT');
  if(direction==='SELL'&&(!sellAmountAtomic||!/^[1-9]\d*$/.test(sellAmountAtomic)||BigInt(sellAmountAtomic)>cap))throw new Error('INVALID_DIRECT_SELL_AMOUNT');
+ if(direction==='BUY'&&buyAmountAtomic!==undefined&&(!/^[1-9]\d*$/.test(buyAmountAtomic)||BigInt(buyAmountAtomic)>10n*10n**18n))throw new Error('INVALID_DIRECT_BUY_AMOUNT');
  const owner=ownerInput as Address,tokenIn=direction==='BUY'?PANCAKE_V3.usdt:PANCAKE_V3.spyOn,tokenOut=direction==='BUY'?PANCAKE_V3.spyOn:PANCAKE_V3.usdt;
- const amountIn=direction==='BUY'?10n*10n**18n:BigInt(sellAmountAtomic!);
+ const amountIn=direction==='BUY'?BigInt(buyAmountAtomic??'10000000000000000000'):BigInt(sellAmountAtomic!);
  const client=createPublicClient({chain:bsc,transport:http(process.env.MANDATE_BSC_RPC_URL||'https://bsc-dataseed.bnbchain.org',{timeout:12000,retryCount:1})});
  if(await client.getChainId()!==56)throw new Error('DIRECT_WRONG_CHAIN');
  const block=await client.getBlock();
@@ -74,11 +75,11 @@ async function inspectDirect(ownerInput:string,direction:DirectDirection,sellAmo
 }
 
 // Public research never returns transaction calldata.
-export async function readDirectPreflight(owner:string,direction:DirectDirection,sellAmountAtomic?:string){return (await inspectDirect(owner,direction,sellAmountAtomic)).view;}
-export async function readDirectPreparation(owner:string,direction:DirectDirection,sellAmountAtomic?:string){return inspectDirect(owner,direction,sellAmountAtomic);}
+export async function readDirectPreflight(owner:string,direction:DirectDirection,sellAmountAtomic?:string,buyAmountAtomic?:string){return (await inspectDirect(owner,direction,sellAmountAtomic,buyAmountAtomic)).view;}
+export async function readDirectPreparation(owner:string,direction:DirectDirection,sellAmountAtomic?:string,buyAmountAtomic?:string){return inspectDirect(owner,direction,sellAmountAtomic,buyAmountAtomic);}
 
-export async function readDirectApprovalPreparation(owner:string,direction:DirectDirection,sellAmountAtomic?:string){
- const {view}=await inspectDirect(owner,direction,sellAmountAtomic);
+export async function readDirectApprovalPreparation(owner:string,direction:DirectDirection,sellAmountAtomic?:string,buyAmountAtomic?:string){
+ const {view}=await inspectDirect(owner,direction,sellAmountAtomic,buyAmountAtomic);
  const amount=BigInt(view.amountInAtomic),allowance=BigInt(view.wallet.allowanceAtomic);
  if(view.gates.poolIdentity!=='CHECKED'||view.gates.referenceCost!=='CHECKED'||view.gates.funds!=='CHECKED'||allowance>=amount)throw new Error('DIRECT_APPROVAL_NOT_NEEDED_OR_BLOCKED');
  const client=createPublicClient({chain:bsc,transport:http(process.env.MANDATE_BSC_RPC_URL||'https://bsc-dataseed.bnbchain.org',{timeout:12000,retryCount:1})});

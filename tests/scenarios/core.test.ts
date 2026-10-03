@@ -30,8 +30,8 @@ describe('Application boundary',()=>{
  it('cannot use the read connector for submission',async()=>{await expect(new BinanceReadClient('test','test').get('/api/v1/dex/aggregator/order/submit')).rejects.toThrow('read-only');});
  it('requires a wallet session before requesting a wallet-bound research route',async()=>{const app=createApp();try{const r=await app.inject({method:'POST',url:'/v1/routes/AAOIB/research',payload:{amount:'10'}});expect(r.statusCode).toBe(401);expect(r.json().error).toBe('WALLET_SESSION_REQUIRED');}finally{await app.close();}});
  it('keeps direct-pool preflight read-only and bound to the signed wallet',async()=>{
-  const account=privateKeyToAccount('0x'+'22'.repeat(32) as `0x${string}`),origin='http://127.0.0.1:3110',seen:string[]=[];
-  const app=createApp(process.cwd(),{directReader:async owner=>{seen.push(owner);return {state:'READ_ONLY_CHECK' as const,executionEnabled:false,owner,gates:{authorization:'NOT_REQUESTED' as const},note:'No transaction prepared.'};}});
+  const account=privateKeyToAccount('0x'+'22'.repeat(32) as `0x${string}`),origin='http://127.0.0.1:3110',seen:Array<{owner:string;buyAmountAtomic?:string}>=[];
+  const app=createApp(process.cwd(),{directReader:async(owner,_direction,_sellAmountAtomic,buyAmountAtomic)=>{seen.push({owner,buyAmountAtomic});return {state:'READ_ONLY_CHECK' as const,executionEnabled:false,owner,gates:{authorization:'NOT_REQUESTED' as const},note:'No transaction prepared.'};}});
   try{
    expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/preflight',headers:{origin},payload:{direction:'BUY'}})).statusCode).toBe(401);
    const challenge=(await app.inject({method:'POST',url:'/v1/wallet/challenge',headers:{origin},payload:{address:account.address,chainId:56}})).json();
@@ -39,10 +39,12 @@ describe('Application boundary',()=>{
    const verified=await app.inject({method:'POST',url:'/v1/wallet/verify',headers:{origin},payload:{challengeId:challenge.id,signature}});
    const cookie=String(verified.headers['set-cookie']).split(';')[0];
    expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/preflight',headers:{origin,cookie},payload:{direction:'BUY',sellAmountAtomic:'1'}})).statusCode).toBe(400);
-   const result=await app.inject({method:'POST',url:'/v1/routes/SPYon/preflight',headers:{origin,cookie},payload:{direction:'BUY'}});
+   expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/preflight',headers:{origin,cookie},payload:{direction:'BUY',buyAmountAtomic:'10000000000000000001'}})).statusCode).toBe(400);
+   expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/preflight',headers:{origin,cookie},payload:{direction:'SELL',sellAmountAtomic:'1',buyAmountAtomic:'1'}})).statusCode).toBe(400);
+   const result=await app.inject({method:'POST',url:'/v1/routes/SPYon/preflight',headers:{origin,cookie},payload:{direction:'BUY',buyAmountAtomic:'1000000000000000000'}});
    expect(result.json()).toMatchObject({state:'READ_ONLY_CHECK',executionEnabled:false,owner:account.address.toLowerCase()});
    expect(JSON.stringify(result.json())).not.toContain('calldata');
-   expect(seen).toEqual([account.address.toLowerCase()]);
+   expect(seen).toEqual([{owner:account.address.toLowerCase(),buyAmountAtomic:'1000000000000000000'}]);
    expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/preflight',headers:{origin:'https://wrong.example',cookie},payload:{direction:'BUY'}})).statusCode).toBe(403);
   }finally{await app.close();}
  });
