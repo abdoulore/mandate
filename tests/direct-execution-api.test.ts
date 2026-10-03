@@ -88,6 +88,7 @@ describe('direct execution API barrier',()=>{
    const headers=await signed(app),payload={direction:'BUY',buyAmountAtomic:'1000000000000000000'};
    const prepared=await app.inject({method:'POST',url:'/v1/routes/SPYon/approval/prepare',headers,payload});expect(prepared.statusCode).toBe(200);
    expect(prepared.json().attempt).toMatchObject({kind:'approval',direction:'BUY',amountInAtomic:payload.buyAmountAtomic});
+   expect(Date.parse(prepared.json().attempt.expiresAt)-Date.now()).toBeGreaterThan(100000);
    expect(JSON.stringify(prepared.json())).not.toContain('095ea7b3');
    delete process.env.MANDATE_DIRECT_APPROVAL_ENABLED;
    expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/begin',headers,payload:{attemptId:prepared.json().attempt.id}})).json().error).toBe('DIRECT_APPROVAL_DISABLED');
