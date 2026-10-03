@@ -23,7 +23,7 @@ export type DirectAttempt={
  to:string;data:string;valueAtomic:'0';tokenIn:string;tokenOut:string;
  amountInAtomic:string;minimumOutAtomic:string;deadline:string;
  preparedAt:string;expiresAt:string;state:DirectAttemptState;
- transactionHash:string|null;settlement:null|{status:'success'|'reverted';blockNumber:string;blockHash:string;confirmations:string;observedAt:string};
+ transactionHash:string|null;settlement:null|{status:'success'|'reverted';blockNumber:string;blockHash:string;confirmations:string;observedAt:string;spentAtomic?:string;receivedAtomic?:string;gasCostWei?:string};
  recovery?:{reason:'expired_without_observed_token_spend';checkedAt:string;fromBlock:string;throughBlock:string;throughBlockHash:string;throughTimestamp:string};
 };
 type PrepareInput=Omit<DirectAttempt,'id'|'preparedAt'|'state'|'transactionHash'|'settlement'>;
@@ -104,11 +104,19 @@ export class DirectAttemptStore {
   });
  }
  async settle(wallet:string,id:string,settlement:NonNullable<DirectAttempt['settlement']>){
-  if(!quantity.test(settlement.blockNumber)||!hash.test(settlement.blockHash)||!quantity.test(settlement.confirmations)||BigInt(settlement.confirmations)<12n||!Number.isFinite(Date.parse(settlement.observedAt)))fail('INVALID_SETTLEMENT');
+  if(!quantity.test(settlement.blockNumber)||!hash.test(settlement.blockHash)||!quantity.test(settlement.confirmations)||BigInt(settlement.confirmations)<12n||!Number.isFinite(Date.parse(settlement.observedAt))||settlement.spentAtomic!==undefined&&!quantity.test(settlement.spentAtomic)||settlement.receivedAtomic!==undefined&&!quantity.test(settlement.receivedAtomic)||settlement.gasCostWei!==undefined&&!quantity.test(settlement.gasCostWei)||((settlement.spentAtomic===undefined)!==(settlement.receivedAtomic===undefined)))fail('INVALID_SETTLEMENT');
   return this.db.transaction(async tx=>{
    const row=(await tx.query<{record:DirectAttempt}>('SELECT record FROM direct_attempts WHERE wallet=$1 AND id=$2 FOR UPDATE',[wallet.toLowerCase(),id])).rows[0];
    if(!row)fail('DIRECT_ATTEMPT_NOT_FOUND');
-   if(row.record.state==='confirmed'||row.record.state==='reverted')return row.record;
+   if(row.record.state==='confirmed'||row.record.state==='reverted'){
+    const prior=row.record.settlement;
+    if(!prior)throw new DirectAttemptError('DIRECT_SETTLEMENT_CONFLICT');
+    if(prior.status!==settlement.status||prior.blockNumber!==settlement.blockNumber||prior.blockHash!==settlement.blockHash)fail('DIRECT_SETTLEMENT_CONFLICT');
+    if(prior.spentAtomic!==undefined||settlement.spentAtomic===undefined)return row.record;
+    const record={...row.record,settlement};
+    await tx.query('UPDATE direct_attempts SET record=$2,updated_at=clock_timestamp() WHERE id=$1',[id,JSON.stringify(record)]);
+    return record;
+   }
    if(row.record.state!=='submitted'||!row.record.transactionHash)fail('DIRECT_ATTEMPT_NOT_SUBMITTED');
    const record={...row.record,state:settlement.status==='success'?'confirmed' as const:'reverted' as const,settlement};
    await tx.query('UPDATE direct_attempts SET state=$2,record=$3,updated_at=clock_timestamp() WHERE id=$1',[id,record.state,JSON.stringify(record)]);

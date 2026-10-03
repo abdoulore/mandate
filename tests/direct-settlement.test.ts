@@ -32,7 +32,7 @@ async function rpc(record:DirectAttempt,options:{wrongInput?:boolean;wrongTarget
 }
 
 describe('direct receipt reconciliation',()=>{
- it('accepts only the matching swap with sufficient output transfers',async()=>{const record=attempt();await rpc(record);expect(await readDirectSettlement(record)).toMatchObject({status:'success',blockNumber:'90',confirmations:'16'});});
+ it('accepts only the matching swap and records exact receipt economics',async()=>{const record=attempt();await rpc(record);expect(await readDirectSettlement(record)).toMatchObject({status:'success',blockNumber:'90',confirmations:'16',spentAtomic:record.amountInAtomic,receivedAtomic:record.minimumOutAtomic,gasCostWei:'512'});});
  it('rejects a matching receipt without the output tokens',async()=>{const record=attempt();await rpc(record,{missingOutput:true});await expect(readDirectSettlement(record)).rejects.toThrow('DIRECT_SWAP_FLOW_UNVERIFIED');});
  it('rejects output below the recorded minimum',async()=>{const record=attempt();await rpc(record,{shortOutput:true});await expect(readDirectSettlement(record)).rejects.toThrow('DIRECT_SWAP_FLOW_UNVERIFIED');});
  it('rejects wrong calldata or destination even when the receipt succeeded',async()=>{const record=attempt();await rpc(record,{wrongInput:true});await expect(readDirectSettlement(record)).rejects.toThrow('DIRECT_TRANSACTION_MISMATCH');});

@@ -15,6 +15,7 @@ export async function readDirectSettlement(attempt:DirectAttempt){
  const client=createPublicClient({chain:bsc,transport:http(process.env.MANDATE_BSC_RPC_URL||'https://bsc-dataseed.bnbchain.org',{timeout:8000,retryCount:0})});
  const tx=await client.getTransaction({hash:attempt.transactionHash as Hash});
  if(tx.hash.toLowerCase()!==attempt.transactionHash||tx.from.toLowerCase()!==attempt.wallet||tx.to?.toLowerCase()!==attempt.to||tx.input.toLowerCase()!==attempt.data.toLowerCase()||tx.value!==0n||tx.blockHash?.toLowerCase()!==observed.blockHash||tx.blockNumber?.toString()!==observed.blockNumber||observed.transactionSender!==attempt.wallet||observed.transactionTo!==attempt.to)throw new Error('DIRECT_TRANSACTION_MISMATCH');
+ let spentAtomic:string|undefined,receivedAtomic:string|undefined;
  if(observed.chainStatus==='success'){
   if(attempt.kind==='approval'){
    const receipt=await client.getTransactionReceipt({hash:attempt.transactionHash as Hash});
@@ -25,7 +26,8 @@ export async function readDirectSettlement(attempt:DirectAttempt){
    const spent=observed.walletTransfers.filter(t=>t.token===attempt.tokenIn&&t.direction==='out').reduce((sum,t)=>sum+BigInt(t.amountAtomic),0n);
    const received=observed.walletTransfers.filter(t=>t.token===attempt.tokenOut&&t.direction==='in').reduce((sum,t)=>sum+BigInt(t.amountAtomic),0n);
    if(spent!==BigInt(attempt.amountInAtomic)||received<BigInt(attempt.minimumOutAtomic))throw new Error('DIRECT_SWAP_FLOW_UNVERIFIED');
+   spentAtomic=spent.toString();receivedAtomic=received.toString();
   }
  }
- return {status:observed.chainStatus,blockNumber:observed.blockNumber,blockHash:observed.blockHash,confirmations:observed.confirmations,observedAt:observed.observedAt};
+ return {status:observed.chainStatus,blockNumber:observed.blockNumber,blockHash:observed.blockHash,confirmations:observed.confirmations,observedAt:observed.observedAt,gasCostWei:observed.transactionGasCostWei,...(spentAtomic===undefined?{}:{spentAtomic,receivedAtomic})};
 }

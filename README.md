@@ -1,12 +1,12 @@
 # Mandate
 
-Mandate is a read-only workspace for researching stock tokens and planning capital. It separates historical quote observations, wallet-specific research, and illustrative plans so that a recorded price or a feasible plan is never mistaken for permission to trade. **Live execution is disabled.**
+Mandate is a workspace for researching stock tokens and planning capital. It separates historical quote observations, wallet-specific research, and illustrative plans so that a recorded price or a feasible plan is never mistaken for permission to trade. The core workspace remains read-only. A separate, wallet-allowlisted SPYon pilot can request a wallet-confirmed approval or swap when explicitly enabled; general live execution remains disabled.
 
 The public workspace includes:
 
 - Historical $10,000 buy-cost observations with timestamps and links to the exact recorded source lines. A cost is measured against that quote's token reference price, not a completed trade or a current executable fee.
 - Token research that keeps discovery, contract identity, market-data freshness, and execution eligibility separate. Stale collector data is labeled and its prices are hidden as current marks.
-- Optional Binance Web3 Wallet sign-in for read-only BNB Smart Chain holdings and unsigned route research. No approval or transaction is requested.
+- Optional Binance Web3 Wallet sign-in for BNB Smart Chain holdings and unsigned route research. Sign-in itself requests no approval or transaction.
 - Illustrative cash, allocation, rebalance, and exit plans that protect saved reserves and commitments. Planner prices and fees are synthetic; these plans do not move funds.
 
 ## Run locally

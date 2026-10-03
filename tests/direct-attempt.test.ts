@@ -39,6 +39,15 @@ describe('durable direct wallet attempts',()=>{
   expect(record.state).toBe('confirmed');expect((await store.history(wallet))[0]?.settlement?.blockHash).toBe(blockHash);
   expect((await store.prepare(draft())).state).toBe('prepared');
  },20000);
+ it('backfills receipt amounts for a verified terminal attempt without changing its outcome',async()=>{
+  const {store}=await open();const attempt=await store.prepare(draft());await store.begin(wallet,attempt.id);await store.recordHash(wallet,attempt.id,transactionHash);
+  const base={status:'success' as const,blockNumber:'123',blockHash,confirmations:'12',observedAt:new Date().toISOString()};
+  await store.settle(wallet,attempt.id,base);
+  const enriched=await store.settle(wallet,attempt.id,{...base,spentAtomic:attempt.amountInAtomic,receivedAtomic:'2',gasCostWei:'512'});
+  expect(enriched).toMatchObject({state:'confirmed',settlement:{spentAtomic:attempt.amountInAtomic,receivedAtomic:'2',gasCostWei:'512'}});
+  expect((await store.get(wallet,attempt.id))?.settlement).toMatchObject({spentAtomic:attempt.amountInAtomic,receivedAtomic:'2'});
+  await expect(store.settle(wallet,attempt.id,{...base,blockHash:'0x'+'7'.repeat(64)})).rejects.toThrow('DIRECT_SETTLEMENT_CONFLICT');
+ },20000);
  it('does not allow an unsubmitted or weakly confirmed receipt to clear the barrier',async()=>{
   const {store}=await open();const attempt=await store.prepare(draft());
   await expect(store.settle(wallet,attempt.id,{status:'success',blockNumber:'123',blockHash,confirmations:'12',observedAt:new Date().toISOString()})).rejects.toThrow('DIRECT_ATTEMPT_NOT_SUBMITTED');
