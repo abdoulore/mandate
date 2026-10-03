@@ -45,6 +45,14 @@ export class DirectAttemptStore {
   if(!address.test(wallet))fail('INVALID_WALLET');
   return (await this.db.query<{record:DirectAttempt}>('SELECT record FROM direct_attempts WHERE wallet=$1 AND id=$2',[wallet.toLowerCase(),id])).rows[0]?.record??null;
  }
+ async trialSellAmount(wallet:string,buyHash:string){
+  if(!address.test(wallet)||!hash.test(buyHash))return null;
+  const buy=(await this.db.query<{record:DirectAttempt}>("SELECT record FROM direct_attempts WHERE wallet=$1 AND transaction_hash=$2 AND kind='swap' AND direction='BUY' AND state='confirmed'",[wallet.toLowerCase(),buyHash.toLowerCase()])).rows[0]?.record;
+  const received=buy?.settlement?.receivedAtomic;
+  if(buy?.settlement?.status!=='success'||buy.settlement.spentAtomic!=='1000000000000000000'||!received||!quantity.test(received)||BigInt(received)<=0n||BigInt(received)>2n*10n**16n)return null;
+  const sold=(await this.db.query("SELECT id FROM direct_attempts WHERE wallet=$1 AND kind='swap' AND direction='SELL' AND state='confirmed' LIMIT 1",[wallet.toLowerCase()])).rows.length>0;
+  return sold?null:received;
+ }
  async prepare(input:PrepareInput){
   const now=Date.now(),expiry=Date.parse(input.expiresAt);
   if(!address.test(input.wallet)||!address.test(input.to)||!address.test(input.tokenIn)||!address.test(input.tokenOut)||!/^0x[0-9a-fA-F]{8,}$/.test(input.data)||input.data.length%2||input.chainId!==56||input.valueAtomic!=='0'||!quantity.test(input.amountInAtomic)||!quantity.test(input.minimumOutAtomic)||!quantity.test(input.deadline)||!Number.isFinite(expiry)||expiry<=now||expiry>now+120000||!['approval','swap'].includes(input.kind)||!['BUY','SELL'].includes(input.direction))fail('INVALID_DIRECT_ATTEMPT');

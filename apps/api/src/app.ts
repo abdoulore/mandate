@@ -212,12 +212,18 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
  const attemptHashBody=attemptIdBody.extend({transactionHash:z.string().regex(/^0x[0-9a-fA-F]{64}$/)}).strict();
  const publicAttempt=(attempt:DirectAttempt)=>{const {data:_,...review}=attempt;return review;};
  const checkBuyCapital=async(address:string,amountIn:bigint)=>{const capital=await refreshCapital(address);return capital.state==='OBSERVED'&&capital.policyRevision>=1&&BigInt(capital.availableAtomic)>=amountIn;};
+ const sellTrialAmount=async(address:string)=>{const pinnedHash=process.env.MANDATE_DIRECT_SELL_TRIAL_BUY_HASH??'';return (await directStore()).trialSellAmount(address,pinnedHash);};
+ const trialAmountAllowed=async(address:string,direction:'BUY'|'SELL',amount:bigint,kind:'approval'|'swap',access:ReturnType<typeof directPilotAccess>)=>{
+  if(access.fullRouteEnabled)return true;
+  if(direction==='BUY')return (kind==='approval'?access.buyApprovalEnabled:access.buyTrialEnabled)&&amount<=10n**18n;
+  return access.sellTrialEnabled&&amount.toString()===await sellTrialAmount(address);
+ };
  const approvalAbi=parseAbi(['function approve(address,uint256) returns (bool)']);
  function swapPayloadMatches(data:Hex,owner:string,amountIn:bigint,minimumOut:bigint,deadline:bigint,direction:'BUY'|'SELL'){
   try{const decoded=decodeFunctionData({abi:pancakeRouterAbi,data});if(decoded.functionName!=='exactInputSingle')return false;const p=decoded.args[0];return p.tokenIn.toLowerCase()===(direction==='BUY'?PANCAKE_V3.usdt:PANCAKE_V3.spyOn).toLowerCase()&&p.tokenOut.toLowerCase()===(direction==='BUY'?PANCAKE_V3.spyOn:PANCAKE_V3.usdt).toLowerCase()&&p.recipient.toLowerCase()===owner&&p.fee===PANCAKE_V3.fee&&p.amountIn===amountIn&&p.amountOutMinimum===minimumOut&&p.deadline===deadline&&p.sqrtPriceLimitX96===0n;}catch{return false;}
  }
  function approvalPayloadMatches(data:Hex,amountIn:bigint){try{const decoded=decodeFunctionData({abi:approvalAbi,data});return decoded.functionName==='approve'&&decoded.args[0].toLowerCase()===PANCAKE_V3.router.toLowerCase()&&decoded.args[1]===amountIn;}catch{return false;}}
- app.get('/v1/routes/SPYon/attempts',async req=>{const session=capitalSession(req.headers.cookie,req.headers.origin),access=directPilotAccess(session.address);return {items:(await (await directStore()).history(session.address)).map(publicAttempt),executionEnabled:access.swapEnabled,approvalEnabled:access.approvalEnabled,fullRouteEnabled:access.fullRouteEnabled};});
+ app.get('/v1/routes/SPYon/attempts',async req=>{const session=capitalSession(req.headers.cookie,req.headers.origin),access=directPilotAccess(session.address);return {items:(await (await directStore()).history(session.address)).map(publicAttempt),executionEnabled:access.swapEnabled,approvalEnabled:access.approvalEnabled,buyTrialEnabled:access.buyTrialEnabled,sellTrialEnabled:access.sellTrialEnabled,sellTrialAmountAtomic:access.sellTrialEnabled?await sellTrialAmount(session.address):null,fullRouteEnabled:access.fullRouteEnabled};});
  app.post('/v1/routes/SPYon/prepare',async(req,reply)=>{
   const session=capitalSession(req.headers.cookie,req.headers.origin,true);
   const access=directPilotAccess(session.address);
@@ -225,7 +231,7 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
   const parsed=directPreflightBody.safeParse(req.body);if(!parsed.success)return reply.code(400).send({error:'INVALID_DIRECT_PREPARATION'});
   const {direction,sellAmountAtomic,buyAmountAtomic}=parsed.data;
   const requestedAmount=direction==='BUY'?BigInt(buyAmountAtomic??'10000000000000000000'):BigInt(sellAmountAtomic!);
-  if(!access.fullRouteEnabled&&(direction!=='BUY'||requestedAmount>10n**18n))return reply.code(409).send({error:'DIRECT_SWAP_TRIAL_LIMIT'});
+  if(!(await trialAmountAllowed(session.address,direction,requestedAmount,'swap',access)))return reply.code(409).send({error:'DIRECT_SWAP_TRIAL_LIMIT'});
   if(direction==='BUY'&&!(await checkBuyCapital(session.address,requestedAmount)))return reply.code(409).send({error:'PROTECTED_CASH_OR_POLICY_BLOCKS_TRADE'});
   const {view,transaction}=await (options.directPreparer??readDirectPreparation)(session.address,direction,sellAmountAtomic,buyAmountAtomic);
   const checkedAt=Date.parse(view.checkedAt),expiry=Math.min(checkedAt+20000,Number(transaction.deadline)*1000);
@@ -241,7 +247,8 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
   const parsed=directPreflightBody.safeParse(req.body);if(!parsed.success)return reply.code(400).send({error:'INVALID_DIRECT_PREPARATION'});
   const {direction,sellAmountAtomic,buyAmountAtomic}=parsed.data;
   const requestedAmount=direction==='BUY'?BigInt(buyAmountAtomic??'10000000000000000000'):BigInt(sellAmountAtomic!);
-  if(!access.fullRouteEnabled&&(direction!=='BUY'||requestedAmount>10n**18n))return reply.code(409).send({error:'DIRECT_APPROVAL_TRIAL_LIMIT'});
+  if(direction==='BUY'&&!access.buyApprovalEnabled||direction==='SELL'&&!access.sellTrialEnabled&&!access.buyApprovalEnabled)return reply.code(409).send({error:'DIRECT_APPROVAL_DISABLED'});
+  if(!(await trialAmountAllowed(session.address,direction,requestedAmount,'approval',access)))return reply.code(409).send({error:'DIRECT_APPROVAL_TRIAL_LIMIT'});
   if(direction==='BUY'&&!(await checkBuyCapital(session.address,requestedAmount)))return reply.code(409).send({error:'PROTECTED_CASH_OR_POLICY_BLOCKS_TRADE'});
   const {view,transaction}=await (options.directApprovalPreparer??readDirectApprovalPreparation)(session.address,direction,sellAmountAtomic,buyAmountAtomic);
   const checkedAt=Date.parse(view.checkedAt),expiry=Math.min(checkedAt+120000,Number(transaction.deadline)*1000);
@@ -257,8 +264,8 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
   const access=directPilotAccess(session.address);
   if(pending.kind==='swap'&&!access.swapEnabled)return reply.code(409).send({error:'DIRECT_EXECUTION_DISABLED'});
   if(pending.kind==='approval'&&!access.approvalEnabled)return reply.code(409).send({error:'DIRECT_APPROVAL_DISABLED'});
-  if(pending.kind==='swap'&&!access.fullRouteEnabled&&(pending.direction!=='BUY'||BigInt(pending.amountInAtomic)>10n**18n))return reply.code(409).send({error:'DIRECT_SWAP_TRIAL_LIMIT'});
-  if(pending.kind==='approval'&&!access.fullRouteEnabled&&(pending.direction!=='BUY'||BigInt(pending.amountInAtomic)>10n**18n))return reply.code(409).send({error:'DIRECT_APPROVAL_TRIAL_LIMIT'});
+  if(pending.kind==='approval'&&(pending.direction==='BUY'&&!access.buyApprovalEnabled||pending.direction==='SELL'&&!access.sellTrialEnabled&&!access.buyApprovalEnabled))return reply.code(409).send({error:'DIRECT_APPROVAL_DISABLED'});
+  if(!(await trialAmountAllowed(session.address,pending.direction,BigInt(pending.amountInAtomic),pending.kind,access)))return reply.code(409).send({error:pending.kind==='swap'?'DIRECT_SWAP_TRIAL_LIMIT':'DIRECT_APPROVAL_TRIAL_LIMIT'});
   if(pending.direction==='BUY'&&!(await checkBuyCapital(session.address,BigInt(pending.amountInAtomic))))return reply.code(409).send({error:'PROTECTED_CASH_OR_POLICY_BLOCKS_TRADE'});
   const attempt=await store.begin(session.address,parsed.data.attemptId);
   return {attemptId:attempt.id,state:attempt.state,transaction:{chainId:56,from:attempt.wallet,to:attempt.to,value:'0x0',data:attempt.data},note:'The submission barrier is committed. If the wallet result is unknown, do not retry.'};
