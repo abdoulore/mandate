@@ -11,9 +11,9 @@ const signer=privateKeyToAccount('0x'+'31'.repeat(32) as `0x${string}`);
 const other=privateKeyToAccount('0x'+'32'.repeat(32) as `0x${string}`);
 const hash='0x'+'7'.repeat(64);
 const blockHash=('0x'+'8'.repeat(64)) as `0x${string}`;
-const previousFlags={swap:process.env.MANDATE_DIRECT_EXECUTION_ENABLED,approval:process.env.MANDATE_DIRECT_APPROVAL_ENABLED,wallets:process.env.MANDATE_DIRECT_PILOT_WALLETS};
+const previousFlags={swap:process.env.MANDATE_DIRECT_EXECUTION_ENABLED,trial:process.env.MANDATE_DIRECT_SWAP_TRIAL_ENABLED,approval:process.env.MANDATE_DIRECT_APPROVAL_ENABLED,wallets:process.env.MANDATE_DIRECT_PILOT_WALLETS};
 const ledgers:Ledger[]=[];
-afterEach(async()=>{for(const [key,value] of [['MANDATE_DIRECT_EXECUTION_ENABLED',previousFlags.swap],['MANDATE_DIRECT_APPROVAL_ENABLED',previousFlags.approval],['MANDATE_DIRECT_PILOT_WALLETS',previousFlags.wallets]] as const){if(value===undefined)delete process.env[key];else process.env[key]=value;}for(const ledger of ledgers.splice(0))await ledger.close();});
+afterEach(async()=>{for(const [key,value] of [['MANDATE_DIRECT_EXECUTION_ENABLED',previousFlags.swap],['MANDATE_DIRECT_SWAP_TRIAL_ENABLED',previousFlags.trial],['MANDATE_DIRECT_APPROVAL_ENABLED',previousFlags.approval],['MANDATE_DIRECT_PILOT_WALLETS',previousFlags.wallets]] as const){if(value===undefined)delete process.env[key];else process.env[key]=value;}for(const ledger of ledgers.splice(0))await ledger.close();});
 async function signed(app:Pick<ReturnType<typeof createApp>,'inject'>,account=signer){
  const challenge=(await app.inject({method:'POST',url:'/v1/wallet/challenge',headers:{origin},payload:{address:account.address,chainId:56}})).json();
  const signature=await account.signMessage({message:challenge.message});
@@ -27,12 +27,13 @@ function preparation(owner:string){
 }
 function approvalPreparation(owner:string){const base=preparation(owner),amountIn=base.transaction.amountIn;const data=encodeFunctionData({abi:parseAbi(['function approve(address,uint256) returns (bool)']),functionName:'approve',args:[PANCAKE_V3.router,amountIn]});return {view:{...base.view,wallet:{...base.view.wallet,allowanceAtomic:'0'},gates:{...base.view.gates,spendingPermission:'BLOCKED' as const,simulation:'NOT_RUN' as const,gas:'UNKNOWN' as const}},transaction:{chainId:56 as const,from:owner as `0x${string}`,to:PANCAKE_V3.spyOn,data,value:0n,tokenIn:PANCAKE_V3.spyOn,tokenOut:PANCAKE_V3.usdt,amountIn,amountOutMinimum:0n,deadline:BigInt(Math.floor(Date.now()/1000)+120)}};}
 function approvalPreparationBuy(owner:string){const amountIn=10n**18n,swap=buildDirectSwap({direction:'BUY',recipient:owner as `0x${string}`,amountIn,quotedOut:1285660000000000n,nowMs:Date.now()}),base=preparation(owner);const data=encodeFunctionData({abi:parseAbi(['function approve(address,uint256) returns (bool)']),functionName:'approve',args:[PANCAKE_V3.router,amountIn]});return {view:{...base.view,direction:'BUY' as const,assetIn:swap.tokenIn,assetOut:swap.tokenOut,amountInAtomic:amountIn.toString(),quotedOutAtomic:swap.quotedOut.toString(),minimumOutAtomic:swap.amountOutMinimum.toString(),wallet:{balanceAtomic:(3n*10n**18n).toString(),allowanceAtomic:'0',bnbAtomic:'990000000000000'},approvalPreview:{simulation:'PASSED' as const,gas:'CHECKED' as const,gasBudgetAtomic:'3020000000000',reason:'Approval gas covered.'},gates:{...base.view.gates,spendingPermission:'BLOCKED' as const,simulation:'NOT_RUN' as const,gas:'UNKNOWN' as const}},transaction:{chainId:56 as const,from:owner as `0x${string}`,to:PANCAKE_V3.usdt,data,value:0n,tokenIn:PANCAKE_V3.usdt,tokenOut:PANCAKE_V3.spyOn,amountIn,amountOutMinimum:0n,deadline:BigInt(Math.floor(Date.now()/1000)+120)}};}
+function swapPreparationBuy(owner:string){const amountIn=10n**18n,transaction=buildDirectSwap({direction:'BUY',recipient:owner as `0x${string}`,amountIn,quotedOut:1285660000000000n,nowMs:Date.now()}),base=approvalPreparationBuy(owner);return {view:{...base.view,wallet:{...base.view.wallet,allowanceAtomic:amountIn.toString()},gates:{...base.view.gates,spendingPermission:'CHECKED' as const,simulation:'PASSED' as const,gas:'CHECKED' as const}},transaction};}
 async function setup(){const ledger=new Ledger(embeddedDatabase());ledgers.push(ledger);await ledger.migrate();const app=createApp(process.cwd(),{ledger,directPreparer:async owner=>preparation(owner),directApprovalPreparer:async owner=>approvalPreparation(owner),directSettlementReader:async()=>({status:'success',blockNumber:'123',blockHash,confirmations:'12',observedAt:new Date().toISOString()})});return app;}
-async function setupApprovalBuy(){const ledger=new Ledger(embeddedDatabase());ledgers.push(ledger);await ledger.migrate();const address=signer.address.toLowerCase(),checkpoint={accountId:capitalAccountId(address),wallet:address,asset:{chainId:56 as const,contract:PANCAKE_V3.usdt.toLowerCase(),decimals:18 as const},balanceAtomic:(3n*10n**18n).toString(),blockNumber:'123',blockHash,observedAt:new Date().toISOString(),positions:[],evidenceMode:'observed' as const};await ledger.applyCapitalCheckpoint(checkpoint);const state=await ledger.capitalState(checkpoint.accountId);await ledger.saveCapitalPolicy(checkpoint.accountId,{reserveFloor:'0',operatingBudget:'0',obligations:[]},state!.revision);return createApp(process.cwd(),{ledger,capitalReader:async()=>checkpoint,directApprovalPreparer:async owner=>approvalPreparationBuy(owner)});}
+async function setupApprovalBuy(){const ledger=new Ledger(embeddedDatabase());ledgers.push(ledger);await ledger.migrate();const address=signer.address.toLowerCase(),checkpoint={accountId:capitalAccountId(address),wallet:address,asset:{chainId:56 as const,contract:PANCAKE_V3.usdt.toLowerCase(),decimals:18 as const},balanceAtomic:(3n*10n**18n).toString(),blockNumber:'123',blockHash,observedAt:new Date().toISOString(),positions:[],evidenceMode:'observed' as const};await ledger.applyCapitalCheckpoint(checkpoint);const state=await ledger.capitalState(checkpoint.accountId);await ledger.saveCapitalPolicy(checkpoint.accountId,{reserveFloor:'0',operatingBudget:'0',obligations:[]},state!.revision);return createApp(process.cwd(),{ledger,capitalReader:async()=>checkpoint,directApprovalPreparer:async owner=>approvalPreparationBuy(owner),directPreparer:async owner=>swapPreparationBuy(owner)});}
 
 describe('direct execution API barrier',()=>{
  it('remains disabled unless explicitly configured',async()=>{
-  delete process.env.MANDATE_DIRECT_EXECUTION_ENABLED;delete process.env.MANDATE_DIRECT_APPROVAL_ENABLED;delete process.env.MANDATE_DIRECT_PILOT_WALLETS;
+  delete process.env.MANDATE_DIRECT_EXECUTION_ENABLED;delete process.env.MANDATE_DIRECT_SWAP_TRIAL_ENABLED;delete process.env.MANDATE_DIRECT_APPROVAL_ENABLED;delete process.env.MANDATE_DIRECT_PILOT_WALLETS;
   const app=await setup();try{const headers=await signed(app);const result=await app.inject({method:'POST',url:'/v1/routes/SPYon/prepare',headers,payload:{direction:'SELL',sellAmountAtomic:'10000000000000000'}});expect(result.statusCode).toBe(409);expect(result.json().error).toBe('DIRECT_EXECUTION_DISABLED');expect((await app.inject({url:'/v1/routes/SPYon/attempts',headers})).json()).toMatchObject({items:[],executionEnabled:false,approvalEnabled:false});}finally{await app.close();}
  },20000);
  it('releases calldata only after the durable barrier and never re-begins an unknown send',async()=>{
@@ -66,7 +67,7 @@ describe('direct execution API barrier',()=>{
   }finally{await app.close();}
  },20000);
  it('allows only the listed wallet into the approval-only stage and keeps swaps closed',async()=>{
-  delete process.env.MANDATE_DIRECT_EXECUTION_ENABLED;process.env.MANDATE_DIRECT_APPROVAL_ENABLED='true';delete process.env.MANDATE_DIRECT_PILOT_WALLETS;
+  delete process.env.MANDATE_DIRECT_EXECUTION_ENABLED;delete process.env.MANDATE_DIRECT_SWAP_TRIAL_ENABLED;process.env.MANDATE_DIRECT_APPROVAL_ENABLED='true';delete process.env.MANDATE_DIRECT_PILOT_WALLETS;
   const app=await setup();try{
    const headers=await signed(app),sell={direction:'SELL',sellAmountAtomic:'10000000000000000'};
    expect((await app.inject({url:'/v1/routes/SPYon/attempts',headers})).json()).toMatchObject({executionEnabled:false,approvalEnabled:false});
@@ -83,7 +84,7 @@ describe('direct execution API barrier',()=>{
   }finally{await app.close();}
  },20000);
  it('prepares only an exact 1 USDT approval after saved cash protection is checked',async()=>{
-  delete process.env.MANDATE_DIRECT_EXECUTION_ENABLED;process.env.MANDATE_DIRECT_APPROVAL_ENABLED='true';process.env.MANDATE_DIRECT_PILOT_WALLETS=signer.address;
+  delete process.env.MANDATE_DIRECT_EXECUTION_ENABLED;delete process.env.MANDATE_DIRECT_SWAP_TRIAL_ENABLED;process.env.MANDATE_DIRECT_APPROVAL_ENABLED='true';process.env.MANDATE_DIRECT_PILOT_WALLETS=signer.address;
   const app=await setupApprovalBuy();try{
    const headers=await signed(app),payload={direction:'BUY',buyAmountAtomic:'1000000000000000000'};
    const prepared=await app.inject({method:'POST',url:'/v1/routes/SPYon/approval/prepare',headers,payload});expect(prepared.statusCode).toBe(200);
@@ -97,6 +98,23 @@ describe('direct execution API barrier',()=>{
    expect(begin.statusCode).toBe(200);expect(begin.json().transaction).toMatchObject({to:PANCAKE_V3.usdt.toLowerCase(),from:signer.address.toLowerCase()});
    expect(begin.json().transaction.data).toMatch(/^0x095ea7b3/);
    expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/prepare',headers,payload})).json().error).toBe('DIRECT_EXECUTION_DISABLED');
+  }finally{await app.close();}
+ },20000);
+ it('opens only a 1 USDT buy when the separate swap-trial flag is set',async()=>{
+  delete process.env.MANDATE_DIRECT_EXECUTION_ENABLED;process.env.MANDATE_DIRECT_SWAP_TRIAL_ENABLED='true';delete process.env.MANDATE_DIRECT_APPROVAL_ENABLED;process.env.MANDATE_DIRECT_PILOT_WALLETS=signer.address;
+  const app=await setupApprovalBuy();try{
+   const headers=await signed(app),buy={direction:'BUY',buyAmountAtomic:'1000000000000000000'};
+   expect((await app.inject({url:'/v1/routes/SPYon/attempts',headers})).json()).toMatchObject({executionEnabled:true,approvalEnabled:false,fullRouteEnabled:false});
+   expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/prepare',headers,payload:{direction:'SELL',sellAmountAtomic:'10000000000000000'}})).json().error).toBe('DIRECT_SWAP_TRIAL_LIMIT');
+   expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/prepare',headers,payload:{direction:'BUY',buyAmountAtomic:'2000000000000000000'}})).json().error).toBe('DIRECT_SWAP_TRIAL_LIMIT');
+   expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/approval/prepare',headers,payload:buy})).json().error).toBe('DIRECT_APPROVAL_DISABLED');
+   const prepared=await app.inject({method:'POST',url:'/v1/routes/SPYon/prepare',headers,payload:buy});expect(prepared.statusCode).toBe(200);
+   expect(prepared.json().attempt).toMatchObject({kind:'swap',direction:'BUY',amountInAtomic:buy.buyAmountAtomic});
+   delete process.env.MANDATE_DIRECT_SWAP_TRIAL_ENABLED;
+   expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/begin',headers,payload:{attemptId:prepared.json().attempt.id}})).json().error).toBe('DIRECT_EXECUTION_DISABLED');
+   process.env.MANDATE_DIRECT_SWAP_TRIAL_ENABLED='true';
+   const begin=await app.inject({method:'POST',url:'/v1/routes/SPYon/begin',headers,payload:{attemptId:prepared.json().attempt.id}});
+   expect(begin.statusCode).toBe(200);expect(begin.json().transaction.to).toBe(PANCAKE_V3.router.toLowerCase());
   }finally{await app.close();}
  },20000);
  it('refuses to begin a prepared swap after the swap stage is disabled',async()=>{

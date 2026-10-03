@@ -8,16 +8,20 @@ function allowedWallets(){
 
 export function directPilotAccess(wallet:string){
  const allowed=isAddress(wallet)&&allowedWallets().has(wallet.toLowerCase());
+ const fullRouteEnabled=allowed&&process.env.MANDATE_DIRECT_EXECUTION_ENABLED==='true';
  return {
   approvalEnabled:allowed&&process.env.MANDATE_DIRECT_APPROVAL_ENABLED==='true',
-  swapEnabled:allowed&&process.env.MANDATE_DIRECT_EXECUTION_ENABLED==='true',
+  swapEnabled:fullRouteEnabled||(allowed&&process.env.MANDATE_DIRECT_SWAP_TRIAL_ENABLED==='true'),
+  fullRouteEnabled,
  };
 }
 
 export function directPilotConfigured(){
  const hasWallet=allowedWallets().size>0;
+ const fullRouteEnabled=hasWallet&&process.env.MANDATE_DIRECT_EXECUTION_ENABLED==='true';
  return {
   approvalEnabled:hasWallet&&process.env.MANDATE_DIRECT_APPROVAL_ENABLED==='true',
-  swapEnabled:hasWallet&&process.env.MANDATE_DIRECT_EXECUTION_ENABLED==='true',
+  swapEnabled:fullRouteEnabled||(hasWallet&&process.env.MANDATE_DIRECT_SWAP_TRIAL_ENABLED==='true'),
+  fullRouteEnabled,
  };
 }
