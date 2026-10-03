@@ -4,7 +4,7 @@ import path from 'node:path';
 import {randomUUID} from 'node:crypto';
 import {z} from 'zod';
 import {decodeFunctionData,parseAbi,type Hex} from 'viem';
-import {Ledger,LedgerError,RecurringStore,DirectAttemptStore,DirectAttemptError,embeddedDatabase,type DirectAttempt} from '@mandate/store';
+import {Ledger,LedgerError,RecurringStore,DirectAttemptStore,DirectAttemptError,PlanBoundDirectStore,PlanBoundDirectError,embeddedDatabase,type DirectAttempt} from '@mandate/store';
 import {capitalPolicySchema,capitalCheckpointSchema} from '@mandate/domain';
 import {readInflowProof} from './inflows.ts';
 import {capitalAccountId,capitalView,readCapitalCheckpoint} from './capital.ts';
@@ -36,6 +36,7 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
  let ledgerPromise:Promise<Ledger>|undefined;
  const getLedger=()=>ledgerPromise??=options.ledger?Promise.resolve(options.ledger):(async()=>{fs.mkdirSync(path.join(root,'.runtime'),{recursive:true});const ledger=new Ledger(embeddedDatabase(path.join(root,'.runtime/capital-ledger')));try{await ledger.migrate();return ledger;}catch(error){await ledger.close();throw error;}})();
  const directStore=async()=>new DirectAttemptStore((await getLedger()).db);
+ const planDirectStore=async()=>new PlanBoundDirectStore((await getLedger()).db);
  app.addHook('onClose',async()=>{if(ledgerPromise&&!options.ledger){const ledger=await ledgerPromise.catch(()=>null);await ledger?.close();}});
  function capitalSession(cookie:string|undefined,origin:string|undefined,mutation=false){const session=wallet.session(cookie,origin);if(!session)throw new WalletSessionError(401,'WALLET_SESSION_REQUIRED');if(mutation&&!origin)throw new WalletSessionError(403,'ORIGIN_NOT_ALLOWED');return session;}
  let markets:ReturnType<typeof readPortfolioMarks>|undefined,marketTime=0;
@@ -281,6 +282,11 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
   if(pending.kind==='approval'&&!access.approvalEnabled)return reply.code(409).send({error:'DIRECT_APPROVAL_DISABLED'});
   if(pending.kind==='approval'&&(pending.direction==='BUY'&&!access.buyApprovalEnabled||pending.direction==='SELL'&&!access.sellTrialEnabled&&!access.buyApprovalEnabled))return reply.code(409).send({error:'DIRECT_APPROVAL_DISABLED'});
   if(!(await trialAmountAllowed(session.address,pending.direction,BigInt(pending.amountInAtomic),pending.kind,access)))return reply.code(409).send({error:pending.kind==='swap'?'DIRECT_SWAP_TRIAL_LIMIT':'DIRECT_APPROVAL_TRIAL_LIMIT'});
+  if(pending.planBinding){
+   if(!access.fullRouteEnabled)return reply.code(409).send({error:'PLAN_DIRECT_EXECUTION_DISABLED'});
+   const attempt=await (await planDirectStore()).begin(session.address,pending.id);
+   return {attemptId:attempt.id,state:attempt.state,transaction:{chainId:56,from:attempt.wallet,to:attempt.to,value:'0x0',data:attempt.data},note:'The plan and cash hold are fenced before this one wallet request. Do not retry an unknown result.'};
+  }
   if(pending.direction==='BUY'&&!(await checkBuyCapital(session.address,BigInt(pending.amountInAtomic))))return reply.code(409).send({error:'PROTECTED_CASH_OR_POLICY_BLOCKS_TRADE'});
   const attempt=await store.begin(session.address,parsed.data.attemptId);
   return {attemptId:attempt.id,state:attempt.state,transaction:{chainId:56,from:attempt.wallet,to:attempt.to,value:'0x0',data:attempt.data},note:'The submission barrier is committed. If the wallet result is unknown, do not retry.'};
@@ -288,7 +294,10 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
  app.post('/v1/routes/SPYon/abandon',async(req,reply)=>{
   const session=capitalSession(req.headers.cookie,req.headers.origin,true);
   const parsed=attemptIdBody.safeParse(req.body);if(!parsed.success)return reply.code(400).send({error:'INVALID_DIRECT_ATTEMPT'});
-  const attempt=await (await directStore()).abandon(session.address,parsed.data.attemptId);return {attempt:publicAttempt(attempt)};
+  const store=await directStore(),pending=await store.get(session.address,parsed.data.attemptId);
+  if(!pending)return reply.code(404).send({error:'DIRECT_ATTEMPT_NOT_FOUND'});
+  const attempt=pending.planBinding?await (await planDirectStore()).abandon(session.address,pending.id):await store.abandon(session.address,pending.id);
+  return {attempt:publicAttempt(attempt)};
  });
  app.post('/v1/routes/SPYon/hash',async(req,reply)=>{
   const session=capitalSession(req.headers.cookie,req.headers.origin,true);
@@ -302,7 +311,14 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
   if(!attempt)return reply.code(404).send({error:'DIRECT_ATTEMPT_NOT_FOUND'});
   if(attempt.state==='confirmed'||attempt.state==='reverted')return {attempt:publicAttempt(attempt)};
   if(attempt.state!=='submitted')return reply.code(409).send({error:'DIRECT_ATTEMPT_UNRESOLVED',attempt:publicAttempt(attempt)});
-  try{const settlement=await (options.directSettlementReader??readDirectSettlement)(attempt);return {attempt:publicAttempt(await store.settle(session.address,attempt.id,settlement))};}
+  try{
+   const settlement=await (options.directSettlementReader??readDirectSettlement)(attempt);
+   if(attempt.planBinding){
+    await refreshCapital(session.address);
+    return {attempt:publicAttempt(await (await planDirectStore()).settle(session.address,attempt.id,settlement))};
+   }
+   return {attempt:publicAttempt(await store.settle(session.address,attempt.id,settlement))};
+  }
   catch{return reply.code(409).send({error:'DIRECT_SETTLEMENT_NOT_VERIFIED',attempt:publicAttempt(attempt)});}
  });
  app.post('/v1/routes/SPYon/recover-expired',async(req,reply)=>{
@@ -310,6 +326,7 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
   const parsed=attemptIdBody.safeParse(req.body);if(!parsed.success)return reply.code(400).send({error:'INVALID_DIRECT_ATTEMPT'});
   const store=await directStore(),attempt=await store.get(session.address,parsed.data.attemptId);
   if(!attempt)return reply.code(404).send({error:'DIRECT_ATTEMPT_NOT_FOUND'});
+  if(attempt.planBinding)return reply.code(409).send({error:'PLAN_DIRECT_RECOVERY_REQUIRES_RECONCILIATION'});
   if(attempt.kind!=='swap'||attempt.state!=='submission_unknown'||attempt.transactionHash)return reply.code(409).send({error:'DIRECT_RECOVERY_NOT_AVAILABLE'});
   try{const evidence=await (options.directRecoveryReader??readExpiredSwapRecovery)(attempt);return {attempt:publicAttempt(await store.releaseExpiredSwap(session.address,attempt.id,evidence))};}
   catch(error){const code=(error as Error).message;return reply.code(code==='DIRECT_RECOVERY_TOO_EARLY'||code==='DIRECT_RECOVERY_SPEND_OBSERVED'||code==='DIRECT_RECOVERY_NOT_AVAILABLE'?409:503).send({error:code.startsWith('DIRECT_RECOVERY_')?code:'DIRECT_RECOVERY_UNAVAILABLE'});}
@@ -323,6 +340,6 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
   if(!amount.success)return reply.code(400).send({error:'INVALID_AMOUNT'});
   return previewWithdrawal(amount.data,'0',[{id:'scenario:NVDA:bstock',maxNet:'700',available:true},{id:'scenario:SPY:ondo',maxNet:'1100',available:true},{id:'scenario:SGOV:ondo',maxNet:'690',available:body?.scenario!=='missing'}]);
  });
- app.setErrorHandler((error,_req,reply)=>{if(error instanceof WalletSessionError)return reply.code(error.statusCode).send({error:error.code});if(error instanceof InflowReadError)return reply.code(503).send({error:'INFLOW_PROOF_UNAVAILABLE',message:'Receipt, payment identity, canonical block or 12 confirmations could not be verified.'});if(error instanceof CapitalReadError)return reply.code(503).send({error:'CAPITAL_READ_UNAVAILABLE',state:'UNKNOWN',executionAllowed:false});if(error instanceof LedgerError||error instanceof DirectAttemptError)return reply.code(409).send({error:error.code});reply.code(500).send({error:'INTERNAL_ERROR',message:'The request could not be completed.'});});
+ app.setErrorHandler((error,_req,reply)=>{if(error instanceof WalletSessionError)return reply.code(error.statusCode).send({error:error.code});if(error instanceof InflowReadError)return reply.code(503).send({error:'INFLOW_PROOF_UNAVAILABLE',message:'Receipt, payment identity, canonical block or 12 confirmations could not be verified.'});if(error instanceof CapitalReadError)return reply.code(503).send({error:'CAPITAL_READ_UNAVAILABLE',state:'UNKNOWN',executionAllowed:false});if(error instanceof LedgerError||error instanceof DirectAttemptError||error instanceof PlanBoundDirectError)return reply.code(409).send({error:error.code});reply.code(500).send({error:'INTERNAL_ERROR',message:'The request could not be completed.'});});
  return Object.assign(app,{runRecurringDue});
 }
