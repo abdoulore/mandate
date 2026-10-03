@@ -1,4 +1,4 @@
-import {createPublicClient,http,isAddress,keccak256,parseAbi,type Address} from 'viem';
+import {createPublicClient,http,isAddress,keccak256,parseAbi,encodeFunctionData,decodeFunctionData,type Address} from 'viem';
 import {bsc} from 'viem/chains';
 import {BinanceReadClient} from '@mandate/connectors';
 import {assessReferenceCost,buildDirectSwap,PANCAKE_V3,pancakeFactoryAbi,pancakePoolAbi,pancakeQuoterAbi,pancakeRouterAbi,type DirectDirection} from './pancake-direct.ts';
@@ -7,12 +7,14 @@ const tokenAbi=parseAbi([
  'function balanceOf(address) view returns (uint256)',
  'function allowance(address,address) view returns (uint256)',
  'function decimals() view returns (uint8)',
+ 'function approve(address,uint256) returns (bool)',
 ]);
 const zero='0x0000000000000000000000000000000000000000';
 const cap=2n*10n**16n;
 
-// A wallet-specific read-only check. It never returns calldata or requests a wallet signature.
-export async function readDirectPreflight(ownerInput:string,direction:DirectDirection,sellAmountAtomic?:string){
+// One inspection feeds the public read-only view and the optional, private
+// preparation path. Only the latter can access the exact simulated calldata.
+async function inspectDirect(ownerInput:string,direction:DirectDirection,sellAmountAtomic?:string){
  if(!isAddress(ownerInput)||!['BUY','SELL'].includes(direction))throw new Error('INVALID_DIRECT_PREFLIGHT');
  if(direction==='SELL'&&(!sellAmountAtomic||!/^[1-9]\d*$/.test(sellAmountAtomic)||BigInt(sellAmountAtomic)>cap))throw new Error('INVALID_DIRECT_SELL_AMOUNT');
  const owner=ownerInput as Address,tokenIn=direction==='BUY'?PANCAKE_V3.usdt:PANCAKE_V3.spyOn,tokenOut=direction==='BUY'?PANCAKE_V3.spyOn:PANCAKE_V3.usdt;
@@ -63,9 +65,32 @@ export async function readDirectPreflight(ownerInput:string,direction:DirectDire
    gasNeeded=gas*gasPrice*13n/10n;simulation='PASSED';
   }catch{simulation='FAILED';}
  }
- return {state:'READ_ONLY_CHECK' as const,executionEnabled:false,checkedAt:new Date().toISOString(),blockNumber:blockNumber.toString(),blockHash:block.hash,direction,assetIn:tokenIn,assetOut:tokenOut,amountInAtomic:amountIn.toString(),quotedOutAtomic:quotedOut.toString(),minimumOutAtomic:transaction.amountOutMinimum.toString(),pool,router:PANCAKE_V3.router,selector:transaction.data.slice(0,10),
+ const view={state:'READ_ONLY_CHECK' as const,executionEnabled:false,checkedAt:new Date().toISOString(),blockNumber:blockNumber.toString(),blockHash:block.hash,direction,assetIn:tokenIn,assetOut:tokenOut,amountInAtomic:amountIn.toString(),quotedOutAtomic:quotedOut.toString(),minimumOutAtomic:transaction.amountOutMinimum.toString(),pool,router:PANCAKE_V3.router,selector:transaction.data.slice(0,10),
   wallet:{balanceAtomic:balance.toString(),allowanceAtomic:allowance.toString(),bnbAtomic:nativeBalance.toString()},
   gates:{poolIdentity:'CHECKED' as const,calldataMeaning:'CHECKED' as const,referenceCost:reference.checked?'CHECKED':'BLOCKED',funds:balance>=amountIn?'CHECKED':'BLOCKED',spendingPermission:allowance>=amountIn?'CHECKED':'BLOCKED',simulation,gas:gasNeeded===null?'UNKNOWN':nativeBalance>=gasNeeded?'CHECKED':'BLOCKED',authorization:'NOT_REQUESTED' as const,settlement:'NOT_RUN' as const},
   reference:{price:referencePrice,updatedAt:referenceUpdatedAt,deviationBps:reference.deviationBps,reason:reference.reason,maximumAdverseBps:200},
   gasBudgetAtomic:gasNeeded?.toString()??null,note:'Fresh wallet-specific research only. A new quote, simulation, user authorization, durable attempt and settlement proof are required before a trade.'};
+ return {view,transaction};
+}
+
+// Public research never returns transaction calldata.
+export async function readDirectPreflight(owner:string,direction:DirectDirection,sellAmountAtomic?:string){return (await inspectDirect(owner,direction,sellAmountAtomic)).view;}
+export async function readDirectPreparation(owner:string,direction:DirectDirection,sellAmountAtomic?:string){return inspectDirect(owner,direction,sellAmountAtomic);}
+
+export async function readDirectApprovalPreparation(owner:string,direction:DirectDirection,sellAmountAtomic?:string){
+ const {view}=await inspectDirect(owner,direction,sellAmountAtomic);
+ const amount=BigInt(view.amountInAtomic),allowance=BigInt(view.wallet.allowanceAtomic);
+ if(view.gates.poolIdentity!=='CHECKED'||view.gates.referenceCost!=='CHECKED'||view.gates.funds!=='CHECKED'||allowance>=amount)throw new Error('DIRECT_APPROVAL_NOT_NEEDED_OR_BLOCKED');
+ const client=createPublicClient({chain:bsc,transport:http(process.env.MANDATE_BSC_RPC_URL||'https://bsc-dataseed.bnbchain.org',{timeout:12000,retryCount:1})});
+ if(await client.getChainId()!==56)throw new Error('DIRECT_WRONG_CHAIN');
+ const ownerAddress=owner as Address,token=view.assetIn as Address;
+ const args=[PANCAKE_V3.router,amount] as const;
+ const simulation=await client.simulateContract({address:token,abi:tokenAbi,functionName:'approve',args,account:ownerAddress});
+ if(simulation.result!==true)throw new Error('DIRECT_APPROVAL_SIMULATION_FAILED');
+ const [gas,gasPrice,balance]=await Promise.all([client.estimateContractGas({address:token,abi:tokenAbi,functionName:'approve',args,account:ownerAddress}),client.getGasPrice(),client.getBalance({address:ownerAddress})]);
+ if(balance<gas*gasPrice*13n/10n)throw new Error('DIRECT_APPROVAL_GAS_BLOCKED');
+ const data=encodeFunctionData({abi:tokenAbi,functionName:'approve',args});
+ const decoded=decodeFunctionData({abi:tokenAbi,data});
+ if(decoded.functionName!=='approve'||decoded.args[0].toLowerCase()!==PANCAKE_V3.router.toLowerCase()||decoded.args[1]!==amount)throw new Error('DIRECT_APPROVAL_CALLDATA_MISMATCH');
+ return {view,transaction:{chainId:56 as const,from:ownerAddress,to:token,data,value:0n,tokenIn:token,tokenOut:view.assetOut,amountIn:amount,amountOutMinimum:0n,deadline:BigInt(Math.floor(Date.now()/1000)+120)}};
 }

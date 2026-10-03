@@ -12,7 +12,9 @@ import {cashRaisingMigration} from './cash-raising-migration.ts';
 import {inflowMigration} from './inflow-migration.ts';
 import {recurringMigration} from './recurring-migration.ts';
 import {planControlMigration} from './plan-control-migration.ts';
+import {directAttemptMigration} from './direct-attempt.ts';
 export {RecurringStore} from './recurring.ts';
+export {DirectAttemptStore,DirectAttemptError,type DirectAttempt} from './direct-attempt.ts';
 export {embeddedDatabase,postgresDatabase,type Database} from './database.ts';
 
 export class LedgerError extends Error {constructor(public code:string){super(code);}}
@@ -29,7 +31,7 @@ export class Ledger {
   const constraints=(await tx.query<{conname:string;definition:string}>("SELECT conname,pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conrelid='accounts'::regclass AND contype='c'")).rows;
   for(const c of constraints)if(c.definition.includes('protected')&&c.definition.includes('balance')){if(!/^[a-z_]+$/.test(c.conname))fail('UNEXPECTED_CONSTRAINT');await tx.query(`ALTER TABLE accounts DROP CONSTRAINT ${c.conname}`);}
   for(const sql of capitalMigration)await tx.query(sql);
- }if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=3')).rows.length)for(const sql of researchMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=4')).rows.length)for(const sql of rebalanceMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=5')).rows.length)for(const sql of cashRaisingMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=6')).rows.length)for(const sql of inflowMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=7')).rows.length)for(const sql of recurringMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=8')).rows.length)for(const sql of planControlMigration)await tx.query(sql);});}
+ }if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=3')).rows.length)for(const sql of researchMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=4')).rows.length)for(const sql of rebalanceMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=5')).rows.length)for(const sql of cashRaisingMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=6')).rows.length)for(const sql of inflowMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=7')).rows.length)for(const sql of recurringMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=8')).rows.length)for(const sql of planControlMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=9')).rows.length)for(const sql of directAttemptMigration)await tx.query(sql);});}
  async close(){await this.db.close();}
  async investmentMandates(accountId:string){return (await this.db.query<{record:SavedInvestmentMandate}>('SELECT record FROM investment_mandates WHERE account_id=$1 ORDER BY revision DESC LIMIT 20',[accountId])).rows.map(r=>r.record);}
  async saveInvestmentMandate(accountId:string,value:InvestmentPolicy,expectedRevision:number){
