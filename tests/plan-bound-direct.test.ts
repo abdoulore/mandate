@@ -1,4 +1,4 @@
-import {afterEach,describe,expect,it} from 'vitest';
+import {afterEach,describe,expect,it,vi} from 'vitest';
 import {buildDirectSwap,PANCAKE_V3} from '../apps/api/src/pancake-direct.ts';
 import {capitalAccountId} from '../apps/api/src/capital.ts';
 import {passportDefinitions} from '../apps/api/src/passports.ts';
@@ -56,6 +56,37 @@ describe('atomic plan-bound direct staging',{timeout:60000},()=>{
   await expect(store.prepare({...input,expectedAccountRevision:state!.revision,cashPolicyRevision:state!.policyRevision})).rejects.toThrow('PLAN_DIRECT_CASH_BLOCKED');
   expect((await ledger.snapshot(accountId)).heldAtomic).toBe('0');
   expect(await new DirectAttemptStore(ledger.db).history(wallet)).toEqual([]);
+ });
+ it('releases an unknown submission only with fresh post-deadline no-spend evidence',async()=>{
+  const {ledger,store,input}=await setup();
+  const {attempt,reservation,plan}=await store.prepare(input);
+  await store.begin(wallet,attempt.id);
+  const future=Number(attempt.deadline)*1000+65000,clock=vi.spyOn(Date,'now').mockReturnValue(future);
+  const evidence={reason:'expired_without_observed_token_spend' as const,checkedAt:new Date(future).toISOString(),fromBlock:'100',throughBlock:'101',throughBlockHash:'0x'+'a'.repeat(64),throughTimestamp:(BigInt(attempt.deadline)+61n).toString()};
+  try{
+   await expect(store.releaseExpiredSwap(wallet,attempt.id,{...evidence,throughTimestamp:attempt.deadline})).rejects.toThrow('PLAN_DIRECT_RECOVERY_EVIDENCE_INVALID');
+   expect((await ledger.snapshot(accountId)).heldAtomic).toBe(amount.toString());
+   await ledger.db.query('ALTER TABLE outbox ADD CONSTRAINT inject_direct_recovery_failure CHECK(false) NOT VALID');
+   await expect(store.releaseExpiredSwap(wallet,attempt.id,evidence)).rejects.toThrow();
+   expect((await ledger.snapshot(accountId)).heldAtomic).toBe(amount.toString());
+   await ledger.db.query('ALTER TABLE outbox DROP CONSTRAINT inject_direct_recovery_failure');
+   const released=await store.releaseExpiredSwap(wallet,attempt.id,evidence);
+   expect(released).toMatchObject({state:'abandoned',recovery:evidence});
+   expect((await ledger.snapshot(accountId)).heldAtomic).toBe('0');
+   expect((await ledger.db.query<{state:string}>('SELECT state FROM reservations WHERE id=$1',[reservation.id])).rows[0].state).toBe('released');
+   expect((await ledger.db.query<{status:string}>('SELECT status FROM plan_controls WHERE plan_id=$1',[plan.id])).rows[0].status).toBe('revoked');
+   expect((await ledger.db.query<{request_id:string}>('SELECT request_id FROM submission_barriers WHERE reservation_id=$1',[reservation.id])).rows[0].request_id).toBe(attempt.id);
+   await expect(store.releaseExpiredSwap(wallet,attempt.id,evidence)).rejects.toThrow('PLAN_DIRECT_RECOVERY_NOT_AVAILABLE');
+  }finally{clock.mockRestore();}
+ });
+ it('keeps the plan hold when the wallet returned a transaction hash',async()=>{
+  const {ledger,store,input}=await setup();
+  const {attempt}=await store.prepare(input);
+  await store.begin(wallet,attempt.id);
+  await new DirectAttemptStore(ledger.db).recordHash(wallet,attempt.id,'0x'+'b'.repeat(64));
+  const evidence={reason:'expired_without_observed_token_spend' as const,checkedAt:new Date().toISOString(),fromBlock:'100',throughBlock:'101',throughBlockHash:'0x'+'a'.repeat(64),throughTimestamp:(BigInt(attempt.deadline)+61n).toString()};
+  await expect(store.releaseExpiredSwap(wallet,attempt.id,evidence)).rejects.toThrow('PLAN_DIRECT_RECOVERY_NOT_AVAILABLE');
+  expect((await ledger.snapshot(accountId)).heldAtomic).toBe(amount.toString());
  });
  it('rolls back all three records when the audit event cannot commit',async()=>{
   const {ledger,store,input}=await setup();

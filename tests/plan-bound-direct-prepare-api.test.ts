@@ -1,4 +1,4 @@
-import {describe,expect,it} from 'vitest';
+import {describe,expect,it,vi} from 'vitest';
 import {privateKeyToAccount} from 'viem/accounts';
 import {Ledger,embeddedDatabase} from '@mandate/store';
 import {createApp} from '../apps/api/src/app.ts';
@@ -17,7 +17,7 @@ describe('gated plan-bound buy preparation',()=>{
   await ledger.applyCapitalCheckpoint(checkpoint);
   await ledger.saveCapitalPolicy(accountId,{reserveFloor:'1',operatingBudget:'0',obligations:[]},(await ledger.capitalState(accountId))!.revision);
   await ledger.saveInvestmentMandate(accountId,{allocations:[{underlying:'SPY',weightBps:10000}],maxIssuerBps:10000,maxCostBps:100,allowLeveraged:false,representationAllowlist:[PANCAKE_V3.spyOn.toLowerCase()],exposureScope:'tracked-holdings-pending-proposed'},0);
-  const app=createApp(process.cwd(),{ledger,recurringTickMs:null,marketReader:async()=>({observedAt:new Date().toISOString(),items:[],source:'fixture'}),capitalReader:async()=>({...checkpoint,blockNumber:'101',blockHash:'0x'+'6'.repeat(64),observedAt:new Date().toISOString()}),directPreparer:async owner=>{
+  const app=createApp(process.cwd(),{ledger,recurringTickMs:null,marketReader:async()=>({observedAt:new Date().toISOString(),items:[],source:'fixture'}),capitalReader:async()=>({...checkpoint,blockNumber:'101',blockHash:'0x'+'6'.repeat(64),observedAt:new Date().toISOString()}),directRecoveryReader:async attempt=>({reason:'expired_without_observed_token_spend',checkedAt:new Date(Date.now()).toISOString(),fromBlock:'100',throughBlock:'101',throughBlockHash:'0x'+'a'.repeat(64),throughTimestamp:(BigInt(attempt.deadline)+61n).toString()}),directPreparer:async owner=>{
    const transaction=buildDirectSwap({direction:'BUY',recipient:owner as `0x${string}`,amountIn:unit,quotedOut:1290000000000000n,nowMs:Date.now()});
    const view={state:'READ_ONLY_CHECK' as const,executionEnabled:false,checkedAt:new Date().toISOString(),blockNumber:'101',blockHash:'0x'+'6'.repeat(64) as `0x${string}`,direction:'BUY' as const,assetIn:transaction.tokenIn,assetOut:transaction.tokenOut,amountInAtomic:unit.toString(),quotedOutAtomic:transaction.quotedOut.toString(),minimumOutAtomic:transaction.amountOutMinimum.toString(),pool:'0x'+'1'.repeat(40) as `0x${string}`,router:PANCAKE_V3.router,selector:transaction.data.slice(0,10),wallet:{balanceAtomic:(3n*unit).toString(),allowanceAtomic:unit.toString(),bnbAtomic:'1000000000000000'},approvalPreview:{simulation:'NOT_NEEDED' as const,gas:'NOT_NEEDED' as const,gasBudgetAtomic:null,reason:'Already approved.'},gates:{poolIdentity:'CHECKED' as const,calldataMeaning:'CHECKED' as const,referenceCost:'CHECKED' as const,funds:'CHECKED' as const,spendingPermission:'CHECKED' as const,simulation:'PASSED' as const,gas:'CHECKED' as const,authorization:'NOT_REQUESTED' as const,settlement:'NOT_RUN' as const},reference:{price:'780',updatedAt:new Date().toISOString(),deviationBps:'0',reason:'WITHIN_LIMIT',maximumAdverseBps:200},gasBudgetAtomic:'100000000000000',note:'fixture'};
    return {view,transaction};
@@ -47,6 +47,16 @@ describe('gated plan-bound buy preparation',()=>{
    expect(begin.json().transaction.data).toMatch(/^0x414bf389/);
    expect((await ledger.db.query<{request_id:string}>('SELECT request_id FROM submission_barriers WHERE reservation_id=$1',[attempt.planBinding.reservationId])).rows[0].request_id).toBe(attempt.id);
    expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/begin',headers,payload:{attemptId:attempt.id}})).statusCode).toBe(409);
+   const recoveryPath='/v1/routes/SPYon/recover-expired';
+   expect((await app.inject({method:'POST',url:recoveryPath,headers,payload:{attemptId:attempt.id}})).json().error).toBe('PLAN_DIRECT_RECOVERY_EVIDENCE_INVALID');
+   expect((await ledger.snapshot(accountId)).heldAtomic).toBe(unit.toString());
+   const clock=vi.spyOn(Date,'now').mockReturnValue(Number(attempt.deadline)*1000+65000);
+   try{
+    const recovered=await app.inject({method:'POST',url:recoveryPath,headers,payload:{attemptId:attempt.id}});
+    expect(recovered.statusCode).toBe(200);
+    expect(recovered.json().attempt).toMatchObject({id:attempt.id,state:'abandoned',recovery:{reason:'expired_without_observed_token_spend'}});
+    expect((await ledger.snapshot(accountId)).heldAtomic).toBe('0');
+   }finally{clock.mockRestore();}
   }finally{
    for(const [key,value] of [['MANDATE_DIRECT_PILOT_WALLETS',prior.wallets],['MANDATE_PLAN_DIRECT_ENABLED',prior.plan],['MANDATE_DIRECT_EXECUTION_ENABLED',prior.full],['MANDATE_DIRECT_APPROVAL_ENABLED',prior.approval]] as const){if(value===undefined)delete process.env[key];else process.env[key]=value;}
    await app.close();await ledger.close();

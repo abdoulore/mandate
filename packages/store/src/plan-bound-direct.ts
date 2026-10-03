@@ -119,6 +119,33 @@ export class PlanBoundDirectStore{
    return abandoned;
   });
  }
+ async releaseExpiredSwap(wallet:string,attemptId:string,recovery:NonNullable<DirectAttempt['recovery']>){
+  return this.db.transaction(async tx=>{
+   const pointer=(await tx.query<{record:DirectAttempt}>('SELECT record FROM direct_attempts WHERE wallet=$1 AND id=$2',[wallet.toLowerCase(),attemptId])).rows[0]?.record;
+   const binding=pointer?.planBinding;if(!binding)throw new PlanBoundDirectError('PLAN_DIRECT_ATTEMPT_NOT_FOUND');
+   await tx.query('SELECT id FROM accounts WHERE id=$1 FOR UPDATE',[binding.accountId]);
+   const row=(await tx.query<{record:DirectAttempt}>('SELECT record FROM direct_attempts WHERE wallet=$1 AND id=$2 FOR UPDATE',[wallet.toLowerCase(),attemptId])).rows[0]?.record;
+   const currentBinding=row?.planBinding;
+   if(!row||!currentBinding)throw new PlanBoundDirectError('PLAN_DIRECT_RECOVERY_NOT_AVAILABLE');
+   if(currentBinding.reservationId!==binding.reservationId||row.kind!=='swap'||row.state!=='submission_unknown'||row.transactionHash!==null)fail('PLAN_DIRECT_RECOVERY_NOT_AVAILABLE');
+   if(currentBinding.payloadHash!==payloadHash(row))fail('PLAN_DIRECT_PAYLOAD_CHANGED');
+   const now=Date.now(),checkedAt=Date.parse(recovery.checkedAt);
+   if(recovery.reason!=='expired_without_observed_token_spend'||!Number.isFinite(checkedAt)||checkedAt>now||now-checkedAt>30000||!atomic(recovery.fromBlock)||!atomic(recovery.throughBlock)||!transactionHash.test(recovery.throughBlockHash)||!atomic(recovery.throughTimestamp))fail('PLAN_DIRECT_RECOVERY_EVIDENCE_INVALID');
+   const throughTimestamp=BigInt(recovery.throughTimestamp);
+   if(throughTimestamp<BigInt(row.deadline)+60n||throughTimestamp>BigInt(Math.floor(now/1000))||BigInt(recovery.throughBlock)<BigInt(recovery.fromBlock))fail('PLAN_DIRECT_RECOVERY_EVIDENCE_INVALID');
+   const plan=(await tx.query<{record:PlanRevisionRecord}>('SELECT record FROM plans WHERE id=$1 AND account_id=$2',[binding.planId,binding.accountId])).rows[0]?.record;
+   const reservation=(await tx.query<{record:ReservationRecord}>('SELECT record FROM reservations WHERE id=$1 AND account_id=$2 FOR UPDATE',[binding.reservationId,binding.accountId])).rows[0]?.record;
+   const barrier=(await tx.query<{request_id:string}>('SELECT request_id FROM submission_barriers WHERE reservation_id=$1',[binding.reservationId])).rows[0];
+   if(!plan||plan.inputHash!==binding.inputHash||!reservation||reservation.state!=='held'||reservation.planRevisionId!==plan.id||barrier?.request_id!==attemptId)fail('PLAN_DIRECT_RECOVERY_CONFLICT');
+   const released={...reservation,state:'released' as const},abandoned={...row,state:'abandoned' as const,recovery};
+   await tx.query("UPDATE reservations SET state='released',record=$2 WHERE id=$1",[reservation.id,JSON.stringify(released)]);
+   await tx.query("UPDATE direct_attempts SET state='abandoned',record=$2,updated_at=clock_timestamp() WHERE id=$1",[attemptId,JSON.stringify(abandoned)]);
+   await tx.query("UPDATE plan_controls SET status='revoked',revision=revision+1,updated_at=clock_timestamp() WHERE plan_id=$1 AND status IN ('active','paused','cancellation_requested')",[binding.planId]);
+   await tx.query('UPDATE accounts SET revision=revision+1 WHERE id=$1',[binding.accountId]);
+   await event(tx,binding.accountId,'direct.plan.expired_without_spend',{planId:binding.planId,reservationId:binding.reservationId,attemptId,fromBlock:recovery.fromBlock,throughBlock:recovery.throughBlock,throughBlockHash:recovery.throughBlockHash});
+   return abandoned;
+  });
+ }
  // Caller must verify the canonical chain receipt and token transfers before
  // supplying settlement. The subsequent checkpoint is independent evidence of
  // the resulting wallet balance and position; neither alone closes the hold.

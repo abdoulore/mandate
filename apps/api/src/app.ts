@@ -346,10 +346,9 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
   const parsed=attemptIdBody.safeParse(req.body);if(!parsed.success)return reply.code(400).send({error:'INVALID_DIRECT_ATTEMPT'});
   const store=await directStore(),attempt=await store.get(session.address,parsed.data.attemptId);
   if(!attempt)return reply.code(404).send({error:'DIRECT_ATTEMPT_NOT_FOUND'});
-  if(attempt.planBinding)return reply.code(409).send({error:'PLAN_DIRECT_RECOVERY_REQUIRES_RECONCILIATION'});
   if(attempt.kind!=='swap'||attempt.state!=='submission_unknown'||attempt.transactionHash)return reply.code(409).send({error:'DIRECT_RECOVERY_NOT_AVAILABLE'});
-  try{const evidence=await (options.directRecoveryReader??readExpiredSwapRecovery)(attempt);return {attempt:publicAttempt(await store.releaseExpiredSwap(session.address,attempt.id,evidence))};}
-  catch(error){const code=(error as Error).message;return reply.code(code==='DIRECT_RECOVERY_TOO_EARLY'||code==='DIRECT_RECOVERY_SPEND_OBSERVED'||code==='DIRECT_RECOVERY_NOT_AVAILABLE'?409:503).send({error:code.startsWith('DIRECT_RECOVERY_')?code:'DIRECT_RECOVERY_UNAVAILABLE'});}
+  try{const evidence=await (options.directRecoveryReader??readExpiredSwapRecovery)(attempt);const released=attempt.planBinding?await (await planDirectStore()).releaseExpiredSwap(session.address,attempt.id,evidence):await store.releaseExpiredSwap(session.address,attempt.id,evidence);return {attempt:publicAttempt(released)};}
+  catch(error){const code=(error as Error).message;return reply.code(error instanceof PlanBoundDirectError||code==='DIRECT_RECOVERY_TOO_EARLY'||code==='DIRECT_RECOVERY_SPEND_OBSERVED'||code==='DIRECT_RECOVERY_NOT_AVAILABLE'?409:503).send({error:code.startsWith('DIRECT_RECOVERY_')||code.startsWith('PLAN_DIRECT_RECOVERY_')?code:'DIRECT_RECOVERY_UNAVAILABLE'});}
  });
  app.post('/v1/plans/preview',async(req,reply)=>{
   const input=mandateSchema.safeParse(req.body);if(!input.success)return reply.code(400).send({error:'INVALID_MANDATE',issues:input.error.issues.map(i=>({path:i.path,message:i.message}))});
