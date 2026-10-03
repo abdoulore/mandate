@@ -127,21 +127,24 @@ describe('direct execution API barrier',()=>{
    const headers=await signed(app),store=new DirectAttemptStore(ledgers.at(-1)!.db),sell={direction:'SELL',sellAmountAtomic:received.toString()};
    expect((await app.inject({url:'/v1/routes/SPYon/attempts',headers})).json().sellTrialAmountAtomic).toBeNull();
    expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/approval/prepare',headers,payload:sell})).json().error).toBe('DIRECT_APPROVAL_TRIAL_LIMIT');
+   const buyApproval=approvalPreparationBuy(signer.address).transaction;
+   const approved=await store.prepare({wallet:signer.address,kind:'approval',direction:'BUY',chainId:56,to:buyApproval.to,data:buyApproval.data,valueAtomic:'0',tokenIn:buyApproval.tokenIn,tokenOut:buyApproval.tokenOut,amountInAtomic:buyApproval.amountIn.toString(),minimumOutAtomic:'0',deadline:buyApproval.deadline.toString(),expiresAt:new Date(Date.now()+20000).toISOString()});
+   await store.begin(signer.address,approved.id);await store.recordHash(signer.address,approved.id,'0x'+'4'.repeat(64));await store.settle(signer.address,approved.id,{status:'success',blockNumber:'122',blockHash,confirmations:'12',observedAt:new Date().toISOString(),gasCostWei:'100'});
    const buy=buildDirectSwap({direction:'BUY',recipient:signer.address,amountIn:10n**18n,quotedOut:received,nowMs:Date.now()});
    const recorded=await store.prepare({wallet:signer.address,kind:'swap',direction:'BUY',chainId:56,to:buy.to,data:buy.data,valueAtomic:'0',tokenIn:buy.tokenIn,tokenOut:buy.tokenOut,amountInAtomic:buy.amountIn.toString(),minimumOutAtomic:buy.amountOutMinimum.toString(),deadline:buy.deadline.toString(),expiresAt:new Date(Date.now()+20000).toISOString()});
    await store.begin(signer.address,recorded.id);await store.recordHash(signer.address,recorded.id,buyHash);
-   await store.settle(signer.address,recorded.id,{status:'success',blockNumber:'123',blockHash,confirmations:'12',observedAt:new Date().toISOString(),spentAtomic:(10n**18n).toString(),receivedAtomic:received.toString()});
+   await store.settle(signer.address,recorded.id,{status:'success',blockNumber:'123',blockHash,confirmations:'12',observedAt:new Date().toISOString(),spentAtomic:(10n**18n).toString(),receivedAtomic:received.toString(),gasCostWei:'200'});
    expect((await app.inject({url:'/v1/routes/SPYon/attempts',headers})).json()).toMatchObject({sellTrialAmountAtomic:received.toString(),sellTrialEnabled:true,buyTrialEnabled:false,fullRouteEnabled:false});
    expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/prepare',headers,payload:{direction:'BUY',buyAmountAtomic:(10n**18n).toString()}})).json().error).toBe('DIRECT_SWAP_TRIAL_LIMIT');
    expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/prepare',headers,payload:{direction:'SELL',sellAmountAtomic:(received-1n).toString()}})).json().error).toBe('DIRECT_SWAP_TRIAL_LIMIT');
    const approval=(await app.inject({method:'POST',url:'/v1/routes/SPYon/approval/prepare',headers,payload:sell})).json().attempt;
    expect(approval).toMatchObject({kind:'approval',direction:'SELL',amountInAtomic:received.toString()});
    expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/begin',headers,payload:{attemptId:approval.id}})).json().transaction.data).toMatch(/^0x095ea7b3/);
-   await store.recordHash(signer.address,approval.id,'0x'+'6'.repeat(64));await store.settle(signer.address,approval.id,{status:'success',blockNumber:'124',blockHash,confirmations:'12',observedAt:new Date().toISOString()});
+   await store.recordHash(signer.address,approval.id,'0x'+'6'.repeat(64));await store.settle(signer.address,approval.id,{status:'success',blockNumber:'124',blockHash,confirmations:'12',observedAt:new Date().toISOString(),gasCostWei:'300'});
    const prepared=(await app.inject({method:'POST',url:'/v1/routes/SPYon/prepare',headers,payload:sell})).json().attempt;
    expect(prepared).toMatchObject({kind:'swap',direction:'SELL',amountInAtomic:received.toString()});
-   await store.begin(signer.address,prepared.id);await store.recordHash(signer.address,prepared.id,'0x'+'5'.repeat(64));await store.settle(signer.address,prepared.id,{status:'success',blockNumber:'125',blockHash,confirmations:'12',observedAt:new Date().toISOString(),spentAtomic:received.toString(),receivedAtomic:'990000000000000000'});
-   expect((await app.inject({url:'/v1/routes/SPYon/attempts',headers})).json().sellTrialAmountAtomic).toBeNull();
+   await store.begin(signer.address,prepared.id);await store.recordHash(signer.address,prepared.id,'0x'+'5'.repeat(64));await store.settle(signer.address,prepared.id,{status:'success',blockNumber:'125',blockHash,confirmations:'12',observedAt:new Date().toISOString(),spentAtomic:received.toString(),receivedAtomic:'990000000000000000',gasCostWei:'400'});
+   expect((await app.inject({url:'/v1/routes/SPYon/attempts',headers})).json()).toMatchObject({sellTrialAmountAtomic:null,roundTrip:{status:'VERIFIED_ROUND_TRIP',usdtDifferenceAtomic:'-10000000000000000',networkFeesWei:'1000'}});
    expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/prepare',headers,payload:sell})).json().error).toBe('DIRECT_SWAP_TRIAL_LIMIT');
   }finally{await app.close();}
  },20000);

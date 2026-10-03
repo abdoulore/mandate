@@ -41,6 +41,10 @@ export class DirectAttemptStore {
   if(!address.test(wallet))fail('INVALID_WALLET');
   return (await this.db.query<{record:DirectAttempt}>('SELECT record FROM direct_attempts WHERE wallet=$1 ORDER BY created_at DESC,id DESC LIMIT 20',[wallet.toLowerCase()])).rows.map(row=>row.record);
  }
+ async confirmedHistory(wallet:string){
+  if(!address.test(wallet))fail('INVALID_WALLET');
+  return (await this.db.query<{record:DirectAttempt}>("SELECT record FROM direct_attempts WHERE wallet=$1 AND state='confirmed' ORDER BY created_at ASC,id ASC",[wallet.toLowerCase()])).rows.map(row=>row.record);
+ }
  async get(wallet:string,id:string){
   if(!address.test(wallet))fail('INVALID_WALLET');
   return (await this.db.query<{record:DirectAttempt}>('SELECT record FROM direct_attempts WHERE wallet=$1 AND id=$2',[wallet.toLowerCase(),id])).rows[0]?.record??null;
@@ -117,11 +121,13 @@ export class DirectAttemptStore {
    const row=(await tx.query<{record:DirectAttempt}>('SELECT record FROM direct_attempts WHERE wallet=$1 AND id=$2 FOR UPDATE',[wallet.toLowerCase(),id])).rows[0];
    if(!row)fail('DIRECT_ATTEMPT_NOT_FOUND');
    if(row.record.state==='confirmed'||row.record.state==='reverted'){
-    const prior=row.record.settlement;
-    if(!prior)throw new DirectAttemptError('DIRECT_SETTLEMENT_CONFLICT');
-    if(prior.status!==settlement.status||prior.blockNumber!==settlement.blockNumber||prior.blockHash!==settlement.blockHash)fail('DIRECT_SETTLEMENT_CONFLICT');
-    if(prior.spentAtomic!==undefined||settlement.spentAtomic===undefined)return row.record;
-    const record={...row.record,settlement};
+   const prior=row.record.settlement;
+   if(!prior)throw new DirectAttemptError('DIRECT_SETTLEMENT_CONFLICT');
+   if(prior.status!==settlement.status||prior.blockNumber!==settlement.blockNumber||prior.blockHash!==settlement.blockHash)fail('DIRECT_SETTLEMENT_CONFLICT');
+    for(const field of ['spentAtomic','receivedAtomic','gasCostWei'] as const)if(prior[field]!==undefined&&settlement[field]!==undefined&&prior[field]!==settlement[field])fail('DIRECT_SETTLEMENT_CONFLICT');
+    const merged={...prior,...Object.fromEntries(Object.entries(settlement).filter(([,value])=>value!==undefined))};
+    if(JSON.stringify(merged)===JSON.stringify(prior))return row.record;
+    const record={...row.record,settlement:merged};
     await tx.query('UPDATE direct_attempts SET record=$2,updated_at=clock_timestamp() WHERE id=$1',[id,JSON.stringify(record)]);
     return record;
    }

@@ -20,6 +20,7 @@ import {readDirectPreflight,readDirectPreparation,readDirectApprovalPreparation}
 import {readDirectSettlement} from './direct-settlement.ts';
 import {readExpiredSwapRecovery} from './direct-expired-recovery.ts';
 import {directPilotAccess,directPilotConfigured} from './direct-pilot-access.ts';
+import {directRoundTrip} from './direct-roundtrip.ts';
 import {PANCAKE_V3,pancakeRouterAbi} from './pancake-direct.ts';
 import {passportCatalogue} from './passports.ts';
 import {readRegime} from './regime.ts';
@@ -223,7 +224,7 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
   try{const decoded=decodeFunctionData({abi:pancakeRouterAbi,data});if(decoded.functionName!=='exactInputSingle')return false;const p=decoded.args[0];return p.tokenIn.toLowerCase()===(direction==='BUY'?PANCAKE_V3.usdt:PANCAKE_V3.spyOn).toLowerCase()&&p.tokenOut.toLowerCase()===(direction==='BUY'?PANCAKE_V3.spyOn:PANCAKE_V3.usdt).toLowerCase()&&p.recipient.toLowerCase()===owner&&p.fee===PANCAKE_V3.fee&&p.amountIn===amountIn&&p.amountOutMinimum===minimumOut&&p.deadline===deadline&&p.sqrtPriceLimitX96===0n;}catch{return false;}
  }
  function approvalPayloadMatches(data:Hex,amountIn:bigint){try{const decoded=decodeFunctionData({abi:approvalAbi,data});return decoded.functionName==='approve'&&decoded.args[0].toLowerCase()===PANCAKE_V3.router.toLowerCase()&&decoded.args[1]===amountIn;}catch{return false;}}
- app.get('/v1/routes/SPYon/attempts',async req=>{const session=capitalSession(req.headers.cookie,req.headers.origin),access=directPilotAccess(session.address);return {items:(await (await directStore()).history(session.address)).map(publicAttempt),executionEnabled:access.swapEnabled,approvalEnabled:access.approvalEnabled,buyTrialEnabled:access.buyTrialEnabled,sellTrialEnabled:access.sellTrialEnabled,sellTrialAmountAtomic:access.sellTrialEnabled?await sellTrialAmount(session.address):null,fullRouteEnabled:access.fullRouteEnabled};});
+ app.get('/v1/routes/SPYon/attempts',async req=>{const session=capitalSession(req.headers.cookie,req.headers.origin),access=directPilotAccess(session.address),store=await directStore();return {items:(await store.history(session.address)).map(publicAttempt),roundTrip:access.sellTrialEnabled?directRoundTrip(await store.confirmedHistory(session.address),process.env.MANDATE_DIRECT_SELL_TRIAL_BUY_HASH??''):null,executionEnabled:access.swapEnabled,approvalEnabled:access.approvalEnabled,buyTrialEnabled:access.buyTrialEnabled,sellTrialEnabled:access.sellTrialEnabled,sellTrialAmountAtomic:access.sellTrialEnabled?await sellTrialAmount(session.address):null,fullRouteEnabled:access.fullRouteEnabled};});
  app.post('/v1/routes/SPYon/prepare',async(req,reply)=>{
   const session=capitalSession(req.headers.cookie,req.headers.origin,true);
   const access=directPilotAccess(session.address);

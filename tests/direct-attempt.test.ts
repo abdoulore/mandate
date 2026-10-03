@@ -46,7 +46,16 @@ describe('durable direct wallet attempts',()=>{
   const enriched=await store.settle(wallet,attempt.id,{...base,spentAtomic:attempt.amountInAtomic,receivedAtomic:'2',gasCostWei:'512'});
   expect(enriched).toMatchObject({state:'confirmed',settlement:{spentAtomic:attempt.amountInAtomic,receivedAtomic:'2',gasCostWei:'512'}});
   expect((await store.get(wallet,attempt.id))?.settlement).toMatchObject({spentAtomic:attempt.amountInAtomic,receivedAtomic:'2'});
+  await expect(store.settle(wallet,attempt.id,{...base,spentAtomic:attempt.amountInAtomic,receivedAtomic:'2',gasCostWei:'513'})).rejects.toThrow('DIRECT_SETTLEMENT_CONFLICT');
   await expect(store.settle(wallet,attempt.id,{...base,blockHash:'0x'+'7'.repeat(64)})).rejects.toThrow('DIRECT_SETTLEMENT_CONFLICT');
+ },20000);
+ it('adds a verified gas cost to an older confirmed approval receipt',async()=>{
+  const {store}=await open();const attempt=await store.prepare({...draft(),kind:'approval'});await store.begin(wallet,attempt.id);await store.recordHash(wallet,attempt.id,transactionHash);
+  const base={status:'success' as const,blockNumber:'123',blockHash,confirmations:'12',observedAt:new Date().toISOString()};
+  await store.settle(wallet,attempt.id,base);
+  const enriched=await store.settle(wallet,attempt.id,{...base,gasCostWei:'2513'});
+  expect(enriched.settlement?.gasCostWei).toBe('2513');
+  await expect(store.settle(wallet,attempt.id,{...base,gasCostWei:'2514'})).rejects.toThrow('DIRECT_SETTLEMENT_CONFLICT');
  },20000);
  it('does not allow an unsubmitted or weakly confirmed receipt to clear the barrier',async()=>{
   const {store}=await open();const attempt=await store.prepare(draft());
