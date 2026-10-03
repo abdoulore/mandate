@@ -21,6 +21,7 @@ import {readDirectSettlement} from './direct-settlement.ts';
 import {readExpiredSwapRecovery} from './direct-expired-recovery.ts';
 import {directPilotAccess,directPilotConfigured} from './direct-pilot-access.ts';
 import {directRoundTrip} from './direct-roundtrip.ts';
+import {reviewDirectMandate} from './direct-mandate-review.ts';
 import {PANCAKE_V3,pancakeRouterAbi} from './pancake-direct.ts';
 import {passportCatalogue} from './passports.ts';
 import {readRegime} from './regime.ts';
@@ -208,6 +209,19 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
   if(!parsed.success)return reply.code(400).send({error:'INVALID_DIRECT_PREFLIGHT'});
   try{return await (options.directReader??readDirectPreflight)(session.address,parsed.data.direction,parsed.data.sellAmountAtomic,parsed.data.buyAmountAtomic);}
   catch{return reply.code(503).send({error:'DIRECT_PREFLIGHT_UNAVAILABLE',executionEnabled:false});}
+ });
+ const mandateRouteBody=z.object({buyAmountAtomic:z.string().regex(/^[1-9]\d*$/).refine(value=>BigInt(value)<=10n*10n**18n)}).strict();
+ app.post('/v1/routes/SPYon/mandate-review',async(req,reply)=>{
+  const session=capitalSession(req.headers.cookie,req.headers.origin,true);
+  const parsed=mandateRouteBody.safeParse(req.body);
+  if(!parsed.success)return reply.code(400).send({error:'INVALID_MANDATE_ROUTE_AMOUNT'});
+  const ledger=await getLedger(),accountId=capitalAccountId(session.address);
+  const capital=await refreshCapital(session.address);
+  const mandate=(await ledger.investmentMandates(accountId))[0]??null;
+  try{
+   const route=await (options.directReader??readDirectPreflight)(session.address,'BUY',undefined,parsed.data.buyAmountAtomic);
+   return reviewDirectMandate(mandate,capital,route as Awaited<ReturnType<typeof readDirectPreflight>>,parsed.data.buyAmountAtomic);
+  }catch{return reply.code(503).send({error:'MANDATE_ROUTE_REVIEW_UNAVAILABLE',executionAllowed:false});}
  });
  const attemptIdBody=z.object({attemptId:z.string().uuid()}).strict();
  const attemptHashBody=attemptIdBody.extend({transactionHash:z.string().regex(/^0x[0-9a-fA-F]{64}$/)}).strict();
