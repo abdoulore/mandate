@@ -66,8 +66,34 @@ async function inspectDirect(ownerInput:string,direction:DirectDirection,sellAmo
    gasNeeded=gas*gasPrice*13n/10n;simulation='PASSED';
   }catch{simulation='FAILED';}
  }
+ let approvalSimulation:'NOT_RUN'|'PASSED'|'FAILED'|'NOT_NEEDED'='NOT_RUN';
+ let approvalGas:'UNKNOWN'|'CHECKED'|'BLOCKED'|'NOT_NEEDED'='UNKNOWN';
+ let approvalGasBudget:bigint|null=null;
+ let approvalReason='Approval precheck waits for a valid reference price and enough input tokens.';
+ if(allowance>=amountIn){approvalSimulation='NOT_NEEDED';approvalGas='NOT_NEEDED';approvalReason='This amount is already covered by the observed spending limit.';}
+ else if(reference.checked&&balance>=amountIn){
+  const args=[PANCAKE_V3.router,amountIn] as const;
+  try{
+   const approval=await client.simulateContract({address:tokenIn,abi:tokenAbi,functionName:'approve',args,account:owner,blockNumber});
+   approvalSimulation=approval.result===true?'PASSED':'FAILED';
+  }catch{approvalSimulation='FAILED';}
+  if(approvalSimulation==='FAILED')approvalReason='The token approval simulation did not pass at this block.';
+  else if(nativeBalance===0n){approvalGas='BLOCKED';approvalReason='Approval simulation passed, but no BNB was observed for network gas.';}
+  else{
+   try{
+    const [gas,gasPrice]=await Promise.all([
+     client.estimateContractGas({address:tokenIn,abi:tokenAbi,functionName:'approve',args,account:owner,blockNumber}),
+     client.getGasPrice(),
+    ]);
+    approvalGasBudget=gas*gasPrice*13n/10n;
+    approvalGas=nativeBalance>=approvalGasBudget?'CHECKED':'BLOCKED';
+    approvalReason=approvalGas==='CHECKED'?'Approval simulation passed; the observed BNB covers an indicative gas budget.':'Approval simulation passed, but observed BNB is below the indicative gas budget.';
+   }catch{approvalReason='Approval simulation passed; its gas cost could not be estimated.';}
+  }
+ }
  const view={state:'READ_ONLY_CHECK' as const,executionEnabled:false,checkedAt:new Date().toISOString(),blockNumber:blockNumber.toString(),blockHash:block.hash,direction,assetIn:tokenIn,assetOut:tokenOut,amountInAtomic:amountIn.toString(),quotedOutAtomic:quotedOut.toString(),minimumOutAtomic:transaction.amountOutMinimum.toString(),pool,router:PANCAKE_V3.router,selector:transaction.data.slice(0,10),
   wallet:{balanceAtomic:balance.toString(),allowanceAtomic:allowance.toString(),bnbAtomic:nativeBalance.toString()},
+  approvalPreview:{simulation:approvalSimulation,gas:approvalGas,gasBudgetAtomic:approvalGasBudget?.toString()??null,reason:approvalReason},
   gates:{poolIdentity:'CHECKED' as const,calldataMeaning:'CHECKED' as const,referenceCost:reference.checked?'CHECKED':'BLOCKED',funds:balance>=amountIn?'CHECKED':'BLOCKED',spendingPermission:allowance>=amountIn?'CHECKED':'BLOCKED',simulation,gas:gasNeeded===null?'UNKNOWN':nativeBalance>=gasNeeded?'CHECKED':'BLOCKED',authorization:'NOT_REQUESTED' as const,settlement:'NOT_RUN' as const},
   reference:{price:referencePrice,updatedAt:referenceUpdatedAt,deviationBps:reference.deviationBps,reason:reference.reason,maximumAdverseBps:200},
   gasBudgetAtomic:gasNeeded?.toString()??null,note:'Fresh wallet-specific research only. A new quote, simulation, user authorization, durable attempt and settlement proof are required before a trade.'};
