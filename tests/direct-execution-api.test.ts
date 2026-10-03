@@ -3,6 +3,7 @@ import {privateKeyToAccount} from 'viem/accounts';
 import {encodeFunctionData,parseAbi} from 'viem';
 import {createApp} from '../apps/api/src/app.ts';
 import {buildDirectSwap,PANCAKE_V3} from '../apps/api/src/pancake-direct.ts';
+import {readExpiredSwapRecovery} from '../apps/api/src/direct-expired-recovery.ts';
 import {capitalAccountId} from '../apps/api/src/capital.ts';
 import {Ledger,embeddedDatabase} from '@mandate/store';
 
@@ -29,7 +30,7 @@ function approvalPreparation(owner:string){const base=preparation(owner),amountI
 function approvalPreparationBuy(owner:string){const amountIn=10n**18n,swap=buildDirectSwap({direction:'BUY',recipient:owner as `0x${string}`,amountIn,quotedOut:1285660000000000n,nowMs:Date.now()}),base=preparation(owner);const data=encodeFunctionData({abi:parseAbi(['function approve(address,uint256) returns (bool)']),functionName:'approve',args:[PANCAKE_V3.router,amountIn]});return {view:{...base.view,direction:'BUY' as const,assetIn:swap.tokenIn,assetOut:swap.tokenOut,amountInAtomic:amountIn.toString(),quotedOutAtomic:swap.quotedOut.toString(),minimumOutAtomic:swap.amountOutMinimum.toString(),wallet:{balanceAtomic:(3n*10n**18n).toString(),allowanceAtomic:'0',bnbAtomic:'990000000000000'},approvalPreview:{simulation:'PASSED' as const,gas:'CHECKED' as const,gasBudgetAtomic:'3020000000000',reason:'Approval gas covered.'},gates:{...base.view.gates,spendingPermission:'BLOCKED' as const,simulation:'NOT_RUN' as const,gas:'UNKNOWN' as const}},transaction:{chainId:56 as const,from:owner as `0x${string}`,to:PANCAKE_V3.usdt,data,value:0n,tokenIn:PANCAKE_V3.usdt,tokenOut:PANCAKE_V3.spyOn,amountIn,amountOutMinimum:0n,deadline:BigInt(Math.floor(Date.now()/1000)+120)}};}
 function swapPreparationBuy(owner:string){const amountIn=10n**18n,transaction=buildDirectSwap({direction:'BUY',recipient:owner as `0x${string}`,amountIn,quotedOut:1285660000000000n,nowMs:Date.now()}),base=approvalPreparationBuy(owner);return {view:{...base.view,wallet:{...base.view.wallet,allowanceAtomic:amountIn.toString()},gates:{...base.view.gates,spendingPermission:'CHECKED' as const,simulation:'PASSED' as const,gas:'CHECKED' as const}},transaction};}
 async function setup(){const ledger=new Ledger(embeddedDatabase());ledgers.push(ledger);await ledger.migrate();const app=createApp(process.cwd(),{ledger,directPreparer:async owner=>preparation(owner),directApprovalPreparer:async owner=>approvalPreparation(owner),directSettlementReader:async()=>({status:'success',blockNumber:'123',blockHash,confirmations:'12',observedAt:new Date().toISOString()})});return app;}
-async function setupApprovalBuy(){const ledger=new Ledger(embeddedDatabase());ledgers.push(ledger);await ledger.migrate();const address=signer.address.toLowerCase(),checkpoint={accountId:capitalAccountId(address),wallet:address,asset:{chainId:56 as const,contract:PANCAKE_V3.usdt.toLowerCase(),decimals:18 as const},balanceAtomic:(3n*10n**18n).toString(),blockNumber:'123',blockHash,observedAt:new Date().toISOString(),positions:[],evidenceMode:'observed' as const};await ledger.applyCapitalCheckpoint(checkpoint);const state=await ledger.capitalState(checkpoint.accountId);await ledger.saveCapitalPolicy(checkpoint.accountId,{reserveFloor:'0',operatingBudget:'0',obligations:[]},state!.revision);return createApp(process.cwd(),{ledger,capitalReader:async()=>checkpoint,directApprovalPreparer:async owner=>approvalPreparationBuy(owner),directPreparer:async owner=>swapPreparationBuy(owner)});}
+async function setupApprovalBuy(directRecoveryReader?:typeof readExpiredSwapRecovery){const ledger=new Ledger(embeddedDatabase());ledgers.push(ledger);await ledger.migrate();const address=signer.address.toLowerCase(),checkpoint={accountId:capitalAccountId(address),wallet:address,asset:{chainId:56 as const,contract:PANCAKE_V3.usdt.toLowerCase(),decimals:18 as const},balanceAtomic:(3n*10n**18n).toString(),blockNumber:'123',blockHash,observedAt:new Date().toISOString(),positions:[],evidenceMode:'observed' as const};await ledger.applyCapitalCheckpoint(checkpoint);const state=await ledger.capitalState(checkpoint.accountId);await ledger.saveCapitalPolicy(checkpoint.accountId,{reserveFloor:'0',operatingBudget:'0',obligations:[]},state!.revision);return createApp(process.cwd(),{ledger,capitalReader:async()=>checkpoint,directApprovalPreparer:async owner=>approvalPreparationBuy(owner),directPreparer:async owner=>swapPreparationBuy(owner),directRecoveryReader});}
 
 describe('direct execution API barrier',()=>{
  it('remains disabled unless explicitly configured',async()=>{
@@ -115,6 +116,25 @@ describe('direct execution API barrier',()=>{
    process.env.MANDATE_DIRECT_SWAP_TRIAL_ENABLED='true';
    const begin=await app.inject({method:'POST',url:'/v1/routes/SPYon/begin',headers,payload:{attemptId:prepared.json().attempt.id}});
    expect(begin.statusCode).toBe(200);expect(begin.json().transaction.to).toBe(PANCAKE_V3.router.toLowerCase());
+  }finally{await app.close();}
+ },20000);
+ it('releases an unknown swap only after an expired no-spend chain check',async()=>{
+  delete process.env.MANDATE_DIRECT_EXECUTION_ENABLED;process.env.MANDATE_DIRECT_SWAP_TRIAL_ENABLED='true';delete process.env.MANDATE_DIRECT_APPROVAL_ENABLED;process.env.MANDATE_DIRECT_PILOT_WALLETS=signer.address;
+  let tooEarly=true;
+  const app=await setupApprovalBuy(async attempt=>{if(tooEarly)throw new Error('DIRECT_RECOVERY_TOO_EARLY');return {reason:'expired_without_observed_token_spend',checkedAt:new Date().toISOString(),fromBlock:'10',throughBlock:'20',throughBlockHash:blockHash,throughTimestamp:(BigInt(attempt.deadline)+120n).toString()};});
+  try{
+   const headers=await signed(app),payload={direction:'BUY',buyAmountAtomic:'1000000000000000000'};
+   const prepared=(await app.inject({method:'POST',url:'/v1/routes/SPYon/prepare',headers,payload})).json().attempt;
+   expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/begin',headers,payload:{attemptId:prepared.id}})).statusCode).toBe(200);
+   const url='/v1/routes/SPYon/recover-expired';
+   expect((await app.inject({method:'POST',url,headers,payload:{attemptId:prepared.id}})).json().error).toBe('DIRECT_RECOVERY_TOO_EARLY');
+   expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/prepare',headers,payload})).json().error).toBe('DIRECT_ATTEMPT_PENDING');
+   const otherHeaders=await signed(app,other);
+   expect((await app.inject({method:'POST',url,headers:otherHeaders,payload:{attemptId:prepared.id}})).statusCode).toBe(404);
+   tooEarly=false;
+   const recovered=await app.inject({method:'POST',url,headers,payload:{attemptId:prepared.id}});
+   expect(recovered.statusCode).toBe(200);expect(recovered.json().attempt).toMatchObject({state:'abandoned',recovery:{reason:'expired_without_observed_token_spend'}});
+   expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/prepare',headers,payload})).statusCode).toBe(200);
   }finally{await app.close();}
  },20000);
  it('refuses to begin a prepared swap after the swap stage is disabled',async()=>{

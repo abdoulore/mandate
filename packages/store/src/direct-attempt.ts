@@ -24,6 +24,7 @@ export type DirectAttempt={
  amountInAtomic:string;minimumOutAtomic:string;deadline:string;
  preparedAt:string;expiresAt:string;state:DirectAttemptState;
  transactionHash:string|null;settlement:null|{status:'success'|'reverted';blockNumber:string;blockHash:string;confirmations:string;observedAt:string};
+ recovery?:{reason:'expired_without_observed_token_spend';checkedAt:string;fromBlock:string;throughBlock:string;throughBlockHash:string;throughTimestamp:string};
 };
 type PrepareInput=Omit<DirectAttempt,'id'|'preparedAt'|'state'|'transactionHash'|'settlement'>;
 const address=/^0x[0-9a-fA-F]{40}$/;
@@ -74,6 +75,18 @@ export class DirectAttemptStore {
    if(!row)fail('DIRECT_ATTEMPT_NOT_FOUND');
    if(row.record.state!=='prepared')fail('DIRECT_ATTEMPT_ALREADY_BEGUN');
    const record={...row.record,state:'abandoned' as const};
+   await tx.query('UPDATE direct_attempts SET state=$2,record=$3,updated_at=clock_timestamp() WHERE id=$1',[id,record.state,JSON.stringify(record)]);
+   return record;
+  });
+ }
+ async releaseExpiredSwap(wallet:string,id:string,recovery:NonNullable<DirectAttempt['recovery']>){
+  return this.db.transaction(async tx=>{
+   const row=(await tx.query<{record:DirectAttempt}>('SELECT record FROM direct_attempts WHERE wallet=$1 AND id=$2 FOR UPDATE',[wallet.toLowerCase(),id])).rows[0];
+   if(!row)fail('DIRECT_ATTEMPT_NOT_FOUND');
+   const prior=row.record;
+   if(prior.kind!=='swap'||prior.state!=='submission_unknown'||prior.transactionHash!==null)fail('DIRECT_ATTEMPT_NOT_RECOVERABLE');
+   if(recovery.reason!=='expired_without_observed_token_spend'||!Number.isFinite(Date.parse(recovery.checkedAt))||!quantity.test(recovery.fromBlock)||!quantity.test(recovery.throughBlock)||!hash.test(recovery.throughBlockHash)||!quantity.test(recovery.throughTimestamp)||BigInt(recovery.throughTimestamp)<BigInt(prior.deadline)+60n||BigInt(recovery.throughBlock)<BigInt(recovery.fromBlock))fail('INVALID_DIRECT_RECOVERY');
+   const record={...prior,state:'abandoned' as const,recovery};
    await tx.query('UPDATE direct_attempts SET state=$2,record=$3,updated_at=clock_timestamp() WHERE id=$1',[id,record.state,JSON.stringify(record)]);
    return record;
   });

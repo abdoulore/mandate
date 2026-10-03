@@ -18,6 +18,7 @@ import {readWalletReadiness} from './wallet-readiness.ts';
 import {reviewResearchExecution} from './execution-review.ts';
 import {readDirectPreflight,readDirectPreparation,readDirectApprovalPreparation} from './direct-preflight.ts';
 import {readDirectSettlement} from './direct-settlement.ts';
+import {readExpiredSwapRecovery} from './direct-expired-recovery.ts';
 import {directPilotAccess,directPilotConfigured} from './direct-pilot-access.ts';
 import {PANCAKE_V3,pancakeRouterAbi} from './pancake-direct.ts';
 import {passportCatalogue} from './passports.ts';
@@ -27,7 +28,7 @@ import {passportPolicySchema,evaluatePassport} from '@mandate/domain';
 import {recurringScheduleInputSchema,recurringChangeSchema} from '@mandate/domain';
 class CapitalReadError extends Error{}
 class InflowReadError extends Error{}
-export function createApp(root=process.cwd(),options:{researchClient?:Pick<BinanceReadClient,'get'>;readinessReader?:typeof readWalletReadiness;directReader?:(owner:string,direction:'BUY'|'SELL',sellAmountAtomic?:string,buyAmountAtomic?:string)=>Promise<unknown>;directPreparer?:typeof readDirectPreparation;directApprovalPreparer?:typeof readDirectApprovalPreparation;directSettlementReader?:typeof readDirectSettlement;capitalReader?:typeof readCapitalCheckpoint;marketReader?:typeof readPortfolioMarks;inflowReader?:typeof readInflowProof;ledger?:Ledger;recurringTickMs?:number|null}={}){
+export function createApp(root=process.cwd(),options:{researchClient?:Pick<BinanceReadClient,'get'>;readinessReader?:typeof readWalletReadiness;directReader?:(owner:string,direction:'BUY'|'SELL',sellAmountAtomic?:string,buyAmountAtomic?:string)=>Promise<unknown>;directPreparer?:typeof readDirectPreparation;directApprovalPreparer?:typeof readDirectApprovalPreparation;directSettlementReader?:typeof readDirectSettlement;directRecoveryReader?:typeof readExpiredSwapRecovery;capitalReader?:typeof readCapitalCheckpoint;marketReader?:typeof readPortfolioMarks;inflowReader?:typeof readInflowProof;ledger?:Ledger;recurringTickMs?:number|null}={}){
  const app=Fastify({logger:false,bodyLimit:16384});
  const wallet=createWalletSessionService();
  let ledgerPromise:Promise<Ledger>|undefined;
@@ -281,6 +282,15 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
   if(attempt.state!=='submitted')return reply.code(409).send({error:'DIRECT_ATTEMPT_UNRESOLVED',attempt:publicAttempt(attempt)});
   try{const settlement=await (options.directSettlementReader??readDirectSettlement)(attempt);return {attempt:publicAttempt(await store.settle(session.address,attempt.id,settlement))};}
   catch{return reply.code(409).send({error:'DIRECT_SETTLEMENT_NOT_VERIFIED',attempt:publicAttempt(attempt)});}
+ });
+ app.post('/v1/routes/SPYon/recover-expired',async(req,reply)=>{
+  const session=capitalSession(req.headers.cookie,req.headers.origin,true);
+  const parsed=attemptIdBody.safeParse(req.body);if(!parsed.success)return reply.code(400).send({error:'INVALID_DIRECT_ATTEMPT'});
+  const store=await directStore(),attempt=await store.get(session.address,parsed.data.attemptId);
+  if(!attempt)return reply.code(404).send({error:'DIRECT_ATTEMPT_NOT_FOUND'});
+  if(attempt.kind!=='swap'||attempt.state!=='submission_unknown'||attempt.transactionHash)return reply.code(409).send({error:'DIRECT_RECOVERY_NOT_AVAILABLE'});
+  try{const evidence=await (options.directRecoveryReader??readExpiredSwapRecovery)(attempt);return {attempt:publicAttempt(await store.releaseExpiredSwap(session.address,attempt.id,evidence))};}
+  catch(error){const code=(error as Error).message;return reply.code(code==='DIRECT_RECOVERY_TOO_EARLY'||code==='DIRECT_RECOVERY_SPEND_OBSERVED'||code==='DIRECT_RECOVERY_NOT_AVAILABLE'?409:503).send({error:code.startsWith('DIRECT_RECOVERY_')?code:'DIRECT_RECOVERY_UNAVAILABLE'});}
  });
  app.post('/v1/plans/preview',async(req,reply)=>{
   const input=mandateSchema.safeParse(req.body);if(!input.success)return reply.code(400).send({error:'INVALID_MANDATE',issues:input.error.issues.map(i=>({path:i.path,message:i.message}))});
