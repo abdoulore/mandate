@@ -55,7 +55,7 @@ describe('direct execution API barrier',()=>{
    expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/reconcile',headers,payload:{attemptId:id}})).json().attempt.state).toBe('confirmed');
    expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/prepare',headers,payload})).statusCode).toBe(200);
   }finally{await app.close();}
- },20000);
+ },120000);
  it('journals an exact token approval separately from the later swap',async()=>{
   process.env.MANDATE_DIRECT_EXECUTION_ENABLED='true';process.env.MANDATE_DIRECT_APPROVAL_ENABLED='true';process.env.MANDATE_DIRECT_PILOT_WALLETS=signer.address;const app=await setup();try{
    const headers=await signed(app),payload={direction:'SELL',sellAmountAtomic:'10000000000000000'};

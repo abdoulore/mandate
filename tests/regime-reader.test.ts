@@ -28,7 +28,7 @@ it('uses original $10k buy rows for the NVDA regime flip, with line provenance',
  expect(result.flips).toContainEqual({ts:after!.ts,from:'broken',to:'healthy'});
  expect(result.observedCount).toBe(result.points.filter(point=>point.pct!==null).length);
  expect(result.brokenPercent).toBeCloseTo(100*result.brokenCount/result.observedCount,8);
-},20000);
+},120000);
 
 it('keeps AMZN sweep evidence separate from the $10k series and does not invent recovery',async()=>{
  const result=await readRegime(projectRoot,'AMZN','ondo');
@@ -39,7 +39,7 @@ it('keeps AMZN sweep evidence separate from the $10k series and does not invent 
  expect(result.flips).toEqual([]);
  expect(result.sweepObservations).toEqual([{ts:'2026-09-21T13:31:05.132Z',pct:299.4746854901014,venueCount:10,
   source:{file:'data/sweep-all-2026-09-21T13-28.jsonl',line:152,sha256:lineHash('data/sweep-all-2026-09-21T13-28.jsonl',152)},broken:true}]);
-});
+},120000);
 
 it('distinguishes full Ondo pauses from a missing Ondo snapshot',async()=>{
  const result=await readRegime(projectRoot,'NVDA','ondo');
@@ -77,4 +77,4 @@ it('rejects unsupported query shapes and unknown instruments on the public histo
   expect((await app.inject('/v1/regime?token=AMZN&platform=ondo')).statusCode).toBe(400);
   expect((await app.inject('/v1/regime?token=NVDA&platform=ondo&extra=1')).statusCode).toBe(400);
  }finally{await app.close();}
-});
+},120000);

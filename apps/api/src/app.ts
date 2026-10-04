@@ -213,6 +213,21 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
  });
  const mandateRouteBody=z.object({buyAmountAtomic:z.string().regex(/^[1-9]\d*$/).refine(value=>BigInt(value)<=10n*10n**18n)}).strict();
  const planRouteBody=z.object({buyAmountAtomic:z.string().regex(/^[1-9]\d*$/).refine(value=>BigInt(value)<=10n**18n)}).strict();
+ const trialMandateBody=z.object({maxCostBps:z.number().int().min(0).max(200),expectedRevision:z.number().int().min(0)}).strict();
+ app.get('/v1/routes/SPYon/trial-mandate',async(req,reply)=>{
+  const session=capitalSession(req.headers.cookie,req.headers.origin),access=directPilotAccess(session.address);
+  if(!access.allowed)return reply.code(403).send({error:'DIRECT_PILOT_WALLET_NOT_ALLOWED'});
+  const ledger=await getLedger(),accountId=capitalAccountId(session.address);
+  const trial=(await ledger.directTrialMandates(accountId))[0]??null,portfolio=(await ledger.investmentMandates(accountId))[0]??null;
+  return {trial,portfolio:portfolio?{revision:portfolio.revision,allocations:portfolio.policy.allocations}:null,executionEnabled:access.planExecutionEnabled};
+ });
+ app.post('/v1/routes/SPYon/trial-mandate',async(req,reply)=>{
+  const session=capitalSession(req.headers.cookie,req.headers.origin,true),access=directPilotAccess(session.address);
+  if(!access.allowed)return reply.code(403).send({error:'DIRECT_PILOT_WALLET_NOT_ALLOWED'});
+  const parsed=trialMandateBody.safeParse(req.body);if(!parsed.success)return reply.code(400).send({error:'INVALID_DIRECT_TRIAL_MANDATE'});
+  const ledger=await getLedger(),trial=await ledger.saveDirectTrialMandate(capitalAccountId(session.address),parsed.data.maxCostBps,parsed.data.expectedRevision);
+  return {trial};
+ });
  app.post('/v1/routes/SPYon/mandate-review',async(req,reply)=>{
   const session=capitalSession(req.headers.cookie,req.headers.origin,true);
   const parsed=mandateRouteBody.safeParse(req.body);
@@ -247,7 +262,7 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
   if(!access.planExecutionEnabled)return reply.code(409).send({error:'PLAN_DIRECT_EXECUTION_DISABLED'});
   const parsed=planRouteBody.safeParse(req.body);if(!parsed.success)return reply.code(400).send({error:'INVALID_PLAN_DIRECT_AMOUNT'});
   const ledger=await getLedger(),accountId=capitalAccountId(session.address),capital=await refreshCapital(session.address);
-  const mandate=(await ledger.investmentMandates(accountId))[0]??null;
+  const mandate=(await ledger.directTrialMandates(accountId))[0]??null;
   const {view,transaction}=await (options.directPreparer??readDirectPreparation)(session.address,'BUY',undefined,parsed.data.buyAmountAtomic);
   const review=reviewDirectMandate(mandate,capital,view,parsed.data.buyAmountAtomic);
   if(review.state!=='POLICY_CHECKED'||!mandate||!capital.checkpointId)return reply.code(409).send({error:'PLAN_DIRECT_REVIEW_BLOCKED',reasons:review.reasons,review});
@@ -282,6 +297,7 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
   const requestedAmount=direction==='BUY'?BigInt(buyAmountAtomic??'10000000000000000000'):BigInt(sellAmountAtomic!);
   if(access.planExecutionEnabled&&direction==='SELL')return reply.code(409).send({error:'PLAN_DIRECT_BUY_ONLY'});
   if(direction==='BUY'&&!access.buyApprovalEnabled||direction==='SELL'&&!access.sellTrialEnabled&&!access.buyApprovalEnabled)return reply.code(409).send({error:'DIRECT_APPROVAL_DISABLED'});
+  if(access.planExecutionEnabled&&direction==='BUY'&&!(await (await getLedger()).directTrialMandates(capitalAccountId(session.address)))[0])return reply.code(409).send({error:'PLAN_DIRECT_TRIAL_MANDATE_REQUIRED'});
   if(!(await trialAmountAllowed(session.address,direction,requestedAmount,'approval',access)))return reply.code(409).send({error:'DIRECT_APPROVAL_TRIAL_LIMIT'});
   if(direction==='BUY'&&!(await checkBuyCapital(session.address,requestedAmount)))return reply.code(409).send({error:'PROTECTED_CASH_OR_POLICY_BLOCKS_TRADE'});
   const {view,transaction}=await (options.directApprovalPreparer??readDirectApprovalPreparation)(session.address,direction,sellAmountAtomic,buyAmountAtomic);
@@ -300,6 +316,7 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
   if(pending.kind==='approval'&&!access.approvalEnabled)return reply.code(409).send({error:'DIRECT_APPROVAL_DISABLED'});
   if(access.planExecutionEnabled&&pending.kind==='approval'&&pending.direction==='SELL')return reply.code(409).send({error:'PLAN_DIRECT_BUY_ONLY'});
   if(pending.kind==='approval'&&(pending.direction==='BUY'&&!access.buyApprovalEnabled||pending.direction==='SELL'&&!access.sellTrialEnabled&&!access.buyApprovalEnabled))return reply.code(409).send({error:'DIRECT_APPROVAL_DISABLED'});
+  if(access.planExecutionEnabled&&pending.kind==='approval'&&pending.direction==='BUY'&&!(await (await getLedger()).directTrialMandates(capitalAccountId(session.address)))[0])return reply.code(409).send({error:'PLAN_DIRECT_TRIAL_MANDATE_REQUIRED'});
   if(pending.planBinding){
    if(!access.planExecutionEnabled)return reply.code(409).send({error:'PLAN_DIRECT_EXECUTION_DISABLED'});
    const attempt=await (await planDirectStore()).begin(session.address,pending.id);

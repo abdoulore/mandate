@@ -14,6 +14,7 @@ export function directPilotAccess(wallet:string){
  const buyTrialEnabled=allowed&&process.env.MANDATE_DIRECT_SWAP_TRIAL_ENABLED==='true';
  const sellTrialEnabled=allowed&&process.env.MANDATE_DIRECT_SELL_TRIAL_ENABLED==='true'&&/^0x[0-9a-fA-F]{64}$/.test(process.env.MANDATE_DIRECT_SELL_TRIAL_BUY_HASH??'');
  return {
+  allowed,
   approvalEnabled:buyApprovalEnabled||sellTrialEnabled,
   buyApprovalEnabled,
   swapEnabled:planExecutionEnabled||fullRouteEnabled||buyTrialEnabled||sellTrialEnabled,

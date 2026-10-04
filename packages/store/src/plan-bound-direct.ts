@@ -53,7 +53,7 @@ export class PlanBoundDirectStore{
    // The first dispatch adapter is deliberately restricted to an empty tracked
    // portfolio; multi-leg allocation requires a separate certified policy path.
    if(head.record.positions.length!==14||head.record.positions.some(p=>p.state!=='OBSERVED'||p.rawAtomic!=='0'))fail('PLAN_DIRECT_PORTFOLIO_UNRESOLVED');
-   const mandate=(await tx.query<{record:SavedInvestmentMandate}>('SELECT record FROM investment_mandates WHERE account_id=$1 ORDER BY revision DESC LIMIT 1',[input.accountId])).rows[0]?.record;
+   const mandate=(await tx.query<{record:SavedInvestmentMandate}>('SELECT record FROM direct_trial_mandates WHERE account_id=$1 ORDER BY revision DESC LIMIT 1',[input.accountId])).rows[0]?.record;
    const policy=(await tx.query<{revision:number}>('SELECT revision FROM capital_policies WHERE account_id=$1 ORDER BY revision DESC LIMIT 1',[input.accountId])).rows[0];
    if(!mandate||mandate.id!==input.mandateId||mandate.revision!==input.mandateRevision||!policy||policy.revision!==input.cashPolicyRevision)fail('STALE_PLAN_DIRECT_POLICY');
    if(!mandate.policy.representationAllowlist.includes(SPYON)||mandate.policy.allocations.length!==1||mandate.policy.allocations[0]?.underlying!=='SPY'||mandate.policy.allocations[0]?.weightBps!==10000||mandate.policy.maxIssuerBps!==10000||costBps>BigInt(mandate.policy.maxCostBps))fail('PLAN_DIRECT_POLICY_BLOCKED');

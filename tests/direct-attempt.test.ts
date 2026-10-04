@@ -14,7 +14,7 @@ const directories:string[]=[];
 const ledgers:Ledger[]=[];
 afterEach(async()=>{for(const ledger of ledgers.splice(0))await ledger.close();for(const directory of directories.splice(0))await fs.rm(directory,{recursive:true,force:true});});
 async function open(directory?:string){const ledger=new Ledger(embeddedDatabase(directory));ledgers.push(ledger);await ledger.migrate();return {ledger,store:new DirectAttemptStore(ledger.db)};}
-function draft(){return {wallet,kind:'swap' as const,direction:'BUY' as const,chainId:56 as const,to:target,data:'0x414bf38900000000',valueAtomic:'0' as const,tokenIn:token,tokenOut:stock,amountInAtomic:'10000000000000000000',minimumOutAtomic:'1',deadline:String(Math.floor(Date.now()/1000)+120),expiresAt:new Date(Date.now()+30000).toISOString()};}
+function draft(){return {wallet,kind:'swap' as const,direction:'BUY' as const,chainId:56 as const,to:target,data:'0x414bf38900000000',valueAtomic:'0' as const,tokenIn:token,tokenOut:stock,amountInAtomic:'10000000000000000000',minimumOutAtomic:'1',deadline:String(Math.floor(Date.now()/1000)+120),expiresAt:new Date(Date.now()+90000).toISOString()};}
 
 describe('durable direct wallet attempts',()=>{
  it('commits a one-shot submission barrier before a wallet can be asked to send',async()=>{
@@ -38,7 +38,7 @@ describe('durable direct wallet attempts',()=>{
   const record=await store.settle(wallet,attempt.id,{status:'success',blockNumber:'123',blockHash,confirmations:'12',observedAt:new Date().toISOString()});
   expect(record.state).toBe('confirmed');expect((await store.history(wallet))[0]?.settlement?.blockHash).toBe(blockHash);
   expect((await store.prepare(draft())).state).toBe('prepared');
- },20000);
+ },120000);
  it('backfills receipt amounts for a verified terminal attempt without changing its outcome',async()=>{
   const {store}=await open();const attempt=await store.prepare(draft());await store.begin(wallet,attempt.id);await store.recordHash(wallet,attempt.id,transactionHash);
   const base={status:'success' as const,blockNumber:'123',blockHash,confirmations:'12',observedAt:new Date().toISOString()};

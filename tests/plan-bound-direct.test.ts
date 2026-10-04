@@ -13,7 +13,8 @@ async function setup(){
  const checkpoint={accountId,wallet,asset:{chainId:56,contract:PANCAKE_V3.usdt.toLowerCase(),decimals:18},balanceAtomic:(3n*amount).toString(),blockNumber:'100',blockHash:'0x'+'5'.repeat(64),observedAt:new Date().toISOString(),positions:passportDefinitions().map(p=>({contract:p.contract,symbol:p.symbol,decimals:18,rawAtomic:'0',multiplierAtomic:null,adjustedAtomic:null,accountingVersion:'raw-token-v1' as const,state:'OBSERVED' as const})),evidenceMode:'observed' as const};
  await ledger.applyCapitalCheckpoint(checkpoint);
  await ledger.saveCapitalPolicy(accountId,{reserveFloor:'1',operatingBudget:'0',obligations:[]},(await ledger.capitalState(accountId))!.revision);
- const mandate=await ledger.saveInvestmentMandate(accountId,{allocations:[{underlying:'SPY',weightBps:10000}],maxIssuerBps:10000,maxCostBps:100,allowLeveraged:false,representationAllowlist:[PANCAKE_V3.spyOn.toLowerCase()],exposureScope:'tracked-holdings-pending-proposed'},0);
+ await ledger.saveInvestmentMandate(accountId,{allocations:[{underlying:'SPY',weightBps:4000},{underlying:'NVDA',weightBps:3500},{underlying:'SGOV',weightBps:2500}],maxIssuerBps:10000,maxCostBps:30,allowLeveraged:false,representationAllowlist:[PANCAKE_V3.spyOn.toLowerCase()],exposureScope:'tracked-holdings-pending-proposed'},0);
+ const mandate=await ledger.saveDirectTrialMandate(accountId,100,0);
  const state=await ledger.capitalState(accountId),transaction=buildDirectSwap({direction:'BUY',recipient:wallet as `0x${string}`,amountIn:amount,quotedOut:1290000000000000n,nowMs:Date.now()});
  const input={accountId,wallet,expectedAccountRevision:state!.revision,mandateId:mandate.id,mandateRevision:mandate.revision,cashPolicyRevision:state!.policyRevision,checkpointId:state!.checkpointId,amountAtomic:amount.toString(),minimumOutAtomic:transaction.amountOutMinimum.toString(),referencePriceUsd:'780',referenceUpdatedAt:new Date().toISOString(),routeCheckedAt:new Date().toISOString(),router:transaction.to,data:transaction.data,deadline:transaction.deadline.toString(),expiresAt:new Date(Date.now()+15000).toISOString()};
  return {ledger,store:new PlanBoundDirectStore(ledger.db),input};
@@ -23,7 +24,10 @@ describe('atomic plan-bound direct staging',{timeout:60000},()=>{
  it('creates a plan, cash hold and exact attempt together, then fences calldata before any wallet send',async()=>{
   const {ledger,store,input}=await setup();
   const {plan,reservation,attempt}=await store.prepare(input);
+  expect((await ledger.investmentMandates(accountId))[0].policy.allocations).toEqual([{underlying:'SPY',weightBps:4000},{underlying:'NVDA',weightBps:3500},{underlying:'SGOV',weightBps:2500}]);
+  expect((await ledger.directTrialMandates(accountId))[0].policy.allocations).toEqual([{underlying:'SPY',weightBps:10000}]);
   expect((await ledger.snapshot(accountId)).heldAtomic).toBe(amount.toString());
+  await expect(ledger.saveDirectTrialMandate(accountId,120,1)).rejects.toThrow('DIRECT_ATTEMPT_PENDING');
   expect(plan.inputHash).toBe(attempt.planBinding?.inputHash);
   expect(reservation.planRevisionId).toBe(plan.id);
   expect(attempt.planBinding?.reservationId).toBe(reservation.id);

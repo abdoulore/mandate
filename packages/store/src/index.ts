@@ -13,6 +13,7 @@ import {inflowMigration} from './inflow-migration.ts';
 import {recurringMigration} from './recurring-migration.ts';
 import {planControlMigration} from './plan-control-migration.ts';
 import {directAttemptMigration} from './direct-attempt.ts';
+import {directTrialMandateMigration} from './direct-trial-mandate-migration.ts';
 export {RecurringStore} from './recurring.ts';
 export {DirectAttemptStore,DirectAttemptError,type DirectAttempt} from './direct-attempt.ts';
 export {PlanBoundDirectStore,PlanBoundDirectError,type PlanDirectPreparation} from './plan-bound-direct.ts';
@@ -32,9 +33,23 @@ export class Ledger {
   const constraints=(await tx.query<{conname:string;definition:string}>("SELECT conname,pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conrelid='accounts'::regclass AND contype='c'")).rows;
   for(const c of constraints)if(c.definition.includes('protected')&&c.definition.includes('balance')){if(!/^[a-z_]+$/.test(c.conname))fail('UNEXPECTED_CONSTRAINT');await tx.query(`ALTER TABLE accounts DROP CONSTRAINT ${c.conname}`);}
   for(const sql of capitalMigration)await tx.query(sql);
- }if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=3')).rows.length)for(const sql of researchMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=4')).rows.length)for(const sql of rebalanceMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=5')).rows.length)for(const sql of cashRaisingMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=6')).rows.length)for(const sql of inflowMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=7')).rows.length)for(const sql of recurringMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=8')).rows.length)for(const sql of planControlMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=9')).rows.length)for(const sql of directAttemptMigration)await tx.query(sql);});}
+  }if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=3')).rows.length)for(const sql of researchMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=4')).rows.length)for(const sql of rebalanceMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=5')).rows.length)for(const sql of cashRaisingMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=6')).rows.length)for(const sql of inflowMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=7')).rows.length)for(const sql of recurringMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=8')).rows.length)for(const sql of planControlMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=9')).rows.length)for(const sql of directAttemptMigration)await tx.query(sql);if(!(await tx.query('SELECT version FROM mandate_schema WHERE version=10')).rows.length)for(const sql of directTrialMandateMigration)await tx.query(sql);});}
  async close(){await this.db.close();}
  async investmentMandates(accountId:string){return (await this.db.query<{record:SavedInvestmentMandate}>('SELECT record FROM investment_mandates WHERE account_id=$1 ORDER BY revision DESC LIMIT 20',[accountId])).rows.map(r=>r.record);}
+ async directTrialMandates(accountId:string){return (await this.db.query<{record:SavedInvestmentMandate}>('SELECT record FROM direct_trial_mandates WHERE account_id=$1 ORDER BY revision DESC LIMIT 20',[accountId])).rows.map(r=>r.record);}
+ async saveDirectTrialMandate(accountId:string,maxCostBps:number,expectedRevision:number){
+  if(!Number.isInteger(maxCostBps)||maxCostBps<0||maxCostBps>200||!Number.isInteger(expectedRevision)||expectedRevision<0)fail('INVALID_DIRECT_TRIAL_MANDATE');
+  const policy=investmentPolicySchema.parse({allocations:[{underlying:'SPY',weightBps:10000}],maxIssuerBps:10000,maxCostBps,allowLeveraged:false,representationAllowlist:['0x6a708ead771238919d85930b5a0f10454e1c331a'],exposureScope:'tracked-holdings-pending-proposed'});
+  return this.db.transaction(async tx=>{await this.lockedAccount(tx,accountId);const previous=(await tx.query<{record:SavedInvestmentMandate}>('SELECT record FROM direct_trial_mandates WHERE account_id=$1 ORDER BY revision DESC LIMIT 1',[accountId])).rows[0]?.record;
+   if((previous?.revision??0)!==expectedRevision)fail('STALE_DIRECT_TRIAL_MANDATE');if(previous&&same(previous.policy,policy))return previous;
+   const account=(await tx.query<{record:AccountRecord}>('SELECT record FROM accounts WHERE id=$1',[accountId])).rows[0]?.record;
+   const active=(await tx.query<{id:string}>("SELECT id FROM direct_attempts WHERE wallet=$1 AND state IN ('prepared','submission_unknown','submitted') LIMIT 1",[account?.wallet.toLowerCase()??''])).rows[0];
+   if(active)fail('DIRECT_ATTEMPT_PENDING');
+   const record:SavedInvestmentMandate={id:randomUUID(),accountId,revision:expectedRevision+1,createdAt:iso(),policy,researchOnly:true};
+   await tx.query('INSERT INTO direct_trial_mandates(account_id,revision,id,record) VALUES($1,$2,$3,$4)',[accountId,record.revision,record.id,JSON.stringify(record)]);
+   await tx.query('UPDATE accounts SET revision=revision+1 WHERE id=$1',[accountId]);await this.event(tx,accountId,'direct.trial_mandate.saved',{mandateId:record.id,mandateRevision:record.revision,maxCostBps});return record;
+  });
+ }
  async saveInvestmentMandate(accountId:string,value:InvestmentPolicy,expectedRevision:number){
   const policy=investmentPolicySchema.parse(value);policy.representationAllowlist.sort();
   if(!Number.isInteger(expectedRevision)||expectedRevision<0)fail('INVALID_REVISION');
