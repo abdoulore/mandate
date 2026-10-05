@@ -12,3 +12,5 @@
 .capital-cash-raising{border-top:1px solid #e2e7e6;padding-top:24px;margin:24px 0}.capital-cash-raising>details{margin:18px 0;font-size:13px}.capital-cash-raising p,.capital-cash-raising strong{overflow-wrap:anywhere}.capital-cash-raising table{font-size:12px}
 
 .capital-inflows{border-top:1px solid #e2e7e6;padding-top:24px;margin:24px 0}.capital-inflows>details{margin:18px 0;font-size:13px}.capital-inflows p,.capital-inflows code{overflow-wrap:anywhere}.capital-inflows select{background:white;padding:12px;border:1px solid #d9dfdf;border-radius:6px;font:inherit;min-width:0;max-width:100%}
+
+.capital-portfolio td strong,.capital-portfolio td small{display:block}.capital-portfolio td small{color:var(--muted);margin-top:3px}.capital-portfolio td:nth-child(2){overflow-wrap:anywhere;font-variant-numeric:tabular-nums}.capital-all-tokens{margin-top:14px}.capital-all-tokens summary{cursor:pointer;color:var(--accent);font-size:12px;font-weight:600}.capital-all-tokens .table-wrap{margin-top:10px}

@@ -33,6 +33,16 @@ try{
  await page.route('**/api/v1/capital/proposals',r=>{if(r.request().method()==='GET')return fulfill(r,{items:history});const input={...mandate,...saved.policy};result=previewInvestment(input,candidates,quotes,new Date(),funding,portfolio);const proposal={id:'fixture-'+history.length,accountId:'fixture',requestId:JSON.parse(r.request().postData()).requestId,mandateId:saved.id,mandateRevision:saved.revision,createdAt:result.createdAt,scenario:'normal',researchOnly:true,inputs:{mandate:input,cashPolicyRevision:0,checkpoint,funding:{...funding},portfolio,candidates,quotes},result};history.unshift(proposal);return fulfill(r,{proposal});});
  await page.goto('http://127.0.0.1:3110/portfolio-exit',{waitUntil:'networkidle'});
  const panel=page.getByLabel('Wallet cash and commitments'),controls=panel.getByRole('group',{name:'Token versions to consider'}),preview=panel.locator('.capital-preview');
+ const exposure=panel.getByLabel('Tracked portfolio exposure');
+ await exposure.getByRole('heading',{name:'Tracked holdings and pending exposure'}).waitFor();
+ if(await exposure.locator('table').first().locator('tbody tr').count()!==2)throw new Error('Empty tracked tokens clutter the holdings summary');
+ if(!await exposure.getByText('$80.00',{exact:true}).isVisible())throw new Error('Held USD mark is not rounded for display');
+ const allTokens=exposure.locator('.capital-all-tokens');
+ if(await allTokens.locator('tbody tr').count()!==defs.length)throw new Error('Exact tracked-token evidence was lost');
+ await allTokens.locator('summary').click();
+ if(!await allTokens.getByText('MSFTon',{exact:true}).isVisible())throw new Error('Empty tracked-token evidence cannot be inspected');
+ await allTokens.locator('summary').click();
+
  await controls.getByLabel('SPYon · Ondo',{exact:true}).check();await controls.getByLabel('SPYB · bStocks',{exact:true}).check();
  await panel.getByRole('button',{name:'Save investment rules'}).click();await panel.getByText('Saved revision 1',{exact:true}).waitFor();
  await panel.getByRole('button',{name:'Preview using wallet cash'}).click();await preview.getByText('This example fits your wallet cash and saved rules.',{exact:true}).waitFor();
