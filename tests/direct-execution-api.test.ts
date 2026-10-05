@@ -71,17 +71,17 @@ describe('direct execution API barrier',()=>{
   delete process.env.MANDATE_DIRECT_EXECUTION_ENABLED;delete process.env.MANDATE_DIRECT_SWAP_TRIAL_ENABLED;process.env.MANDATE_DIRECT_APPROVAL_ENABLED='true';delete process.env.MANDATE_DIRECT_PILOT_WALLETS;
   const app=await setup();try{
    const headers=await signed(app),sell={direction:'SELL',sellAmountAtomic:'10000000000000000'};
-   expect((await app.inject({url:'/v1/routes/SPYon/attempts',headers})).json()).toMatchObject({executionEnabled:false,approvalEnabled:false});
+   expect((await app.inject({url:'/v1/routes/SPYon/attempts',headers})).json()).toMatchObject({executionEnabled:false,approvalEnabled:false,buyApprovalEnabled:false});
    expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/approval/prepare',headers,payload:sell})).json().error).toBe('DIRECT_APPROVAL_DISABLED');
    process.env.MANDATE_DIRECT_PILOT_WALLETS=signer.address+',not-an-address';
-   expect((await app.inject({url:'/v1/routes/SPYon/attempts',headers})).json()).toMatchObject({executionEnabled:false,approvalEnabled:false});
+   expect((await app.inject({url:'/v1/routes/SPYon/attempts',headers})).json()).toMatchObject({executionEnabled:false,approvalEnabled:false,buyApprovalEnabled:false});
    process.env.MANDATE_DIRECT_PILOT_WALLETS=signer.address;
-   expect((await app.inject({url:'/v1/routes/SPYon/attempts',headers})).json()).toMatchObject({executionEnabled:false,approvalEnabled:true});
+   expect((await app.inject({url:'/v1/routes/SPYon/attempts',headers})).json()).toMatchObject({executionEnabled:false,approvalEnabled:true,buyApprovalEnabled:true});
    expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/prepare',headers,payload:sell})).json().error).toBe('DIRECT_EXECUTION_DISABLED');
    expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/approval/prepare',headers,payload:sell})).json().error).toBe('DIRECT_APPROVAL_TRIAL_LIMIT');
    expect((await app.inject({method:'POST',url:'/v1/routes/SPYon/approval/prepare',headers,payload:{direction:'BUY',buyAmountAtomic:'2000000000000000000'}})).json().error).toBe('DIRECT_APPROVAL_TRIAL_LIMIT');
    const otherHeaders=await signed(app,other);
-   expect((await app.inject({url:'/v1/routes/SPYon/attempts',headers:otherHeaders})).json()).toMatchObject({executionEnabled:false,approvalEnabled:false});
+   expect((await app.inject({url:'/v1/routes/SPYon/attempts',headers:otherHeaders})).json()).toMatchObject({executionEnabled:false,approvalEnabled:false,buyApprovalEnabled:false});
   }finally{await app.close();}
  },20000);
  it('prepares only an exact 1 USDT approval after saved cash protection is checked',async()=>{
