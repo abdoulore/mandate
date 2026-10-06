@@ -12,3 +12,5 @@
 .nav-item{text-decoration:none}
 
 img.mark{width:32px;height:32px;display:block;flex:none;margin-right:10px;border-radius:0;background:none}@media(max-width:880px){img.mark{width:28px;height:28px}}
+
+.connect-planning{margin-top:24px}.connect-planning p{font-size:13px;color:var(--muted);max-width:65ch}

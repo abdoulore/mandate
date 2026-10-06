@@ -33,6 +33,11 @@ try{
  await page.route('**/api/v1/capital/proposals',r=>{if(r.request().method()==='GET')return fulfill(r,{items:history});const input={...mandate,...saved.policy};result=previewInvestment(input,candidates,quotes,new Date(),funding,portfolio);const proposal={id:'fixture-'+history.length,accountId:'fixture',requestId:JSON.parse(r.request().postData()).requestId,mandateId:saved.id,mandateRevision:saved.revision,createdAt:result.createdAt,scenario:'normal',researchOnly:true,inputs:{mandate:input,cashPolicyRevision:0,checkpoint,funding:{...funding},portfolio,candidates,quotes},result};history.unshift(proposal);return fulfill(r,{proposal});});
  await page.goto('http://127.0.0.1:3110/portfolio-exit',{waitUntil:'networkidle'});
  const panel=page.getByLabel('Wallet cash and commitments'),controls=panel.getByRole('group',{name:'Token versions to consider'}),preview=panel.locator('.capital-preview');
+ await panel.getByRole('heading',{name:'Your wallet at a glance'}).waitFor();
+ if(!await panel.getByRole('link',{name:'View holdings'}).isVisible())throw new Error('Overview hides the holdings task');
+ if(await panel.getByRole('group',{name:'Token versions to consider'}).count())throw new Error('Detailed investment controls clutter the overview');
+ await panel.screenshot({path:'.runtime/outputs/mandate-portfolio-fixture-mobile.png'});
+ await panel.getByRole('link',{name:'View holdings'}).click();
  const exposure=panel.getByLabel('Tracked portfolio exposure');
  await exposure.getByRole('heading',{name:'Tracked holdings and pending exposure'}).waitFor();
  if(await exposure.locator('table').first().locator('tbody tr').count()!==2)throw new Error('Empty tracked tokens clutter the holdings summary');
@@ -43,20 +48,28 @@ try{
  if(!await allTokens.getByText('MSFTon',{exact:true}).isVisible())throw new Error('Empty tracked-token evidence cannot be inspected');
  await allTokens.locator('summary').click();
 
+ await page.goto('http://127.0.0.1:3110/plans',{waitUntil:'networkidle'});
+ await panel.getByRole('heading',{name:'Investment rules and proposals'}).waitFor();
  await controls.getByLabel('SPYon · Ondo',{exact:true}).check();await controls.getByLabel('SPYB · bStocks',{exact:true}).check();
  await panel.getByRole('button',{name:'Save investment rules'}).click();await panel.getByText('Saved revision 1',{exact:true}).waitFor();
  await panel.getByRole('button',{name:'Preview using wallet cash'}).click();await preview.getByText('This example fits your wallet cash and saved rules.',{exact:true}).waitFor();
  if(result.legs[0]?.instrumentId!==spy.contract)throw new Error('Loose limit did not choose SPYon');
- await page.getByLabel(/^Illustrative cost condition/).selectOption('expensive');if(await panel.getByLabel('Maximum with one token issuer · %',{exact:true}).inputValue()!=='95'||!await panel.getByRole('button',{name:'Preview using wallet cash'}).isEnabled())throw new Error('Scenario condition reset saved investment rules');await page.getByLabel(/^Illustrative cost condition/).selectOption('normal');
+ if(await panel.getByLabel('Maximum with one token issuer · %',{exact:true}).inputValue()!=='95'||!await panel.getByRole('button',{name:'Preview using wallet cash'}).isEnabled())throw new Error('Saved investment controls lost their state');
  await panel.getByLabel('Maximum with one token issuer · %',{exact:true}).fill('70');if(await preview.count())throw new Error('Unsaved rules retained old proposal');if(await panel.getByRole('button',{name:'Preview using wallet cash'}).isEnabled())throw new Error('Unsaved rules allowed a new proposal');await panel.getByRole('button',{name:'Save investment rules'}).click();await panel.getByText('Saved revision 2',{exact:true}).waitFor();
  await panel.getByRole('button',{name:'Preview using wallet cash'}).click();await preview.getByText('SPY · bstock · 100 USDT budget',{exact:true}).waitFor();
  if(result.legs[0]?.instrumentId!==spyb.contract)throw new Error('Tight limit did not switch to SPYB');
- await panel.screenshot({path:'.runtime/outputs/mandate-portfolio-fixture-mobile.png'});
+ await panel.screenshot({path:'.runtime/outputs/mandate-investment-rules-fixture-mobile.png'});
  await controls.getByLabel('SPYB · bStocks',{exact:true}).uncheck();if(await preview.count())throw new Error('Representation edit retained an obsolete result');
  await panel.getByRole('button',{name:'Save investment rules'}).click();await panel.getByText('Saved revision 3',{exact:true}).waitFor();
  await panel.getByRole('button',{name:'Preview using wallet cash'}).click();await preview.getByText('No allocation is available.',{exact:true}).waitFor();
  if(result.status!=='infeasible')throw new Error('Unselected representation was substituted');
  await panel.getByLabel('Choose another investment',{exact:true}).selectOption('MSFT');await panel.getByRole('button',{name:'Add investment target',exact:true}).click();if(await panel.getByLabel('Target allocation SPY · %',{exact:true}).inputValue()!=='50'||await panel.getByLabel('Target allocation MSFT · %',{exact:true}).inputValue()!=='50')throw new Error('New target weights are inconsistent');await panel.getByRole('button',{name:'Remove target allocation MSFT',exact:true}).click();if(await panel.getByLabel('Target allocation SPY · %',{exact:true}).inputValue()!=='100')throw new Error('Removing a target left invalid weights');
+ for(const [route,heading] of [['cash-rules','Cash rules and commitments'],['rebalance','Target drift and rebalance'],['cash-raising','Raise cash for a need'],['inflows','Incoming funds'],['recurring','Recurring checks'],['records','Saved records and evidence']]){
+  await page.goto('http://127.0.0.1:3110/'+route,{waitUntil:'networkidle'});
+  await panel.getByRole('heading',{name:heading,exact:true}).first().waitFor();
+  if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1))throw new Error('Mobile overflow on '+route);
+ }
+ await page.goto('http://127.0.0.1:3110/portfolio-exit',{waitUntil:'networkidle'});await panel.getByRole('heading',{name:'Your wallet at a glance'}).waitFor();
  if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1))throw new Error('Mobile overflow');if(errors.length)throw new Error(errors.join('; '));
- console.log('Synthetic funded portfolio smoke passed: holdings change issuer denominator, cap switches SPYon to SPYB, exact-contract deselection clears and blocks proposal, mobile layout has no overflow or page errors.');
+ console.log('Synthetic funded portfolio smoke passed: focused routes, holdings, investment rules and proposal guards, mobile layout and page errors.');
 }finally{await browser.close();}

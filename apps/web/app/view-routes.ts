@@ -17,6 +17,9 @@ export const routeViews={
  'cash-raising':'Cash raising',
  inflows:'Inflows',
  recurring:'Recurring',
+ 'cash-rules':'Cash rules',
+ rebalance:'Rebalance',
+ records:'Records',
  passports:'Passports',
  'saved-evidence-lab':'Lab',
 } as const;
