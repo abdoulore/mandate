@@ -6,5 +6,5 @@ export default async function WorkspaceRoute({params}:{params:Promise<{view:stri
  const {view}=await params;
  const initialView=routeViews[view as keyof typeof routeViews];
  if(!initialView)notFound();
- return <Home initialView={initialView}/>;
+ return <Home key={initialView} initialView={initialView}/>;
 }

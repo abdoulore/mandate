@@ -1,15 +1,60 @@
 # Mandate
 
-Mandate is a workspace for researching stock tokens and planning capital. It separates historical quote observations, wallet-specific research, and illustrative plans so that a recorded price or a feasible plan is never mistaken for permission to trade. The core workspace remains read-only. A separate, wallet-allowlisted SPYon pilot can request a wallet-confirmed approval or swap when explicitly enabled; general live execution remains disabled.
+**Know what a tokenized stock really costs before you buy it.**
 
-The public workspace includes:
+Mandate is a pre-trade decision and execution-control layer for tokenized stocks on BNB Smart Chain. It separates a token's identity, recorded market data, a fresh wallet-specific route, available cash after protections, and the user's explicit transaction authorization. A token listing is not a buy opportunity; a quote is not an approval.
 
-- Historical $10,000 buy-cost observations with timestamps and links to the exact recorded source lines. A cost is measured against that quote's token reference price, not a completed trade or a current executable fee.
-- Token research that keeps discovery, contract identity, market-data freshness, and execution eligibility separate. Stale collector data is labeled and its prices are hidden as current marks.
-- Optional Binance Web3 Wallet sign-in for BNB Smart Chain holdings and unsigned route research. Sign-in itself requests no approval or transaction.
-- Illustrative cash, allocation, rebalance, and exit plans that protect saved reserves and commitments. Planner prices and fees are synthetic; these plans do not move funds.
+[Read-only demo video](media/mandate-read-only-demo.mp4) · [Developer experience report](DEVELOPER-EXPERIENCE.md) · [Verified 1 USDT SPYon round trip](VERIFIED-PILOT.md) · [Demo runbook](DEMO-RUNBOOK.md) · [GitHub repository](https://github.com/abdoulore/mandate)
 
-## Run locally
+## The problem
+
+A tokenized stock can track a familiar security while the onchain route is expensive, unavailable, or unsuitable for a particular wallet. The reference price, recorded token price, executable route, available wallet balance, and amount the user is willing to spend answer different questions. A single green “Buy” button hides those distinctions.
+
+## What Mandate does
+
+The product path is **Explore → Understand → Plan → Verify → Confirm → Track**.
+
+1. **Explore:** Browse sourced Ondo and bStocks token identities. Recorded token prices show their collector timestamp and are never used as executable quotes.
+2. **Understand:** Open an asset to inspect its contract, issuer, historical cost evidence, original source line, and unresolved facts.
+3. **Plan:** Connect a BNB Smart Chain wallet, protect cash for reserves and commitments, and save investment rules. Sign-in proves wallet ownership; it cannot move funds.
+4. **Verify:** For the bounded SPYon path, Mandate obtains a fresh route and reference, checks route and pool identity, wallet balance, allowance, saved rules, and simulation. Other token routes remain research-only until separately certified.
+5. **Confirm:** A wallet request is shown only after its checks pass. Exact-amount approvals and swaps each require their own user confirmation.
+6. **Track:** Mandate records attempts, blocks uncertain outcomes from automatic retry, and reconciles canonical receipts and token flows.
+
+Historical observations are evidence, not current offers. Planning previews are models, not fund locks. Route verification is not trade authorization.
+
+## BNB Chain and Binance Web3 APIs
+
+Mandate uses BNB Smart Chain mainnet (chain ID 56), BSC USDT, Ondo and bStocks tokenized assets, and a separately verified PancakeSwap V3 route for its SPYon pilot. The Binance Web3 RWA Data API supplies discovery, issuer/platform metadata, token profiles, and reference-price observations. Its Trading API supplies quote and unsigned-build research. Mandate independently checks response identity, age and transaction meaning; API success alone cannot grant market access or authorize a wallet action. See the [developer report](DEVELOPER-EXPERIENCE.md) for endpoint behavior, exact integration findings, and requested API improvements.
+
+## Architecture
+
+```text
+Binance Web3 RWA + Trading APIs ──► discovery, reference and route observations
+                                          │
+                         recorded source lines and hashes
+                                          │
+Wallet BSC RPC ──► balances and allowances ──► Mandate decision engine
+Saved rules ─────► protected cash and limits ─┘         │
+                                                       ▼
+                                           route identity + simulation
+                                                       │
+                                              separate wallet prompt
+                                                       │
+                                         canonical receipt + token flows
+```
+
+The Next.js web app proxies an allowlisted API surface to the local Fastify service. Locally, the API uses a durable embedded PostgreSQL-compatible ledger under `.runtime/`; production selects persistent PostgreSQL through `MANDATE_DATABASE_URL`. Runtime state, credentials and recent collector output are ignored by Git. Frozen September research evidence is committed for the historical example.
+
+## Verified pilot and boundaries
+
+On 3 October 2026, one wallet confirmed exact USDT and SPYon approvals plus a SPYon buy and sell. The buy spent **1 USDT** and received **0.00127831014865403 SPYon**; selling that exact quantity returned **0.993895483757431244 USDT**. The cash difference was **−0.006104516242568756 USDT** before **0.000032044657128095 BNB** in four network fees. [All four BscScan transaction links and receipt accounting](VERIFIED-PILOT.md) are public proof of this bounded PancakeSwap V3 route, not a claim that other stock tokens or Binance RFQ routes can execute.
+
+The pilot is wallet allowlisted and off by default. Each stage has a separate flag and size cap. Unknown wallet results are held for reconciliation rather than automatically repeated. Broad execution is disabled. Research-only portfolio proposals use modeled costs and nominal USDT parity; they are not executable orders. Application cash reserves and pending holds do not lock funds onchain.
+
+The captioned [read-only backup demo](media/mandate-read-only-demo.mp4) tours the public product and prior receipt proof. It does not claim to show a new wallet confirmation; the four mainnet receipts above are the execution evidence.
+
+## Try it locally
 
 Use Node.js 24 and npm:
 
@@ -18,11 +63,9 @@ npm ci
 npm run dev
 ```
 
-Open [http://127.0.0.1:3110](http://127.0.0.1:3110) for the landing page. The research workspace starts at `/regime`; the local API listens on `127.0.0.1:4110`. The development command starts both processes. Run `node scripts/check-preview.mjs` to check web/API health and the unsigned access boundary.
+Open `http://127.0.0.1:3110` for the landing page and `http://127.0.0.1:3110/market` to explore. The Fastify API listens on `127.0.0.1:4110`. The committed historical research can be viewed without credentials. A fresh clone has no live collector frame, so current price cells remain unavailable until data is collected.
 
-The included historical observations are sufficient to explore the recorded cost example without credentials. They are frozen, derived research records from September 2026, not live prices. Only selected dated files in `data/` are committed. Local logs, new collector output, wallet/session state, and credentials remain ignored. A fresh clone will mark the historical catalogue stale until new observations are collected.
-
-To use the optional signed Binance research API, copy `.env.example` to `.env` and set your own `BINANCE_WEB3_API_KEY` and `BINANCE_WEB3_API_SECRET`. Wallet sign-in also uses `MANDATE_SESSION_SECRET`; production requires at least 32 random characters and an HTTPS `MANDATE_APP_ORIGIN`. Keep `.env` local. A phone wallet needs a reachable HTTPS origin in its DApp browser; its `127.0.0.1` is not this computer.
+For signed API research, copy `.env.example` to `.env` and supply your own `BINANCE_WEB3_API_KEY` and `BINANCE_WEB3_API_SECRET`. Wallet sessions need `MANDATE_SESSION_SECRET` (at least 32 random characters in production) and an HTTPS `MANDATE_APP_ORIGIN` for a phone wallet. Never commit `.env`, `.runtime`, private research, or wallet state. Execution flags default to `false` and should stay off in a public research deployment.
 
 ## Verify
 
@@ -30,27 +73,14 @@ To use the optional signed Binance research API, copy `.env.example` to `.env` a
 npm run typecheck
 npm run test:invariants
 npm run build
+node scripts/product-journey-smoke.mjs
+node scripts/navigation-smoke.mjs
 ```
 
-The invariant suite runs without private credentials. A PostgreSQL-server test is skipped unless `MANDATE_TEST_DATABASE_URL` is set; CI supplies a disposable PostgreSQL service for it. The browser checks in `scripts/ui-*.mjs` expect a running local app and Microsoft Edge. Some use synthetic funded fixtures; those are labeled as examples, not wallet holdings.
+The invariant suite runs without credentials; the current run passed **248 tests with one database-server test skipped**. The browser smoke uses installed Microsoft Edge and a running local app/API. On the local optimized preview, six mobile page transitions to fully visible headings/data took **54–335 ms**; network and phone-wallet conditions will vary. The repository also has focused API, route, wallet, ledger and synthetic funded-portfolio tests; synthetic fixtures are not live holdings or transaction proof. CI runs the core checks. The [demo runbook](DEMO-RUNBOOK.md) gives a concise judge path and fallback evidence.
 
-## Boundaries
+## Technical detail
 
-- Source line hashes and timestamps show what the collector recorded. They do not prove a fill, current liquidity, market access, or transaction safety.
-- Wallet reads and unsigned route checks do not authorize a transaction. The 10 USDT AAOIB route has no matching historical collector-cost observation.
-- Reserves and pending holds are application bookkeeping, not on-chain locks. Allocation and cash-raising estimates use synthetic costs and nominal USDT parity.
-- The public deployment remains read-only. The separate SPYon pilot is disabled by default; enabling it is a deliberate operator choice and still requires a wallet confirmation for each approval and swap.
+`/direct-trade` and `/plan/SPYon` expose the same capped direct-route review for the pilot; the plan page does not bypass its wallet checks. A buy can check a user-chosen positive USDT amount up to 10 USDT. Pilot flags restrict actual stages further. A separate SPYon-only trial rule set leaves the main multi-asset plan unchanged. Preparation repeats fresh quote, reference, contract, route, wallet and simulation checks; an exact-amount approval is requested only when needed. The one-use begin step records a durable submission barrier before returning calldata. Reconciliation requires a canonical receipt with 12 confirmations and matching token transfers. An unresolved attempt must be resolved before another wallet request.
 
-## Direct-route research in progress
-
-`npm run probe:roundtrip -- SPYon` checks fresh Binance buy and sell quote/build shapes. `npm run probe:pancake-direct` checks the corresponding Pancake V3 pool, its published router interface and a direct on-chain quote. Both commands are read-only and save sanitized, local-only reports under `data/capabilities/`.
-
-`npm run probe:direct-amounts` checks public-chain SPYon quotes for 0.01, 0.1, 1, 5 and 10 USDT at one block. It makes no wallet request and does not establish a trading minimum.
-
-A connected wallet can open `/direct-trade` or request `POST /v1/routes/SPYon/preflight` with `{"direction":"BUY","buyAmountAtomic":"1000000000000000000"}` (1 USDT) or `{"direction":"SELL","sellAmountAtomic":"..."}`. The buy amount may be any positive amount up to 10 USDT; omitting it retains the original 10 USDT default. The read-only check tests the capped SPYon/USDT pool route, wallet funds and allowance, a current reference-price limit, and simulation when possible. When allowance is below the chosen amount, it also simulates an exact-amount token approval and checks an indicative approval gas budget without requesting approval. It returns no calldata and requests no wallet transaction. The page asks compatible wallets to switch to BNB Smart Chain during connection.
-
-Every SPYon pilot stage requires an exact wallet address in `MANDATE_DIRECT_PILOT_WALLETS`; an empty or malformed list disables them. `MANDATE_DIRECT_APPROVAL_ENABLED=true` permits a separately confirmed exact-amount approval. `MANDATE_DIRECT_SWAP_TRIAL_ENABLED=true` permits only a buy of at most 1 USDT for the allowlisted wallet. `MANDATE_DIRECT_SELL_TRIAL_ENABLED=true`, with `MANDATE_DIRECT_SELL_TRIAL_BUY_HASH` set to a reconciled 1 USDT buy hash, separately permits one exact-amount SPYon approval and sell for only the quantity actually received in that buy. The sell trial closes after a confirmed sell; neither trial flag enables the wider route. `MANDATE_DIRECT_EXECUTION_ENABLED=true` separately opens the wider route, capped at a 10 USDT buy or a 0.02 SPYon sell with quoted output no greater than 11 USDT. `MANDATE_PLAN_DIRECT_ENABLED=true` separately exposes a plan-bound BUY preparation path for the allowlisted wallet. It caps the route and any exact USDT approval at 1 USDT. The allowlisted wallet saves a separate SPYon-only trial mandate (100% SPY, Ondo issuer limit 100%, SPYon contract only, and a chosen maximum route cost of 0–200 basis points); the main multi-asset investment mandate stays unchanged. Preparation checks that trial mandate and the latest saved cash rules, then atomically records the plan, cash hold, and attempt before wallet review. This experimental path remains off until ambiguous wallet-result recovery is verified. A buy requires a fresh capital checkpoint and saved cash policy with at least the chosen USDT amount available after protections. Preparation repeats the quote and contract checks, simulates the action, and records an exact-amount approval or swap attempt. The one-use `/begin` call commits a durable submission barrier before returning calldata for a separate wallet confirmation. A returned hash is recorded and later reconciled against a canonical receipt with 12 confirmations; a successful swap also requires the expected token transfers. Unknown wallet outcomes cannot be retried automatically. All execution flags default to false; a temporary wallet-specific preview enables only the stage under test.
-
-An unresolved plan-bound request with no transaction hash can be checked after its swap deadline and chain-finality delay. Mandate scans the wallet's outgoing USDT transfers across the valid swap window; only a verified no-spend result closes the attempt and releases its plan hold. A request with a known hash must follow receipt reconciliation. This recovery is tested locally; the plan-bound flag remains off pending a phone-based flow check. The direct-trade page exposes the separate trial rules to a signed allowlisted wallet even while the plan-bound execution flag is off. Saving those rules requests no wallet transaction.
-
-After all four wallet actions have confirmed, `/direct-trade` shows a combined round-trip receipt: exact USDT spent and returned, the matched SPYon quantity, the USDT cash difference, and BNB network fees across both approvals and swaps. The cash difference and BNB fees remain separate units.
+The older AAOIB aggregator research is deliberately read-only because its router calldata and wallet market access are not certified. The 488-token collector survey and 14 sourced passports broaden research coverage; they do not broaden live execution coverage.

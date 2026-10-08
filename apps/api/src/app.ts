@@ -4,7 +4,7 @@ import path from 'node:path';
 import {randomUUID} from 'node:crypto';
 import {z} from 'zod';
 import {decodeFunctionData,parseAbi,type Hex} from 'viem';
-import {Ledger,LedgerError,RecurringStore,DirectAttemptStore,DirectAttemptError,PlanBoundDirectStore,PlanBoundDirectError,embeddedDatabase,type DirectAttempt} from '@mandate/store';
+import {Ledger,LedgerError,RecurringStore,DirectAttemptStore,DirectAttemptError,PlanBoundDirectStore,PlanBoundDirectError,embeddedDatabase,postgresDatabase,type DirectAttempt} from '@mandate/store';
 import {capitalPolicySchema,capitalCheckpointSchema} from '@mandate/domain';
 import {readInflowProof} from './inflows.ts';
 import {capitalAccountId,capitalView,readCapitalCheckpoint} from './capital.ts';
@@ -34,7 +34,7 @@ export function createApp(root=process.cwd(),options:{researchClient?:Pick<Binan
  const app=Fastify({logger:false,bodyLimit:16384});
  const wallet=createWalletSessionService();
  let ledgerPromise:Promise<Ledger>|undefined;
- const getLedger=()=>ledgerPromise??=options.ledger?Promise.resolve(options.ledger):(async()=>{fs.mkdirSync(path.join(root,'.runtime'),{recursive:true});const ledger=new Ledger(embeddedDatabase(path.join(root,'.runtime/capital-ledger')));try{await ledger.migrate();return ledger;}catch(error){await ledger.close();throw error;}})();
+ const getLedger=()=>ledgerPromise??=options.ledger?Promise.resolve(options.ledger):(async()=>{const url=process.env.MANDATE_DATABASE_URL;if(!url)fs.mkdirSync(path.join(root,'.runtime'),{recursive:true});const ledger=new Ledger(url?postgresDatabase(url):embeddedDatabase(path.join(root,'.runtime/capital-ledger')));try{await ledger.migrate();return ledger;}catch(error){await ledger.close();throw error;}})();
  const directStore=async()=>new DirectAttemptStore((await getLedger()).db);
  const planDirectStore=async()=>new PlanBoundDirectStore((await getLedger()).db);
  app.addHook('onClose',async()=>{if(ledgerPromise&&!options.ledger){const ledger=await ledgerPromise.catch(()=>null);await ledger?.close();}});

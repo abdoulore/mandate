@@ -52,20 +52,24 @@ try{
  await panel.getByRole('heading',{name:'Investment rules and proposals'}).waitFor();
  await controls.getByLabel('SPYon · Ondo',{exact:true}).check();await controls.getByLabel('SPYB · bStocks',{exact:true}).check();
  await panel.getByRole('button',{name:'Save investment rules'}).click();await panel.getByText('Saved revision 1',{exact:true}).waitFor();
- await panel.getByRole('button',{name:'Preview using wallet cash'}).click();await preview.getByText('This example fits your wallet cash and saved rules.',{exact:true}).waitFor();
+ await panel.getByRole('button',{name:'Preview using wallet cash'}).click();await preview.getByText('This example fits your wallet cash and saved rules.',{exact:true}).waitFor();if(await preview.locator('.capital-preview-evidence').evaluate(el=>el.open))throw new Error('Preview evidence expanded by default');
  if(result.legs[0]?.instrumentId!==spy.contract)throw new Error('Loose limit did not choose SPYon');
+ if(await panel.locator('.capital-advanced-rules').evaluate(el=>el.open))throw new Error('Advanced limits expanded by default');
+ await panel.locator('.capital-advanced-rules summary').click();
  if(await panel.getByLabel('Maximum with one token issuer · %',{exact:true}).inputValue()!=='95'||!await panel.getByRole('button',{name:'Preview using wallet cash'}).isEnabled())throw new Error('Saved investment controls lost their state');
  await panel.getByLabel('Maximum with one token issuer · %',{exact:true}).fill('70');if(await preview.count())throw new Error('Unsaved rules retained old proposal');if(await panel.getByRole('button',{name:'Preview using wallet cash'}).isEnabled())throw new Error('Unsaved rules allowed a new proposal');await panel.getByRole('button',{name:'Save investment rules'}).click();await panel.getByText('Saved revision 2',{exact:true}).waitFor();
  await panel.getByRole('button',{name:'Preview using wallet cash'}).click();await preview.getByText('SPY · bstock · 100 USDT budget',{exact:true}).waitFor();
  if(result.legs[0]?.instrumentId!==spyb.contract)throw new Error('Tight limit did not switch to SPYB');
+ await panel.locator('.capital-advanced-rules summary').click();
+ if(await panel.locator('.capital-proposal-history').evaluate(el=>el.open))throw new Error('Old previews clutter the guided form');
  await panel.screenshot({path:'.runtime/outputs/mandate-investment-rules-fixture-mobile.png'});
  await controls.getByLabel('SPYB · bStocks',{exact:true}).uncheck();if(await preview.count())throw new Error('Representation edit retained an obsolete result');
  await panel.getByRole('button',{name:'Save investment rules'}).click();await panel.getByText('Saved revision 3',{exact:true}).waitFor();
  await panel.getByRole('button',{name:'Preview using wallet cash'}).click();await preview.getByText('No allocation is available.',{exact:true}).waitFor();
  if(result.status!=='infeasible')throw new Error('Unselected representation was substituted');
  await panel.getByLabel('Choose another investment',{exact:true}).selectOption('MSFT');await panel.getByRole('button',{name:'Add investment target',exact:true}).click();if(await panel.getByLabel('Target allocation SPY · %',{exact:true}).inputValue()!=='50'||await panel.getByLabel('Target allocation MSFT · %',{exact:true}).inputValue()!=='50')throw new Error('New target weights are inconsistent');await panel.getByRole('button',{name:'Remove target allocation MSFT',exact:true}).click();if(await panel.getByLabel('Target allocation SPY · %',{exact:true}).inputValue()!=='100')throw new Error('Removing a target left invalid weights');
- for(const [route,heading] of [['cash-rules','Cash rules and commitments'],['rebalance','Target drift and rebalance'],['cash-raising','Raise cash for a need'],['inflows','Incoming funds'],['recurring','Recurring checks'],['records','Saved records and evidence']]){
-  await page.goto('http://127.0.0.1:3110/'+route,{waitUntil:'networkidle'});
+ for(const [route,heading] of [['cash-rules','Cash rules and commitments'],['rebalance','Target drift and rebalance'],['cash-raising','Raise cash for a need'],['inflows','Incoming funds'],['recurring','Recurring checks'],['records','Activity and receipts']]){
+  await page.goto('http://127.0.0.1:3110/'+route,{waitUntil:'domcontentloaded'});
   await panel.getByRole('heading',{name:heading,exact:true}).first().waitFor();
   if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1))throw new Error('Mobile overflow on '+route);
  }

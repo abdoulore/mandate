@@ -10,6 +10,7 @@ export const routeViews={
  'portfolio-exit':'Portfolio/exit',
  overview:'Overview',
  portfolio:'Portfolio',
+ holdings:'Portfolio',
  plans:'Plans',
  instruments:'Instruments',
  withdraw:'Withdraw',
@@ -28,7 +29,8 @@ export type WorkspaceView=typeof routeViews[keyof typeof routeViews];
 export function viewName(view:WorkspaceView){
  if(view==='Regime')return 'Cost history';
  if(view==='Execution review')return 'Token research';
- if(view==='Portfolio/exit')return 'Plan and exit';
+ if(view==='Portfolio/exit')return 'Portfolio';
+ if(view==='Records')return 'Activity';
  return view;
 }
 export function primaryViewFor(view:WorkspaceView){

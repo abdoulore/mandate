@@ -51,8 +51,8 @@ function CostChart({result,selectedIndex,onSelect}:{result:RegimeResult;selected
   </svg></div><p className="regime-chart-note">Swipe across the chart for the full history. Each dot is one recorded buy quote. Red means the quoted cost was more than 1% above reference value. Bottom ticks have no measured cost. Shading marks reported Ondo pauses. The vertical scale compresses large values; displayed percentages use unscaled data rounded to two decimals.</p></div>;
 }
 
-export default function RegimeView(){
- const [token,setToken]=useState('NVDA'),[platform,setPlatform]=useState('ondo');
+export default function RegimeView({initialToken='NVDA',initialPlatform='ondo'}:{initialToken?:string;initialPlatform?:string}={}){
+ const [token,setToken]=useState(initialToken),[platform,setPlatform]=useState(initialPlatform);
  const evidenceRef=useRef<HTMLElement|null>(null);
  const [result,setResult]=useState<RegimeResult|null>(null),[error,setError]=useState(''),[loading,setLoading]=useState(true),[selectedIndex,setSelectedIndex]=useState(0);
  const [reviewExample,setReviewExample]=useState(false),[review,setReview]=useState<CostReview|null>(null),[reviewError,setReviewError]=useState(''),[reviewLoading,setReviewLoading]=useState(true);

@@ -1,5 +1,10 @@
 import type {Metadata} from 'next';
 import './globals.css';
+import './product.css';
+import './market/market.css';
+import './asset/[symbol]/asset.css';
+import './activity.css';
+import './proof/proof.css';
 import './readiness.css';
 import './passports.css';
 import './capital.css';
