@@ -3,6 +3,8 @@
 .env
 .env.*
 !.env.example
+mandate.compose.env
+mandate.production.env
 **/node_modules
 **/.next
 **/.next-production

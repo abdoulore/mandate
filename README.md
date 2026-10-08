@@ -4,7 +4,7 @@
 
 Mandate is a pre-trade decision and execution-control layer for tokenized stocks on BNB Smart Chain. It separates a token's identity, recorded market data, a fresh wallet-specific route, available cash after protections, and the user's explicit transaction authorization. A token listing is not a buy opportunity; a quote is not an approval.
 
-[Read-only demo video](media/mandate-read-only-demo.mp4) · [Developer experience report](DEVELOPER-EXPERIENCE.md) · [Verified 1 USDT SPYon round trip](VERIFIED-PILOT.md) · [Demo runbook](DEMO-RUNBOOK.md) · [GitHub repository](https://github.com/abdoulore/mandate)
+[Read-only demo video](media/mandate-read-only-demo.mp4) · [Developer experience report](DEVELOPER-EXPERIENCE.md) · [Verified 1 USDT SPYon round trip](VERIFIED-PILOT.md) · [Demo runbook](DEMO-RUNBOOK.md) · [Deployment guide](DEPLOYMENT.md)
 
 ## The problem
 

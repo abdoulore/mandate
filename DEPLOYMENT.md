@@ -2,6 +2,27 @@
 
 The repository includes a single-container production process for the Next.js frontend and loopback Fastify API. The API is not directly exposed; only port 3110 should be reachable through an HTTPS reverse proxy. Production requires a persistent PostgreSQL database. The API migrates its ledger on first use; wallet-specific holds and execution attempts must survive web/container restarts. Run one application replica for the hackathon deployment because the recurring-check worker is currently embedded in the API process.
 
+## Your VPS with Docker Compose and Caddy
+
+The included [`compose.vps.yaml`](compose.vps.yaml) runs the app, a private PostgreSQL 17 database with a named volume, and Caddy for automatic HTTPS. Only ports 80 and 443 are published. The API remains on loopback inside the app container; neither PostgreSQL nor port 3110 is exposed publicly. This is a single-server deployment, so arrange VPS backups for the PostgreSQL volume before relying on it long term. See [Docker's production Compose guidance](https://docs.docker.com/compose/how-tos/production/) and [Caddy's HTTPS documentation](https://caddyserver.com/docs/automatic-https).
+
+Prerequisites: a Linux VPS with Docker Engine and the Compose plugin, enough RAM to build and run Node/Next plus PostgreSQL (start with at least 2 GB; 4 GB is more comfortable for builds), inbound TCP 80/443 open, and a DNS A or AAAA record for the chosen subdomain pointing to the VPS. Reserve an SSH-only admin path; do not expose Docker's remote API or PostgreSQL. If another website already uses ports 80/443, use its existing reverse proxy instead of launching the Caddy service.
+
+On the VPS, clone the public repository and create two **untracked** environment files from [`mandate.compose.env.example`](mandate.compose.env.example) and [`mandate.production.env.example`](mandate.production.env.example). In `mandate.compose.env`, set `MANDATE_DOMAIN` to the DNS name without `https://` and set `MANDATE_DB_PASSWORD` to URL-safe random hex from `openssl rand -hex 32`. In `mandate.production.env`, set a separate `MANDATE_SESSION_SECRET` from `openssl rand -hex 32`, plus the server-side Binance credentials and BSC RPC URL needed for live checks. Keep all execution flags `false` and the pilot wallet list empty. Set both filled files to mode `600`.
+
+```sh
+git clone https://github.com/abdoulore/mandate.git
+cd mandate
+cp mandate.compose.env.example mandate.compose.env
+cp mandate.production.env.example mandate.production.env
+# Edit the filled files with your own domain, random secrets, and API credentials.
+chmod 600 mandate.compose.env mandate.production.env
+docker compose --env-file mandate.compose.env -f compose.vps.yaml up -d --build
+docker compose --env-file mandate.compose.env -f compose.vps.yaml ps
+```
+
+After DNS and Caddy certificate issuance succeed, open `https://YOUR_DOMAIN/api/v1/health`, then run the public route and Binance Web3 Wallet smoke described below. Check `docker compose --env-file mandate.compose.env -f compose.vps.yaml logs --tail=100 app caddy` for startup errors, without pasting logs that contain secrets. For updates, run `git pull --ff-only` followed by the same `docker compose ... up -d --build` command. Back up the database volume before upgrades; verify saved rules and attempts persist across an app restart.
+
 ## Recommended hackathon host: Railway Hobby
 
 Railway can build this repository's root `Dockerfile`, run the app and PostgreSQL as two services in one project, and assign the app a stable HTTPS `*.up.railway.app` domain. Use one app replica. Railway Hobby has a $5 monthly base that includes $5 of resource usage; actual charges can exceed that amount as usage grows. Set a usage alert. Avoid a sleeping/free web instance for a wallet demo where cold starts would look like a broken connection. See [Railway's pricing](https://docs.railway.com/pricing/plans), [PostgreSQL guide](https://docs.railway.com/databases/postgresql), and [domain guide](https://docs.railway.com/networking/domains/working-with-domains).

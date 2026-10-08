@@ -2,6 +2,8 @@
 .env
 .env.*
 !.env.example
+/mandate.compose.env
+/mandate.production.env
 *.pem
 *.key
 .wallets/

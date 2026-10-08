@@ -1,0 +1,67 @@
+name: mandate
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mandate
+      POSTGRES_DB: mandate
+      POSTGRES_PASSWORD: ${MANDATE_DB_PASSWORD:?Set a random hex password in mandate.compose.env}
+    volumes:
+      - mandate_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mandate -d mandate"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [internal]
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: ./mandate.production.env
+    environment:
+      PORT: "3110"
+      MANDATE_APP_ORIGIN: https://${MANDATE_DOMAIN:?Set the public domain in mandate.compose.env}
+      MANDATE_DATABASE_URL: postgresql://mandate:${MANDATE_DB_PASSWORD:?Set a random hex password in mandate.compose.env}@db:5432/mandate
+    depends_on:
+      db:
+        condition: service_healthy
+    expose: ["3110"]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3110/api/v1/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+    networks: [edge, internal]
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      MANDATE_DOMAIN: ${MANDATE_DOMAIN:?Set the public domain in mandate.compose.env}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [edge]
+
+volumes:
+  mandate_db:
+  caddy_data:
+  caddy_config:
+
+networks:
+  edge:
+  internal:
+    internal: true
