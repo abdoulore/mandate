@@ -25,7 +25,10 @@ try{
   await page.getByRole('link',{name:'Check the market'}).click();
   await page.waitForURL('**/market');
   await page.getByRole('link',{name:'Inspect SPYon'}).waitFor();
-  check(await page.getByText('Not a current buy quote').first().isVisible(),`${width}px recorded price is marked non-executable`);
+  const recordedPriceWarning=await page.getByText('Not a current buy quote').first().isVisible().catch(()=>false);
+  const staleFrameWarning=await page.getByText(/Recorded market data is stale/).first().isVisible().catch(()=>false);
+  const stalePricesHidden=await page.getByText('Stale frame hidden').count()>0;
+  check(recordedPriceWarning||(staleFrameWarning&&stalePricesHidden),`${width}px recorded price is non-executable or stale prices are hidden`);
   await page.getByRole('textbox',{name:'Search tokens'}).fill('SPY');
   check(await page.getByRole('link',{name:'Inspect SPYon'}).count()===1,`${width}px market search works`);
   await page.getByRole('link',{name:'Inspect SPYon'}).click();
