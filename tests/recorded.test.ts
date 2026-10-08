@@ -63,3 +63,29 @@ it('retains last-known age when the missing issuer was last seen in a prior file
   expect(result.issuerStates.find(state => state.issuer === 'bstock')).toMatchObject({state:'UNKNOWN',lastKnownAgeSeconds:1199});
   expect(result.items.find(item => item.symbol === 'AAOIB')?.tokenPrice).toBeNull();
 });
+
+it('uses a fresh complete live catalogue frame over the bundled history', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'mandate-catalogue-'));
+  roots.push(root);
+  fs.mkdirSync(path.join(root, 'data', 'live'), {recursive:true});
+  fs.writeFileSync(path.join(root, 'data', 'universe-2026-09-23.jsonl'),
+    [ondo, bstock].map(row => JSON.stringify(row)).join('\n') + '\n');
+  const ts = '2026-09-24T12:00:00Z';
+  fs.writeFileSync(path.join(root, 'data', 'live', 'catalogue.jsonl'),
+    [{...ondo,ts,px:'12'}, {...bstock,ts,px:'101'}].map(row => JSON.stringify(row)).join('\n') + '\n');
+  const result = recordedCatalogue(root, Date.parse('2026-09-24T12:05:00Z'));
+  expect(result).toMatchObject({source:'live/catalogue.jsonl',stale:false,completeIssuers:true});
+  expect(result.items.find(item => item.symbol === 'TESTon')?.tokenPrice).toBe('12');
+  expect(result.items.find(item => item.symbol === 'AAOIB')?.tokenPrice).toBe('101');
+});
+
+it('hides marks when the last live frame is stale', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'mandate-catalogue-'));
+  roots.push(root);
+  fs.mkdirSync(path.join(root, 'data', 'live'), {recursive:true});
+  fs.writeFileSync(path.join(root, 'data', 'live', 'catalogue.jsonl'),
+    [ondo, bstock].map(row => JSON.stringify(row)).join('\n') + '\n');
+  const result = recordedCatalogue(root, Date.parse('2026-09-23T13:00:00Z'));
+  expect(result).toMatchObject({source:'live/catalogue.jsonl',stale:true,completeIssuers:false});
+  expect(result.items.every(item => item.tokenPrice === null)).toBe(true);
+});

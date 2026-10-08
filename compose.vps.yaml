@@ -18,6 +18,7 @@ services:
     networks: [internal]
 
   app:
+    image: mandate-app
     build:
       context: .
       dockerfile: Dockerfile
@@ -31,6 +32,8 @@ services:
       db:
         condition: service_healthy
     expose: ["3110"]
+    volumes:
+      - catalogue_live:/app/data/live:ro
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3110/api/v1/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s
@@ -38,6 +41,16 @@ services:
       retries: 5
       start_period: 90s
     networks: [edge, internal]
+
+  collector:
+    profiles: [fresh-market]
+    image: mandate-app
+    command: ["node", "collector/refresh-catalogue.mjs", "--run", "--max-requests", "2", "--interval-min", "15"]
+    restart: unless-stopped
+    env_file: ./mandate.production.env
+    volumes:
+      - catalogue_live:/app/data/live
+    networks: [edge]
 
   caddy:
     image: caddy:2-alpine
@@ -58,6 +71,7 @@ services:
 
 volumes:
   mandate_db:
+  catalogue_live:
   caddy_data:
   caddy_config:
 

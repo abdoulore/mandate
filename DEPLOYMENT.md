@@ -23,6 +23,15 @@ docker compose --env-file mandate.compose.env -f compose.vps.yaml ps
 
 After DNS and Caddy certificate issuance succeed, open `https://YOUR_DOMAIN/api/v1/health`, then run the public route and Binance Web3 Wallet smoke described below. Check `docker compose --env-file mandate.compose.env -f compose.vps.yaml logs --tail=100 app caddy` for startup errors, without pasting logs that contain secrets. For updates, run `git pull --ff-only` followed by the same `docker compose ... up -d --build` command. Back up the database volume before upgrades; verify saved rules and attempts persist across an app restart.
 
+The optional `fresh-market` profile refreshes the read-only token catalogue every 15 minutes. It uses the same v1 signed Binance catalogue endpoint as the existing collector, makes exactly two requests per cycle with retries disabled, and atomically replaces a shared file only after both issuer responses pass validation. It does not request a trade quote or change execution permissions. Keep the profile off until both Binance API credentials are configured and one supervised refresh succeeds:
+
+```sh
+docker compose --env-file mandate.compose.env -f compose.vps.yaml run --rm collector node collector/refresh-catalogue.mjs --run --once --max-requests 2 --interval-min 15
+docker compose --env-file mandate.compose.env -f compose.vps.yaml --profile fresh-market up -d
+```
+
+The first command writes the shared frame and exits. The second starts the recurring process. If a refresh fails, the previous frame remains intact; after 30 minutes without a successful refresh, the app hides its token marks as current data. The catalogue is research data, not an executable quote.
+
 ## Recommended hackathon host: Railway Hobby
 
 Railway can build this repository's root `Dockerfile`, run the app and PostgreSQL as two services in one project, and assign the app a stable HTTPS `*.up.railway.app` domain. Use one app replica. Railway Hobby has a $5 monthly base that includes $5 of resource usage; actual charges can exceed that amount as usage grows. Set a usage alert. Avoid a sleeping/free web instance for a wallet demo where cold starts would look like a broken connection. See [Railway's pricing](https://docs.railway.com/pricing/plans), [PostgreSQL guide](https://docs.railway.com/databases/postgresql), and [domain guide](https://docs.railway.com/networking/domains/working-with-domains).

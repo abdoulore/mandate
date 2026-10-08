@@ -25,14 +25,16 @@ export function recordedCatalogue(root: string, now = Date.now()) {
   try {
     const files = fs.readdirSync(dir).filter(f => /^universe-\d{4}-\d{2}-\d{2}\.jsonl$/.test(f)).sort();
     const file = files.at(-1);
-    if (!file) throw new Error('No observations');
-    const latestRows = observations(path.join(dir, file));
+    const liveFile = path.join(dir, 'live', 'catalogue.jsonl');
+    const liveRows = fs.existsSync(liveFile) ? observations(liveFile) : [];
+    if (!file && !liveRows.length) throw new Error('No observations');
+    const latestRows = liveRows.length ? liveRows : observations(path.join(dir, file!));
     if (!latestRows.length) throw new Error('No complete observations');
     const latestMs = Math.max(...latestRows.map(r => Date.parse(r.ts)));
     const collectorStaleMs = Math.max(0, now - latestMs);
     const stale = collectorStaleMs > COLLECTOR_STALE_MS || latestMs > now + 10_000;
     const rows = [...latestRows];
-    for (const previous of files.slice(0, -1).reverse()) {
+    for (const previous of (liveRows.length ? files : files.slice(0, -1)).reverse()) {
       if (EXPECTED_ISSUERS.every(issuer => rows.some(row => row.plat === issuer))) break;
       rows.push(...observations(path.join(dir, previous)));
     }
@@ -69,7 +71,7 @@ export function recordedCatalogue(root: string, now = Date.now()) {
         };
       });
     });
-    return {mode: 'recorded', source: file, observedAt: new Date(latestMs).toISOString(),
+    return {mode: 'recorded', source: liveRows.length ? 'live/catalogue.jsonl' : file, observedAt: new Date(latestMs).toISOString(),
       ageSeconds: Math.floor(collectorStaleMs / 1000), collectorStaleMs, stale,
       completeIssuers: issuerStates.every(s => s.state === 'OBSERVED'), issuerStates, items,
       note: stale ? 'Collector observations are stale; displayed historical identity is not a current market quote or trading signal.' : 'Recorded collector observations, not executable quotes. Missing issuer data is unknown; trading eligibility is unverified.'};

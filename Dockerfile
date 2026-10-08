@@ -4,6 +4,7 @@ ENV NODE_ENV=production
 COPY package.json package-lock.json tsconfig.json ./
 COPY apps ./apps
 COPY packages ./packages
+COPY collector ./collector
 COPY scripts/start-production.mjs ./scripts/start-production.mjs
 COPY data ./data
 COPY research/evidence-manifest.json ./research/evidence-manifest.json
