@@ -26,6 +26,10 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - name: Validate VPS Compose configuration
+        run: |
+          cp mandate.production.env.example mandate.production.env
+          MANDATE_DOMAIN=mandate.example.com MANDATE_DB_PASSWORD=ci_only_hex docker compose -f compose.vps.yaml config --quiet
       - run: npm run typecheck
       - run: npm run test:invariants
       - run: npm run build
