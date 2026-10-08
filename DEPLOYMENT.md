@@ -2,6 +2,17 @@
 
 The repository includes a single-container production process for the Next.js frontend and loopback Fastify API. The API is not directly exposed; only port 3110 should be reachable through an HTTPS reverse proxy. Production requires a persistent PostgreSQL database. The API migrates its ledger on first use; wallet-specific holds and execution attempts must survive web/container restarts. Run one application replica for the hackathon deployment because the recurring-check worker is currently embedded in the API process.
 
+## Recommended hackathon host: Railway Hobby
+
+Railway can build this repository's root `Dockerfile`, run the app and PostgreSQL as two services in one project, and assign the app a stable HTTPS `*.up.railway.app` domain. Use one app replica. Railway Hobby has a $5 monthly base that includes $5 of resource usage; actual charges can exceed that amount as usage grows. Set a usage alert. Avoid a sleeping/free web instance for a wallet demo where cold starts would look like a broken connection. See [Railway's pricing](https://docs.railway.com/pricing/plans), [PostgreSQL guide](https://docs.railway.com/databases/postgresql), and [domain guide](https://docs.railway.com/networking/domains/working-with-domains).
+
+1. In Railway, create a project from `abdoulore/mandate` on `main`. Let it build the root Dockerfile. Create a PostgreSQL service in that same project; keep the database private.
+2. In the app service, generate a Railway domain and target port **3110**. Set `PORT=3110` and `MANDATE_APP_ORIGIN` to that exact `https://...up.railway.app` origin, with no trailing path. The app deliberately refuses to start without a valid origin, secret and database URL, so configure these variables before expecting the first deployment to pass health checks.
+3. Set `MANDATE_DATABASE_URL=${{Postgres.DATABASE_URL}}` as a Railway reference variable. Set a unique `MANDATE_SESSION_SECRET` of at least 32 random characters. Add the Binance Web3 API credentials and a reliable BSC RPC URL as server-side variables if fresh market and wallet checks are needed. Never put these values in the repository or a client-side `NEXT_PUBLIC_` variable.
+4. Leave `MANDATE_DIRECT_PILOT_WALLETS` empty and every `MANDATE_DIRECT_*_ENABLED` and `MANDATE_PLAN_DIRECT_ENABLED` flag `false` for the public research launch. No database domain or port 4110 should be public. Set the app health-check path to `/api/v1/health`.
+5. After Railway reports healthy, open `/`, `/market`, `/asset/SPYon`, `/plan/SPYon`, `/portfolio`, `/activity`, and `/proof` on the assigned HTTPS origin. Then test wallet sign-in from Binance Web3 Wallet on BNB Smart Chain, a fresh read-only route, private portfolio access, and a restart without losing saved rules. The confirmed historical pilot is already linked from `/proof`; a new transaction is unnecessary for launch validation.
+6. Add the verified Railway URL as the GitHub repository homepage and README live-app link. Only after that should a custom domain be considered; it is not required for the submission.
+
 ## Build and run
 
 ```sh
