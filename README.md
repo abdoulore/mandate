@@ -1,10 +1,12 @@
 # Mandate
 
-**Know what a tokenized stock really costs before you buy it.**
+**Check a tokenized stock before you sign a trade.**
 
-Mandate is a pre-trade decision and execution-control layer for tokenized stocks on BNB Smart Chain. It separates a token's identity, recorded market data, a fresh wallet-specific route, available cash after protections, and the user's explicit transaction authorization. A token listing is not a buy opportunity; a quote is not an approval.
+Mandate helps people researching tokenized stocks on BNB Smart Chain answer four questions: **What token is this? What could a trade cost now? Can my wallet afford it after my cash protections? What am I being asked to sign?** It shows sourced research, checks a fresh route and wallet state, and tracks what happened after a wallet request. A listed token or reference price alone does not mean it can be traded.
 
-[Read-only demo video](media/mandate-read-only-demo.mp4) · [Developer experience report](DEVELOPER-EXPERIENCE.md) · [Verified 1 USDT SPYon round trip](VERIFIED-PILOT.md)
+[Try the live app](https://mandate.moonrider.online/) · [Watch the read-only demo](media/mandate-read-only-demo.mp4) · [Read the verified SPYon pilot](VERIFIED-PILOT.md) · [Developer experience report](DEVELOPER-EXPERIENCE.md)
+
+You can browse asset research without connecting a wallet. Connecting a wallet lets you review cash protections and route checks; it does not authorize a transaction. Live swap preparation is limited to an allowlisted, capped SPYon pilot. Other assets are research-only.
 
 ## The problem
 
