@@ -4,7 +4,7 @@
 
 Mandate helps people researching tokenized stocks on BNB Smart Chain answer four questions: **What token is this? What could a trade cost now? Can my wallet afford it after my cash protections? What am I being asked to sign?** It shows sourced research, checks a fresh route and wallet state, and tracks what happened after a wallet request. A listed token or reference price alone does not mean it can be traded.
 
-[Try the live app](https://mandate.moonrider.online/) · [Watch the read-only demo](media/mandate-read-only-demo.mp4) · [Read the verified SPYon pilot](VERIFIED-PILOT.md) · [Developer experience report](DEVELOPER-EXPERIENCE.md)
+[Try the live app](https://mandate.moonrider.online/) · [Watch the read-only demo](media/mandate-read-only-demo.mp4) · [Read the verified SPYon pilot](VERIFIED-PILOT.md)
 
 You can browse asset research without connecting a wallet. Connecting a wallet lets you review cash protections and route checks; it does not authorize a transaction. Live swap preparation is limited to an allowlisted, capped SPYon pilot. Other assets are research-only.
 
@@ -27,7 +27,7 @@ Historical observations are evidence, not current offers. Planning previews are 
 
 ## BNB Chain and Binance Web3 APIs
 
-Mandate uses BNB Smart Chain mainnet (chain ID 56), BSC USDT, Ondo and bStocks tokenized assets, and a separately verified PancakeSwap V3 route for its SPYon pilot. The Binance Web3 RWA Data API supplies discovery, issuer/platform metadata, token profiles, and reference-price observations. Its Trading API supplies quote and unsigned-build research. Mandate independently checks response identity, age and transaction meaning; API success alone cannot grant market access or authorize a wallet action. See the [developer report](DEVELOPER-EXPERIENCE.md) for endpoint behavior, exact integration findings, and requested API improvements.
+Mandate uses BNB Smart Chain mainnet (chain ID 56), BSC USDT, Ondo and bStocks tokenized assets, and a separately verified PancakeSwap V3 route for its SPYon pilot. The Binance Web3 RWA Data API supplies discovery, issuer/platform metadata, token profiles, and reference-price observations. Its Trading API supplies quote and unsigned-build research. Mandate independently checks response identity, age and transaction meaning; API success alone cannot grant market access or authorize a wallet action.
 
 ## Architecture
 

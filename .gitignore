@@ -32,6 +32,7 @@ data/*
 # Internal planning, handoff, design exploration and private research notes
 /DEMO-RUNBOOK.md
 /DEPLOYMENT.md
+/DEVELOPER-EXPERIENCE.md
 /PLAN.md
 /REVIEW-2026-09-28.md
 /DX-REPORT.md
