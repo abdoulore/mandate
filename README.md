@@ -4,7 +4,7 @@
 
 Mandate is a pre-trade decision and execution-control layer for tokenized stocks on BNB Smart Chain. It separates a token's identity, recorded market data, a fresh wallet-specific route, available cash after protections, and the user's explicit transaction authorization. A token listing is not a buy opportunity; a quote is not an approval.
 
-[Read-only demo video](media/mandate-read-only-demo.mp4) · [Developer experience report](DEVELOPER-EXPERIENCE.md) · [Verified 1 USDT SPYon round trip](VERIFIED-PILOT.md) · [Demo runbook](DEMO-RUNBOOK.md) · [Deployment guide](DEPLOYMENT.md)
+[Read-only demo video](media/mandate-read-only-demo.mp4) · [Developer experience report](DEVELOPER-EXPERIENCE.md) · [Verified 1 USDT SPYon round trip](VERIFIED-PILOT.md)
 
 ## The problem
 
@@ -77,7 +77,7 @@ node scripts/product-journey-smoke.mjs
 node scripts/navigation-smoke.mjs
 ```
 
-The invariant suite runs without credentials; the current run passed **248 tests with one database-server test skipped**. The browser smoke uses installed Microsoft Edge and a running local app/API. On the local optimized preview, six mobile page transitions to fully visible headings/data took **54–335 ms**; network and phone-wallet conditions will vary. The repository also has focused API, route, wallet, ledger and synthetic funded-portfolio tests; synthetic fixtures are not live holdings or transaction proof. CI runs the core checks. The [demo runbook](DEMO-RUNBOOK.md) gives a concise judge path and fallback evidence.
+The invariant suite runs without live Binance credentials. The browser smoke uses installed Microsoft Edge and a running local app/API. The repository also has focused API, route, wallet, ledger and synthetic funded-portfolio tests; synthetic fixtures are not live holdings or transaction proof. CI runs the core checks.
 
 ## Technical detail
 
